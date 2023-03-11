@@ -1,0 +1,199 @@
+from pyautogui import *
+import pyautogui
+import time
+# import keyboard
+# import random
+# import win32api, win32con, win32gui
+# import webbrowser
+import os
+# import pyperclip
+# from openpyxl import Workbook, load_workbook
+# from datetime import date
+# from openpyxl.utils import get_column_letter
+# import pandas as pd
+# import numpy as np
+# import sys
+# import pygetwindow
+from datetime import datetime, timedelta, timezone
+# from PIL import Image
+# from pytesseract import pytesseract
+import os
+import os
+import csv
+import re
+class v:
+    currentPath = os.path.dirname(os.path.abspath(__file__))
+    currentPath += "\\"
+    screenshotPath = currentPath+'source\\'
+    def agentXYposition():
+        csv_filename = v.currentPath+ 'agentXYposition.csv'
+        agentXYposition = []
+        with open(csv_filename) as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                agentXYposition.append(row)
+        return agentXYposition
+    def getAgentsPosition():
+        today = datetime.today().strftime(f'%Y%m%d')
+        column = ['date','Agent', 'Xposition', 'Yposition']
+        with open(f'{v.currentPath}\\agentXYposition.csv', 'w') as f:
+            # create the csv writer
+            writer = csv.writer(f)
+            # write a row to the csv file
+            writer.writerow(column)
+            AllFiles = os.listdir(v.screenshotPath)
+            for i in AllFiles:
+                if re.match(r"agent_*", i):
+                    agent = i.replace("agent_", "")
+                    agent = agent[:int(agent.find('.'))]
+                    print(f"searching agent: {agent}")
+                    x, y = v.searchAndClick(i)
+                    row  =[today,agent,x,y]
+                    writer.writerow(row)
+        # csv_filename = v.currentPath+ 'agentXYposition.csv'
+        # with open(csv_filename) as f:
+        #     reader = csv.DictReader(f)
+        #     for row in reader:
+        #         print(row)
+    def searchAndClick(target):
+        while True:
+            print(f'trying: {target}')
+            try:
+                x, y = pyautogui.locateCenterOnScreen(v.screenshotPath+target, region = (0,0,2500,1440), confidence=0.75)
+                if (x, y) is not None:
+                    pyautogui.moveTo(x, y)
+                    click()
+                    print('found')
+                    print(x,y)
+                    return x,y
+                else:
+                    print('nope')
+            except:
+                pass
+    def tryAndSearch(target):
+        try:
+            x, y = pyautogui.locateCenterOnScreen(v.screenshotPath+target, region = (0,0,2500,1440), confidence=0.8)
+            if (x, y) is not None:
+                pyautogui.moveTo(x, y)
+                click()
+                # print(x,y)
+                return x,y
+        except:
+            pass
+    def getVenue():
+        AllFiles = os.listdir(v.screenshotPath)
+        venueList = []
+        for i in AllFiles:
+            if re.match(r"venue_*", i):
+                # print(i)
+                venueList.append(i)
+        count=0
+        v.stateReport(0,f'queuing')
+        while True:
+            searchingVenue = venueList[count%len(venueList)]
+            try:
+                x, y = v.tryAndSearch(searchingVenue)
+                if x is not None:
+                    venue = searchingVenue.replace("venue_", "")
+                    venue = venue[:int(venue.find('.'))]
+                    v.stateReport(1,f'found {venue}')
+                    return searchingVenue, venue
+            except:
+                count+=1
+            try:
+                x, y = pyautogui.locateCenterOnScreen(v.screenshotPath+'inGame.png', region = (0,0,2500,1440), confidence=0.8)
+                if (x, y) is not None:
+                    click()
+                    time.sleep(0.2)
+                    click()
+                    time.sleep(0.2)
+                    click()
+                    time.sleep(0.05)
+                    click()
+                    v.stateReport(4, 'in game, have fun.')
+                    return x,y
+                else:
+                    pass
+            except:
+                pass
+    def stateReport(tick, msg):
+        total = 4
+        cross = total - tick
+        print("   ="* 20)
+        print('✅'*tick+'❌'*cross+' '+msg)
+        print("   ="* 20)
+    def selectAgent(preference, searchingVenue, venue, agentXYposition, order=0):
+        try:
+            agent = preference[venue][order]
+        except:
+            return 
+        for i in agentXYposition:
+            if i['Agent'] == agent:
+                agentPostion = i
+                xaxis = int(i['Xposition'])
+                yaxis = int(i['Yposition'])
+                break
+        # while True:
+        #     try:
+        #         x = v.tryAndSearch(searchingVenue)
+        #         if x is None:
+        #             v.stateReport(2, 'select agent page')
+        #             break
+        #     except:
+        #         pass
+        lockx, locky= int(agentXYposition[0]['Xposition']), int(agentXYposition[0]['Yposition'])
+        print(f'picking {agent}')
+        v.searchAndClick('agent_phoenix.png')
+        for i in range(6):
+            pyautogui.click(lockx, locky)
+        count = 0
+        while True:
+            # pyautogui.click(xaxis, yaxis)
+            # pyautogui.click(lockx, locky)
+            try:
+                x, y = pyautogui.locateCenterOnScreen(v.screenshotPath+'agentNotSelected.png', region = (0,0,2500,1440), confidence=0.8)
+            except:
+                v.stateReport(3,'agent selected')
+                return 'selected'
+            count+=1
+            if count >5:
+                order+=1
+                v.selectAgent(preference, venue, agentXYposition, order)
+            
+    def checkState(state):
+        while True:
+            try:
+                x, y = pyautogui.locateCenterOnScreen(v.screenshotPath+target, region = (0,0,2500,1440), confidence=0.8)
+                if (x, y) is not None:
+                    pyautogui.moveTo(x, y)
+                    click()
+                    # print(x,y)
+                    return x,y
+            except:
+                pass
+    def MainFlow():
+        v.searchAndClick('start.png')
+        agentXYposition = v.agentXYposition()
+        searchingVenue, venue = v.getVenue()
+        state = v.selectAgent(preference, searchingVenue, venue, agentXYposition)
+        v.checkState(state)
+# Astra, Breach, Brimstone, Chamber, Cypher, Gekko, Jett, Kay/O, Killjoy, Neon, Omen, Phoenix, Raze, Reyna, Sage, Skye, Sova, Viper, Yoru
+preference = {
+    'ascent':['omen','phoenix','breach'],
+    'bind': ['omen','phoenix','breach'],
+    'breeze':['habor','phoenix','breach'],
+    'haven': ['omen','phoenix','breach'],
+    'icebox': ['phoenix','omen','breach'], 
+    'lotus': ['omen','phoenix','breach'],
+    'pearl': ['habor','phoenix','breach'],
+    'split': ['omen','phoenix','breach'],
+    'fracture': ['phoenix','breach','omen'],
+}
+if __name__ == "__main__":
+    # print(preference)
+    v.MainFlow()
+# venue = 'split'
+# agentXYposition = [{'date': '20230311', 'Agent': 'agentNotSelected', 'Xposition': '1214', 'Yposition': '1083'}, {'date': '20230311', 'Agent': 'breach', 'Xposition': '833', 'Yposition': '1231'}, {'date': '20230311', 'Agent': 'brimstone', 'Xposition': '943', 'Yposition': '1230'}, {'date': '20230311', 'Agent': 'habor', 'Xposition': '1389', 'Yposition': '1232'}, {'date': '20230311', 'Agent': 'omen', 'Xposition': '717', 'Yposition': '1344'}, {'date': '20230311', 'Agent': 'phoenix', 'Xposition': '831', 'Yposition': '1344'}, {'date': '20230311', 'Agent': 'reyna', 'Xposition': '1056', 'Yposition': '1343'}]
+# v.getAgentsPosition()
+
+# q->inselectpage->selected->🎲
