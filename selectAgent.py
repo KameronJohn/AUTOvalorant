@@ -139,19 +139,23 @@ class v:
         print("   ="* 20)
     def selectAgent(preference, searchingVenue, venue, agentXYposition, order=0):
         if v.random:
-            agent=random.choice(agentXYposition)['Agent']
+            print('v.random is random')
+            systemChoice = random.choice(agentXYposition)
+            agent=systemChoice['Agent']
+            xaxis = int(systemChoice['Xposition'])
+            yaxis = int(systemChoice['Yposition'])
         else:
             try:
                 agent = preference[venue][order]
             except:
                 print('out of order la')
                 return
-        for i in agentXYposition:
-            if i['Agent'] == agent:
-                agnetPosition = i
-                xaxis = int(i['Xposition'])
-                yaxis = int(i['Yposition'])
-                break
+            for i in agentXYposition:
+                if i['Agent'] == agent:
+                    agnetPosition = i
+                    xaxis = int(i['Xposition'])
+                    yaxis = int(i['Yposition'])
+                    break
         while True:
             try:
                 x = pyautogui.locateCenterOnScreen(v.screenshotPath+searchingVenue, region = (0,0,2500,1440), confidence=0.65)
