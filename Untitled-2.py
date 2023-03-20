@@ -250,6 +250,27 @@ class v:
             pyautogui.click(i)
         time.sleep(0.4)
         pyautogui.click(x=1244, y=974)
+    def ErrorChecking(account,agentXYposition):
+        if v.random:
+            systemChoice = random.choice(agentXYposition)
+            agent=systemChoice['Agent']
+            xaxis = int(systemChoice['Xposition'])
+            yaxis = int(systemChoice['Yposition'])
+        else:
+            if type(preference) is dict:
+                try:
+                    agent = preference[venue][order]
+                except:
+                    print('out of order la')
+                    return
+            else:
+                agent = preference[order]
+            for i in agentXYposition:
+                if i['Agent'] == agent:
+                    # agnetPosition = i
+                    xaxis = int(i['Xposition'])
+                    yaxis = int(i['Yposition'])
+                    break
     def MainFlow(account, skipStart=False, random=False):
         v.stateReport(0, 'initiated')
         v.random = random
@@ -257,7 +278,7 @@ class v:
         if skipStart is False:
             v.searchAndClick('start.png')
         agentXYposition = v.agentXYposition(account)
-        exit
+        # v.ErrorChecking(account,agentXYposition)
         v.getStatus(agentXYposition)
 """
 astra, breach, brimstone, chamber, cypher, gekko,jett, 
