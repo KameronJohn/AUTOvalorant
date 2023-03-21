@@ -112,13 +112,6 @@ class v:
                 v.stateReport(1,f'match found')
                 v.getVenue(venueList, agentXYposition)
             if v.tryAndSearch('inGame.png'):
-                click()
-                time.sleep(0.5)
-                click()
-                time.sleep(0.5)
-                click()
-                time.sleep(0.25)
-                click()
                 v.stateReport(6, 'in game, have fun.')
                 return
             else:
@@ -181,14 +174,18 @@ class v:
         for i in range(10):
             pyautogui.click(xaxis, yaxis)
             pyautogui.click(v.lockX, v.lockY)
-        pyautogui.moveTo(cursorPos)
-        cursorPos = pyautogui.position()
         if v.checkIfAgentLocked(agentXYposition): 
             print(f'❗❗❗❗ agent {order+1} cant be selected')
             v.selectAgent(preference, venue, agentXYposition, order, repickAgent=True)
         else:
             v.stateReport(5,f'agent selected')
+            pyautogui.FAILSAFE = False
+            """ alt tab here """
+            pyautogui.keyDown('alt')
+            pyautogui.press('tab')
             pyautogui.moveTo(cursorPos)
+            pyautogui.keyUp('alt')
+            """ alt tab here """
     def checkIfAgentLocked(agentXYposition):
         shuffleList = random.sample(agentXYposition, len(agentXYposition))
         # print(shuffleList)
@@ -257,7 +254,6 @@ class v:
         if skipStart is False:
             v.searchAndClick('start.png')
         agentXYposition = v.agentXYposition(account)
-        exit
         v.getStatus(agentXYposition)
 """
 astra, breach, brimstone, chamber, cypher, gekko,jett, 
@@ -295,8 +291,6 @@ if __name__ == "__main__":
     # v.reportPlayer()
     v.MainFlow('speakEngInVal')
     # v.MainFlow('FatherSun', random='    random is on')
+
+
     # v.getAgentsPosition(account='speakEngInVal')
-
-
-# v.afk()
-# q->inselectpage->selected->🎲
