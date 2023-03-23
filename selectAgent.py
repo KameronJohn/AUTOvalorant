@@ -53,7 +53,9 @@ class v:
                     lines.append(line)
             f.close()
         if foundAccount:
+            print('  !'*10)
             print('previous record has found')
+            print('  !'*10)
         with open(csvFile, 'a', newline='') as f:
             # create the csv writer
             # writer = csv.writer(f)
@@ -64,7 +66,7 @@ class v:
                 if re.match(r"agent_*", i):
                     agent = i.replace("agent_", "")
                     agent = agent[:int(agent.find('.'))]
-                    count =0
+                    # count =0
                     while True:
                         try:
                             x, y = pyautogui.locateCenterOnScreen(v.screenshotPath+i, region = (0,0,2500,1440), confidence=0.8)
@@ -77,8 +79,9 @@ class v:
                             else:
                                 print('nope')
                         except:
-                            count+=1
-                        if count >2:
+                        #     count+=1
+                        # if count >2:
+                            print(f"-   -   -   -   failed to locate: {agent}")
                             break
             f.close()
         with open(csvFile, 'w', newline='') as f:
@@ -275,7 +278,12 @@ class v:
         for i in agentXYposition:
             availableAgent.append(i['Agent'])
         if type(preference) is dict:
-            possibleAgent = preference.values()
+            mySet = set()
+            tmp = preference.values()
+            for iList in tmp:
+                for i in iList:
+                    mySet.add(i)
+            possibleAgent = list(mySet)
         elif type(preference) is list:
             possibleAgent = preference
         else:
@@ -318,21 +326,21 @@ preference = {
     'icebox': ['breach','phoenix','breach'], 
     'lotus': ['omen','phoenix','breach'],
     'pearl': ['habor','phoenix','breach'],
-    'split': ['breach','phoenix','breach'],
+    'split': ['gekko','phoenix','breach'],
     'fracture': ['phoenix','breach','omen'],
     'bind': ['omen','phoenix','breach'],
     'breeze':['habor','phoenix','breach']
 }
-preference = ['gekko', 'chamber', 'breach'] 
-preference = ['jett', 'phoenix', 'yoru']
+# preference = ['jett', 'phoenix', 'yoru']
+# preference = ['gekko', 'chamber', 'breach'] 
 """ 
 MainFlow(account, skipStart=False, random=False)
 FatherSun, LaVanTor, speakEngInVal
 """
 if __name__ == "__main__":
     # v.reportPlayer()
-    # v.MainFlow('speakEngInVal')
+    v.MainFlow('speakEngInVal')
     # v.MainFlow('FatherSun', random='random is on')
 
 
-    v.getAgentsPosition(account='speakEngInVal')
+    # v.getAgentsPosition(account='speakEngInVal')
