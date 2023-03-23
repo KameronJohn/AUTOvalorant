@@ -41,11 +41,24 @@ class v:
     def getAgentsPosition(account):
         today = datetime.today().strftime(f'%Y%m%d')
         column = ['Date','Account','Agent', 'Xposition', 'Yposition']
-        with open(f'{v.currentPath}\\agentXYposition.csv', 'a') as f:
-            # create the csv writer
+        csvFile = f'{v.currentPath}\\agentXYposition.csv'
+        lines = list()
+        with open(csvFile, 'r', newline='') as f:
             writer = csv.writer(f)
+            for line in csv.reader(f):
+                if account in line:
+                    foundAccount = column.index('Account')
+                    foundDate = column.index('Date')
+                else:
+                    lines.append(line)
+            f.close()
+        if foundAccount:
+            print('previous record has found')
+        with open(csvFile, 'a', newline='') as f:
+            # create the csv writer
+            # writer = csv.writer(f)
             # write a row to the csv file
-            writer.writerow(column)
+            # writer.writerow(column)
             AllFiles = os.listdir(v.screenshotPath)
             for i in AllFiles:
                 if re.match(r"agent_*", i):
@@ -58,7 +71,7 @@ class v:
                             if (x, y) is not None:
                                 pyautogui.moveTo(x, y)
                                 row  =[today,account,agent,x,y]
-                                writer.writerow(row)
+                                lines.append(row)
                                 print(f"agent found: {agent}")
                                 break
                             else:
@@ -67,7 +80,12 @@ class v:
                             count+=1
                         if count >2:
                             break
-                    
+            f.close()
+        with open(csvFile, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows(lines)
+            f.close()
+        # exit()
         # csv_filename = v.currentPath+ 'agentXYposition.csv'
         # with open(csv_filename) as f:
         #     reader = csv.DictReader(f)
@@ -104,7 +122,7 @@ class v:
                 # print(i)
                 venueList.append(i)
         if v.random:
-            v.stateReport(0,f'queuing: {v.account}'+ v.random)
+            v.stateReport(0,f'queuing: {v.account}'+ '      '+v.random)
         else:
             v.stateReport(0,f'queuing: {v.account}')
         while True: 
@@ -240,20 +258,43 @@ class v:
             if keyboard.is_pressed('2'):
                 return
     def reportAction():
+        pyautogui.click()
+        pyautogui.click()
         pyautogui.click(button='right')
         pyautogui.click()
+        a = pyautogui.position()
         reportPos = [Point(x=949, y=368), Point(x=952, y=439), Point(x=939, y=730), Point(x=949, y=825), Point(x=945, y=894), Point(x=1239, y=1133)]
         for i in reportPos:
             pyautogui.click(i)
         time.sleep(0.4)
         pyautogui.click(x=1244, y=974)
+        pyautogui.moveTo(a)
+    def errorChecking(agentXYposition):
+        availableAgent = []
+        possibleAgent = []
+        for i in agentXYposition:
+            availableAgent.append(i['Agent'])
+        if type(preference) is dict:
+            possibleAgent = preference.values()
+        elif type(preference) is list:
+            possibleAgent = preference
+        else:
+            exit('UNKNOWN DATA TYPE')
+        for a in possibleAgent:
+            if a not in availableAgent:
+                print('possibleAgent:   ')
+                print(possibleAgent)
+                print('availableAgent:  ')
+                print(availableAgent)
+                exit(f'{a} is not available in this account!!!')
     def MainFlow(account, skipStart=False, random=False):
         v.stateReport(0, 'initiated')
         v.random = random
         v.account = account
+        agentXYposition = v.agentXYposition(account)
+        v.errorChecking(agentXYposition)
         if skipStart is False:
             v.searchAndClick('start.png')
-        agentXYposition = v.agentXYposition(account)
         v.getStatus(agentXYposition)
 """
 astra, breach, brimstone, chamber, cypher, gekko,jett, 
@@ -285,12 +326,13 @@ preference = {
 preference = ['gekko', 'chamber', 'breach'] 
 preference = ['jett', 'phoenix', 'yoru']
 """ 
+MainFlow(account, skipStart=False, random=False)
 FatherSun, LaVanTor, speakEngInVal
 """
 if __name__ == "__main__":
     # v.reportPlayer()
-    v.MainFlow('speakEngInVal')
-    # v.MainFlow('FatherSun', random='    random is on')
+    # v.MainFlow('speakEngInVal')
+    # v.MainFlow('FatherSun', random='random is on')
 
 
-    # v.getAgentsPosition(account='speakEngInVal')
+    v.getAgentsPosition(account='speakEngInVal')
