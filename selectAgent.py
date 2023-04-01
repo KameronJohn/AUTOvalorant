@@ -22,6 +22,7 @@ import os
 import csv
 import re
 class v:
+    debug = 0
     currentPath = os.path.dirname(os.path.abspath(__file__))
     currentPath += '\\'
     screenshotPath = currentPath+'\\source\\'
@@ -39,6 +40,7 @@ class v:
             exit('SOMETIME IS NOT RIGHT')
         return agentXYposition
     def getAgentsPosition(account):
+        originalLength = 0
         today = datetime.today().strftime(f'%Y%m%d')
         column = ['Date','Account','Agent', 'Xposition', 'Yposition']
         csvFile = f'{v.currentPath}\\agentXYposition.csv'
@@ -46,13 +48,18 @@ class v:
         with open(csvFile, 'r', newline='') as f:
             writer = csv.writer(f)
             for line in csv.reader(f):
+                originalLength +=1
                 if account in line:
                     foundAccount = column.index('Account')
                     foundDate = column.index('Date')
                 else:
                     lines.append(line)
             f.close()
-        if foundAccount:
+        try:
+            foundAccount
+        except NameError:
+            pass
+        else:
             print('  !'*10)
             print('previous record has found')
             print('  !'*10)
@@ -84,10 +91,17 @@ class v:
                             print(f"-   -   -   -   failed to locate: {agent}")
                             break
             f.close()
-        with open(csvFile, 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerows(lines)
-            f.close()
+        v.debugger('originalLength: '+str(originalLength))
+        v.debugger('len(lines): '+ str(len(lines)))
+        if originalLength < len(lines):
+            with open(csvFile, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerows(lines)
+                f.close()
+        else:
+            print('  !'*10)
+            print('nothing executed: originalLength < new length')
+            print('  !'*10)
         # exit()
         # csv_filename = v.currentPath+ 'agentXYposition.csv'
         # with open(csv_filename) as f:
@@ -123,11 +137,8 @@ class v:
         for i in AllFiles:
             if re.match(r"venue_*", i):
                 # print(i)
-                venueList.append(i)
-        if v.random:
-            v.stateReport(0,f'queuing: {v.account}'+ '      '+v.random)
-        else:
-            v.stateReport(0,f'queuing: {v.account}')
+                 venueList.append(i)
+        v.stateReport(0,f'queuing')
         while True: 
             if v.tryAndSearch('matchFound.png'):
                 v.stateReport(1,f'match found')
@@ -163,6 +174,8 @@ class v:
         cross = total - tick
         print("   ="* 20)
         print('✅'*tick+'❌'*cross+' '+msg)
+        v.debugger('stateReport ends')
+        return
     def selectAgent(preference, venue, agentXYposition, order=0, repickAgent=False):
         if v.random:
             systemChoice = random.choice(agentXYposition)
@@ -192,9 +205,15 @@ class v:
             v.stateReport(4,f'🍭🍭RANDOM🍭🍭 agent selecting: 🍭  {agent} 🍭')
         else:
             v.stateReport(4,f'agent selecting: 🕵️  {agent} 🕵️')
-        for i in range(10):
-            pyautogui.click(xaxis, yaxis)
-            pyautogui.click(v.lockX, v.lockY)
+            v.debugger('after agent sel')
+        pyautogui.FAILSAFE = False
+        try:
+            for i in range(11):
+                pyautogui.click(xaxis, yaxis)
+                pyautogui.click(v.lockX, v.lockY)
+        except Exception as error:
+            # handle the exception
+            print("An exception occurred:", error) # An exception occurred: division by zero
         if v.checkIfAgentLocked(agentXYposition): 
             print(f'❗❗❗❗ agent {order+1} cant be selected')
             v.selectAgent(preference, venue, agentXYposition, order, repickAgent=True)
@@ -209,7 +228,7 @@ class v:
             """ alt tab here """
     def checkIfAgentLocked(agentXYposition):
         shuffleList = random.sample(agentXYposition, len(agentXYposition))
-        # print(shuffleList)
+        v.debugger(shuffleList)
         for i in shuffleList[:8]:
             xaxis = int(i['Xposition'])
             yaxis = int(i['Yposition'])
@@ -259,7 +278,11 @@ class v:
             if keyboard.is_pressed('1'):
                 v.reportAction()
             if keyboard.is_pressed('2'):
+                v.restart()
+            if keyboard.is_pressed('3'):
                 return
+    def restart():
+        pass
     def reportAction():
         pyautogui.click()
         pyautogui.click()
@@ -269,7 +292,7 @@ class v:
         reportPos = [Point(x=949, y=368), Point(x=952, y=439), Point(x=939, y=730), Point(x=949, y=825), Point(x=945, y=894), Point(x=1239, y=1133)]
         for i in reportPos:
             pyautogui.click(i)
-        time.sleep(0.4)
+        time.sleep(0.55)
         pyautogui.click(x=1244, y=974)
         pyautogui.moveTo(a)
     def errorChecking(agentXYposition):
@@ -295,12 +318,27 @@ class v:
                 print('availableAgent:  ')
                 print(availableAgent)
                 exit(f'{a} is not available in this account!!!')
+    def debugger(msg):
+        v.debug = 0
+        if v.debug == 1:
+            print(f'debug: {msg}')
     def MainFlow(account, skipStart=False, random=False):
-        v.stateReport(0, 'initiated')
         v.random = random
         v.account = account
+        """ 
+        try:
+            v.random
+        except AttributeError:
+            v.stateReport(0,f'autoSelect initiated: {v.account}'+ '      '+v.random)
+        else:
+            v.stateReport(0, f'autoSelect initiated: {v.account}')
+        """
         agentXYposition = v.agentXYposition(account)
         v.errorChecking(agentXYposition)
+        if v.random:
+            v.stateReport(0,f'autoSelect initiated: {v.account}'+ '\n'+v.random)
+        else:
+            v.stateReport(0, f'autoSelect initiated: {v.account}')
         if skipStart is False:
             v.searchAndClick('start.png')
         v.getStatus(agentXYposition)
@@ -321,26 +359,38 @@ preference = {
     # 'breeze':['habor','phoenix','breach']
 
 
-    'ascent':['jett','phoenix','breach'],
-    'haven': ['breach','phoenix','breach'], 
-    'icebox': ['breach','phoenix','breach'], 
-    'lotus': ['omen','phoenix','breach'],
-    'pearl': ['habor','phoenix','breach'],
-    'split': ['gekko','phoenix','breach'],
-    'fracture': ['phoenix','breach','omen'],
+    'ascent':['chamber','phoenix','breach'],
+    'haven': ['chamber','phoenix','breach'], 
+    'icebox': ['jett','phoenix','breach'], 
+    'lotus': ['chamber','phoenix','breach'],
+    'pearl': ['chamber','phoenix','breach'],
+    'split': ['chamber','phoenix','breach'],
+    'fracture': ['chamber','breach','omen'],
     'bind': ['omen','phoenix','breach'],
     'breeze':['habor','phoenix','breach']
 }
-# preference = ['jett', 'phoenix', 'yoru']
 # preference = ['gekko', 'chamber', 'breach'] 
+# preference = ['jett', 'phoenix', 'yoru']  
 """ 
 MainFlow(account, skipStart=False, random=False)
+"""
+"""
 FatherSun, LaVanTor, speakEngInVal
 """
+def hold():
+    print('1️: main program\n2: report player')
+    while True:
+        if keyboard.is_pressed('1'):
+            v.MainFlow('speakEngInVal')
+            # v.MainFlow('FatherSun', random='random is on')
+            return
+        if keyboard.is_pressed('2'):
+            v.reportPlayer()
+            # return21
+        if keyboard.is_pressed('3'):
+            return
 if __name__ == "__main__":
-    # v.reportPlayer()
-    v.MainFlow('speakEngInVal')
+    hold()
+    # v.MainFlow('speakEngInVal')
     # v.MainFlow('FatherSun', random='random is on')
-
-
     # v.getAgentsPosition(account='speakEngInVal')
