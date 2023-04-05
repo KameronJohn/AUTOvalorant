@@ -3,7 +3,6 @@ import pyautogui
 import time
 import keyboard
 import random
-# import win32api, win32con, win32gui
 # import webbrowser
 import os
 # import pyperclip
@@ -21,6 +20,7 @@ import os
 import os
 import csv
 import re
+import math
 class v:
     debug = 0
     currentPath = os.path.dirname(os.path.abspath(__file__))
@@ -274,13 +274,14 @@ class v:
         pyautogui.moveTo(a)
     def reportPlayer():
         print('fuction: reportPlayer is running...')
-        while True:
-            if keyboard.is_pressed('1'):
-                v.reportAction()
-            if keyboard.is_pressed('2'):
-                v.restart()
-            if keyboard.is_pressed('3'):
-                return
+        v.reportAction()
+        # while True:
+        #     if keyboard.is_pressed('1'):
+        #         v.reportAction()
+        #     if keyboard.is_pressed('2'):
+        #         v.restart()
+        #     if keyboard.is_pressed('3'):
+        #         return
     def restart():
         pass
     def reportAction():
@@ -325,14 +326,6 @@ class v:
     def MainFlow(account, skipStart=False, random=False):
         v.random = random
         v.account = account
-        """ 
-        try:
-            v.random
-        except AttributeError:
-            v.stateReport(0,f'autoSelect initiated: {v.account}'+ '      '+v.random)
-        else:
-            v.stateReport(0, f'autoSelect initiated: {v.account}')
-        """
         agentXYposition = v.agentXYposition(account)
         v.errorChecking(agentXYposition)
         if v.random:
@@ -342,6 +335,12 @@ class v:
         if skipStart is False:
             v.searchAndClick('start.png')
         v.getStatus(agentXYposition)
+        return
+    def requeueRank():
+        reQ = [Point(x=1219, y=50), Point(x=1219, y=50), Point(x=866, y=142), Point(x=1240, y=1296)]
+        for i in reQ:
+            click(i)
+            time.sleep(0.15)
 """
 astra, breach, brimstone, chamber, cypher, gekko,jett, 
 kayo, killjoy, neon, omen, phoenix, raze, 
@@ -359,36 +358,40 @@ preference = {
     # 'breeze':['habor','phoenix','breach']
 
 
-    'ascent':['chamber','phoenix','breach'],
-    'haven': ['chamber','phoenix','breach'], 
-    'icebox': ['jett','phoenix','breach'], 
-    'lotus': ['chamber','phoenix','breach'],
+    'ascent':['omen','phoenix','breach'],
+    'haven': ['omen','phoenix','breach'], 
+    'icebox': ['omen','phoenix','breach'], 
+    'lotus': ['omen','phoenix','breach'],
     'pearl': ['chamber','phoenix','breach'],
-    'split': ['chamber','phoenix','breach'],
-    'fracture': ['chamber','breach','omen'],
+    'split': ['omen','phoenix','breach'],
+    'fracture': ['omen','breach','omen'],
     'bind': ['omen','phoenix','breach'],
     'breeze':['habor','phoenix','breach']
 }
 # preference = ['gekko', 'chamber', 'breach'] 
-# preference = ['jett', 'phoenix', 'yoru']  
+# preference = ['jett', 'chamber', 'yoru']2
 """ 
 MainFlow(account, skipStart=False, random=False)
 """
-"""
+"""config
 FatherSun, LaVanTor, speakEngInVal
 """
 def hold():
-    print('1️: main program\n2: report player')
+    print('1️: main program\n2: report player\n3: requeue')
+    func_str = "v.MainFlow('speakEngInVal', skipStart='y')"
+    func_str1 = "v.MainFlow('speakEngInVal')"
     while True:
-        if keyboard.is_pressed('1'):
-            v.MainFlow('speakEngInVal')
-            # v.MainFlow('FatherSun', random='random is on')
-            return
+        if keyboard.is_pressed('1'): 
+            eval(func_str1)
+            break
         if keyboard.is_pressed('2'):
             v.reportPlayer()
-            # return21
         if keyboard.is_pressed('3'):
-            return
+            v.requeueRank()
+            eval(func_str)
+            break
+        if keyboard.is_pressed('4'):
+            exit()
 if __name__ == "__main__":
     hold()
     # v.MainFlow('speakEngInVal')
