@@ -332,15 +332,23 @@ class v:
             v.stateReport(0,f'autoSelect initiated: {v.account}'+ '\n'+v.random)
         else:
             v.stateReport(0, f'autoSelect initiated: {v.account}')
-        if skipStart is False:
+        if skipStart is False:  
             v.searchAndClick('start.png')
         v.getStatus(agentXYposition)
         return
     def requeueRank():
-        reQ = [Point(x=1219, y=50), Point(x=1219, y=50), Point(x=866, y=142), Point(x=1240, y=1296)]
+        a = pyautogui.position()
+        reQ = [Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50), Point(x=866, y=142), Point(x=1240, y=1296)]
         for i in reQ:
             click(i)
-            time.sleep(0.15)
+            time.sleep(0.2)
+        pyautogui.FAILSAFE = False
+        """ alt tab here """
+        pyautogui.keyDown('alt')
+        pyautogui.press('tab')
+        pyautogui.moveTo(a)
+        pyautogui.keyUp('alt')
+        """ alt tab here """
 """
 astra, breach, brimstone, chamber, cypher, gekko,jett, 
 kayo, killjoy, neon, omen, phoenix, raze, 
@@ -362,14 +370,14 @@ preference = {
     'haven': ['omen','phoenix','breach'], 
     'icebox': ['omen','phoenix','breach'], 
     'lotus': ['omen','phoenix','breach'],
-    'pearl': ['chamber','phoenix','breach'],
+    'pearl': ['reyna','phoenix','breach'],
     'split': ['omen','phoenix','breach'],
     'fracture': ['omen','breach','omen'],
     'bind': ['omen','phoenix','breach'],
     'breeze':['habor','phoenix','breach']
 }
 # preference = ['gekko', 'chamber', 'breach'] 
-# preference = ['jett', 'chamber', 'yoru']2
+preference = ['omen', 'breach', 'sage']
 """ 
 MainFlow(account, skipStart=False, random=False)
 """
@@ -377,9 +385,10 @@ MainFlow(account, skipStart=False, random=False)
 FatherSun, LaVanTor, speakEngInVal
 """
 def hold():
+    v.requeueRank()
     print('1️: main program\n2: report player\n3: requeue')
-    func_str = "v.MainFlow('speakEngInVal', skipStart='y')"
-    func_str1 = "v.MainFlow('speakEngInVal')"
+    func_str = "v.MainFlow('FatherSun', skipStart='y')"
+    func_str1 = "v.MainFlow('FatherSun')"
     while True:
         if keyboard.is_pressed('1'): 
             eval(func_str1)
@@ -387,7 +396,6 @@ def hold():
         if keyboard.is_pressed('2'):
             v.reportPlayer()
         if keyboard.is_pressed('3'):
-            v.requeueRank()
             eval(func_str)
             break
         if keyboard.is_pressed('4'):
