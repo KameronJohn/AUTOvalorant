@@ -274,17 +274,6 @@ class v:
         pyautogui.moveTo(a)
     def reportPlayer():
         print('fuction: reportPlayer is running...')
-        v.reportAction()
-        # while True:
-        #     if keyboard.is_pressed('1'):
-        #         v.reportAction()
-        #     if keyboard.is_pressed('2'):
-        #         v.restart()
-        #     if keyboard.is_pressed('3'):
-        #         return
-    def restart():
-        pass
-    def reportAction():
         pyautogui.click()
         pyautogui.click()
         pyautogui.click(button='right')
@@ -296,6 +285,8 @@ class v:
         time.sleep(0.55)
         pyautogui.click(x=1244, y=974)
         pyautogui.moveTo(a)
+    def restart():
+        pass
     def errorChecking(agentXYposition):
         availableAgent = []
         possibleAgent = []
@@ -385,21 +376,25 @@ MainFlow(account, skipStart=False, random=False)
 FatherSun, LaVanTor, speakEngInVal
 """
 def hold():
-    v.requeueRank()
-    print('1️: main program\n2: report player\n3: requeue')
+    # v.requeueRank()
     func_str = "v.MainFlow('FatherSun', skipStart='y')"
     func_str1 = "v.MainFlow('FatherSun')"
     while True:
-        if keyboard.is_pressed('1'): 
+        input_value = input("  #"*10 + f"\n1: {func_str1}\n2: v.reportPlayer()\n3: {func_str1}\n" + "  #"*10+"\nPlease input:")
+        if input_value == "1":
             eval(func_str1)
-            break
-        if keyboard.is_pressed('2'):
-            v.reportPlayer()
-        if keyboard.is_pressed('3'):
+        if input_value == "2":
+            print('1: report\n2: exit')
+            time.sleep(1)
+            while True:
+                if keyboard.is_pressed('1'): 
+                    v.reportPlayer()
+                elif keyboard.is_pressed('2'):
+                    print('exiting..')
+                    time.sleep(1)
+                    break
+        if input_value == "3":
             eval(func_str)
-            break
-        if keyboard.is_pressed('4'):
-            exit()
 if __name__ == "__main__":
     hold()
     # v.MainFlow('speakEngInVal')
