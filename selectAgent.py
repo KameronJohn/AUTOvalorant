@@ -314,11 +314,13 @@ class v:
         v.debug = 0
         if v.debug == 1:
             print(f'debug: {msg}')
-    def MainFlow(account, skipStart=False, random=False):
+    def MainFlow(account, skipStart=False, random=False, reQ=False):
         v.random = random
         v.account = account
         agentXYposition = v.agentXYposition(account)
         v.errorChecking(agentXYposition)
+        if reQ:
+            v.requeueRank()
         if v.random:
             v.stateReport(0,f'autoSelect initiated: {v.account}'+ '\n'+v.random)
         else:
@@ -363,12 +365,12 @@ preference = {
     'lotus': ['omen','phoenix','breach'],
     'pearl': ['reyna','phoenix','breach'],
     'split': ['omen','phoenix','breach'],
-    'fracture': ['omen','breach','omen'],
+    'fracture': ['breach','breach','omen'],
     'bind': ['omen','phoenix','breach'],
     'breeze':['habor','phoenix','breach']
 }
 # preference = ['gekko', 'chamber', 'breach'] 
-preference = ['omen', 'breach', 'sage']
+preference = ['jett', 'reyna', 'chamber']
 """ 
 MainFlow(account, skipStart=False, random=False)
 """
@@ -376,8 +378,8 @@ MainFlow(account, skipStart=False, random=False)
 FatherSun, LaVanTor, speakEngInVal
 """
 def hold():
-    # v.requeueRank()
-    func_str = "v.MainFlow('FatherSun', skipStart='y')"
+    print('1️: main program\n2: report player\n3: requeue')
+    func_str = "v.MainFlow('FatherSun', skipStart='y', reQ='y')"
     func_str1 = "v.MainFlow('FatherSun')"
     while True:
         input_value = input("  #"*10 + f"\n1: {func_str1}\n2: v.reportPlayer()\n3: {func_str1}\n" + "  #"*10+"\nPlease input:")
