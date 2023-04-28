@@ -22,7 +22,7 @@ import csv
 import re
 import math
 class v:
-    debug = 0
+    agentSelected = [] 
     currentPath = os.path.dirname(os.path.abspath(__file__))
     currentPath += '\\'
     screenshotPath = currentPath+'\\source\\'
@@ -191,6 +191,7 @@ class v:
                     return
             else:
                 agent = preference[order]
+            v.agentSelected.append(agent)
             for i in agentXYposition:
                 if i['Agent'] == agent:
                     # agnetPosition = i
@@ -227,9 +228,36 @@ class v:
             pyautogui.keyUp('alt')
             """ alt tab here """
     def checkIfAgentLocked(agentXYposition):
+        v.debugger('agentXYposition:\n')
+        v.debugger(agentXYposition)
+        # import time
+
+        # start_time = time.perf_counter()
+        # for i in agentXYposition:
+        #     for key, value in i.items():
+        #         if key == 'Agent' and value in v.agentSelected:
+        #             agentXYposition.remove(i)
+        # shuffleList = random.sample(agentXYposition, len(agentXYposition))
+        # end_time = time.perf_counter()
+
+        # elapsed_time = end_time - start_time
+
+        # print(f'Time elapsed: {elapsed_time:.6f} seconds')
+
+        # start_time = time.perf_counter()
+        new_items = [d for d in agentXYposition if 'Agent' not in d or d['Agent'] not in v.agentSelected]
+        agentXYposition = new_items
+
         shuffleList = random.sample(agentXYposition, len(agentXYposition))
+        # end_time = time.perf_counter()
+
+        # elapsed_time = end_time - start_time
+
+        # print(f'Time elapsed: {elapsed_time:.6f} seconds')
+        v.debugger('  =   =   =')
+        v.debugger('shuffleList:\n')
         v.debugger(shuffleList)
-        for i in shuffleList[:8]:
+        for i in shuffleList[:6]:
             xaxis = int(i['Xposition'])
             yaxis = int(i['Yposition'])
             pyautogui.click(xaxis,yaxis)
@@ -331,7 +359,7 @@ class v:
         return
     def requeueRank():
         a = pyautogui.position()
-        reQ = [Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50), Point(x=866, y=142), Point(x=1240, y=1296)]
+        reQ = [Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50), Point(x=743, y=142), Point(x=1240, y=1296)]
         for i in reQ:
             click(i)
             time.sleep(0.2)
@@ -353,25 +381,26 @@ preference = {
     # 'icebox': ['omen','phoenix','breach'], 
     # 'lotus': ['omen','phoenix','breach'],
     # 'pearl': ['habor','phoenix','breach'],
-    # 'split': ['omen','phoenix','breach'],
-    # 'fracture': ['phoenix','breach','omen'],
+    # 'split': ['omen','phoenix','breach'],`
+    # 'fracture': ['phoenix','breach','omen'],`
     # 'bind': ['omen','phoenix','breach'],
     # 'breeze':['habor','phoenix','breach']
 
 
+    'pearl': ['habor','phoenix','breach'],
     'ascent':['omen','phoenix','breach'],
     'haven': ['omen','phoenix','breach'], 
     'icebox': ['omen','phoenix','breach'], 
     'lotus': ['omen','phoenix','breach'],
-    'pearl': ['reyna','phoenix','breach'],
     'split': ['omen','phoenix','breach'],
-    'fracture': ['breach','breach','omen'],
+    'fracture': ['omen','breach','omen'],
+    """  """
     'bind': ['omen','phoenix','breach'],
     'breeze':['habor','phoenix','breach']
 }
-# preference = ['gekko', 'chamber', 'breach'] 
-preference = ['jett', 'reyna', 'chamber']
-""" 
+preference = ['sage', 'killjoy', 'cypher']
+preference = ['omen', 'breach', 'chamber']  
+"""
 MainFlow(account, skipStart=False, random=False)
 """
 """config

@@ -111,41 +111,7 @@ def getMousePosition():
         if keyboard.is_pressed('2'):
             print(PosList)
             return
-        
-# win32api.MessageBox(None, "fUnCtIoN eNdEd.   FuNcTiOn EnDeD.\n"*10, "✅✅✅✅✅✅", 0)
-# print('hi')
-
-import tkinter as tk
-from tkinter import messagebox
-
-# create a function to display the message box
-def show_message():
-    messagebox.showinfo("Message", "The code is running and printing 'hi'.")
-
-# create a root window for the GUI
-root = tk.Tk()
-
-# hide the root window
-root.withdraw()
-
-# display the message box
-show_message()
-
-# define a function to periodically check if the message box is still open
-def check_messagebox():
-    # if the message box is still open, keep checking after 1 second
-    if messagebox._showing:
-        root.after(1000, check_messagebox)
-    # if the message box is closed, print "hi" and exit the program
-    else:
-        print("hi")
-        root.destroy()
-
-# start checking if the message box is still open
-check_messagebox()
-
-# start the main event loop
-root.mainloop()
+    
 
 
 
@@ -154,7 +120,7 @@ root.mainloop()
 
 
 
-# getMousePosition()
+getMousePosition()
 # while True:
 #   a = pyautogui.position()
 #   print(a)
