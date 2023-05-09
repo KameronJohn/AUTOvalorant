@@ -369,6 +369,12 @@ class v:
         pyautogui.press('tab')
         pyautogui.moveTo(a)
         pyautogui.keyUp('alt')
+    def login():
+        v.searchAndClick('username.png')
+        pyautogui.write(v.username)
+        pyautogui.press('tab')
+        pyautogui.write(v.password)
+        pyautogui.press('enter')
         """ alt tab here """
 """
 astra, breach, brimstone, chamber, cypher, gekko,jett, 
@@ -400,6 +406,7 @@ preference = {
 }
 preference = ['sage', 'killjoy', 'cypher']
 preference = ['omen', 'breach', 'chamber']  
+preference = ['phoenix', 'reyna', 'jett']  
 """
 MainFlow(account, skipStart=False, random=False)
 """
@@ -409,11 +416,11 @@ FatherSun, LaVanTor, speakEngInVal
 def hold():
     print('1️: main program\n2: report player\n3: requeue')
     func_str = "v.MainFlow('FatherSun', skipStart='y', reQ='y')"
-    func_str1 = "v.MainFlow('FatherSun')"
+    withpartyRank = "v.MainFlow('FatherSun'), skipStart='y'"
     while True:
-        input_value = input("  #"*10 + f"\n1: {func_str1}\n2: v.reportPlayer()\n3: {func_str1}\n" + "  #"*10+"\nPlease input:")
+        input_value = input("  #"*10 + f"\n1: {withpartyRank}\n2: v.reportPlayer()\n3: {func_str}\n" + "  #"*10+"\nPlease input:")
         if input_value == "1":
-            eval(func_str1)
+            eval(withpartyRank)
         if input_value == "2":
             print('1: report\n2: exit')
             time.sleep(1)
@@ -426,6 +433,10 @@ def hold():
                     break
         if input_value == "3":
             eval(func_str)
+        if input_value == "4":
+            v.username = 'Pleasetellme3'
+            v.password = 'wonnacha'
+            v.login()
 if __name__ == "__main__":
     hold()
     # v.MainFlow('speakEngInVal')
