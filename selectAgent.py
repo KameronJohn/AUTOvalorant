@@ -27,6 +27,11 @@ class v:
     currentPath += '\\'
     screenshotPath = currentPath+'\\source\\'
     lockX, lockY = 1213,1084
+    accountCredentials = {
+        'FatherSun': ['wonnacha','Pleasetellme3'],
+        'LaVanTor': ['wonnacha3','Pleasetellme3'],
+        'speakEngInVal': ['wonnacha4','Pleasetellme3']
+    }
     #if even number= either select agent/ re queuing
     def agentXYposition(account):
         csv_filename = v.currentPath+ 'agentXYposition.csv'
@@ -342,11 +347,13 @@ class v:
         v.debug = 0
         if v.debug == 1:
             print(f'debug: {msg}')
-    def MainFlow(account, skipStart=False, random=False, reQ=False):
+    def MainFlow(account, skipStart=False, random=False, reQ=False,launchAndLogin=False):
         v.random = random
         v.account = account
         agentXYposition = v.agentXYposition(account)
         v.errorChecking(agentXYposition)
+        if launchAndLogin:
+            v.login()
         if reQ:
             v.requeueRank()
         if v.random:
@@ -369,13 +376,53 @@ class v:
         pyautogui.press('tab')
         pyautogui.moveTo(a)
         pyautogui.keyUp('alt')
-    def login():
-        v.searchAndClick('username.png')
-        pyautogui.write(v.username)
-        pyautogui.press('tab')
-        pyautogui.write(v.password)
-        pyautogui.press('enter')
         """ alt tab here """
+    def login():
+        #open riot
+        pyautogui.press('win')
+        time.sleep(1)
+        pyautogui.write('riot')
+        time.sleep(0.4)
+        pyautogui.press('enter')
+        #two types of username scenerio
+        while True:
+            try:
+                x,y = pyautogui.locateCenterOnScreen(v.screenshotPath+'username.png', region = (0,0,2560,1440), confidence=0.8)
+                if x is not None:
+                    break
+            except:
+                pass
+            try:
+                x,y = pyautogui.locateCenterOnScreen(v.screenshotPath+'username.png', region = (0,0,2560,1440), confidence=0.8)
+                if x is not None:
+                    break
+            except:
+                pass
+        #retrieve login username and password
+        loginUsername, loginPassword = v.accountCredentials[v.account]
+        pyautogui.click(x,y)
+        pyautogui.write(loginUsername)
+        pyautogui.press('tab')
+        pyautogui.write(loginPassword)
+        pyautogui.press('enter')
+        #press start in game
+        while True:
+            try:
+                x,y = pyautogui.locateCenterOnScreen(v.screenshotPath+'username.png', region = (0,0,2560,1440), confidence=0.8)
+                if x is not None:
+                    break
+            except:
+                pass
+        #press start in game
+        while True:
+            try:
+                x,y = pyautogui.locateCenterOnScreen(v.screenshotPath+'username.png', region = (0,0,2560,1440), confidence=0.8)
+                if x is not None:
+                    break
+            except:
+                pass
+        
+
 """
 astra, breach, brimstone, chamber, cypher, gekko,jett, 
 kayo, killjoy, neon, omen, phoenix, raze, 
@@ -414,11 +461,12 @@ MainFlow(account, skipStart=False, random=False)
 FatherSun, LaVanTor, speakEngInVal
 """
 def hold():
-    print('1️: main program\n2: report player\n3: requeue')
-    func_str = "v.MainFlow('FatherSun', skipStart='y', reQ='y')"
+    print('1️: main program\n2: report player\n3: requeue\n4: login & queue')
+    MainFlow = "v.MainFlow('FatherSun', skipStart='y', reQ='y')"
     withpartyRank = "v.MainFlow('FatherSun'), skipStart='y'"
+    launchAndLogin = "v.MainFlow('FatherSun', skipStart='y', reQ='y', launchAndLogin=True)"
     while True:
-        input_value = input("  #"*10 + f"\n1: {withpartyRank}\n2: v.reportPlayer()\n3: {func_str}\n" + "  #"*10+"\nPlease input:")
+        input_value = input("  #"*10 + f"\n1: {withpartyRank}\n2: v.reportPlayer()\n3: {MainFlow}\n4: {launchAndLogin}\n" + "  #"*10+"\nPlease input:")
         if input_value == "1":
             eval(withpartyRank)
         if input_value == "2":
@@ -432,13 +480,11 @@ def hold():
                     time.sleep(1)
                     break
         if input_value == "3":
-            eval(func_str)
+            eval(MainFlow)
         if input_value == "4":
-            v.username = 'Pleasetellme3'
-            v.password = 'wonnacha'
-            v.login()
+            eval(launchAndLogin)
 if __name__ == "__main__":
     hold()
-    # v.MainFlow('speakEngInVal')
-    # v.MainFlow('FatherSun', random='random is on')
+    # v.MainFlow('speakEngInVal') #waiting for match found directly
+    # v.MainFlow('FatherSun', random='random is on', reQ='y')
     # v.getAgentsPosition(account='speakEngInVal')

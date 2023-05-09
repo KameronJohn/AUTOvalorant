@@ -18,8 +18,20 @@ import datetime
 from PIL import Image
 from pytesseract import pytesseract
 import os
+def getMousePosition():
+    PosList = []
+    while True:
+        a = pyautogui.position()
+        print(a)
+        if keyboard.is_pressed('1'):
+            PosList.append(a)
+            print(PosList)
+            time.sleep(0.3)
+        if keyboard.is_pressed('2'):
+            print(PosList)
+            return
+getMousePosition()
 
-import os
 def afk():
     while True:
         try:
@@ -99,31 +111,16 @@ def fn2():
     type = f"git commit -m {today}"
     os.system(type)
     type = 'git push -f origin main'
-def getMousePosition():
-    PosList = []
-    while True:
-        a = pyautogui.position()
-        print(a)
-        if keyboard.is_pressed('1'):
-            PosList.append(a)
-            print(PosList)
-            time.sleep(0.3)
-        if keyboard.is_pressed('2'):
-            print(PosList)
-            return
-    
 
-
-
-
-
-
-
-
-getMousePosition()
-# while True:
-#   a = pyautogui.position()
-#   print(a)
+"""  """
+while True:
+    try:
+        x,y = pyautogui.locateCenterOnScreen('username.png', region = (0,0,2560,1440), confidence=0.8)
+        if x is not None:
+            break
+    except:
+        pass
+"""  """
 # afk()
 # import os
 # def startSim():
