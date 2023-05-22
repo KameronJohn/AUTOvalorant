@@ -214,14 +214,15 @@ class v:
             v.debugger('after agent sel')
         pyautogui.FAILSAFE = False
         try:
-            for i in range(11):
+            for i in range(8):
                 pyautogui.click(xaxis, yaxis)
                 pyautogui.click(v.lockX, v.lockY)
         except Exception as error:
             # handle the exception
             print("An exception occurred:", error) # An exception occurred: division by zero
         if v.checkIfAgentLocked(agentXYposition): 
-            print(f'❗❗❗❗ agent {order+1} cant be selected')
+            order +=1 
+            print('  ❗'* 10 + f'\n10agent {order} cant be selected\n'+'  ❗'* 10 )
             v.selectAgent(preference, venue, agentXYposition, order, repickAgent=True)
         else:
             v.stateReport(5,f'agent selected')
@@ -266,7 +267,7 @@ class v:
             xaxis = int(i['Xposition'])
             yaxis = int(i['Yposition'])
             pyautogui.click(xaxis,yaxis)
-            if v.tryAndSearch('availableAgent.png'):
+            if v.tryAndSearch('availableAgent.png', withoutClick=True):
                 return 'notSelected'
     def checkIfLoadingPageDone():
         pixelx,pixelY = 1550,712
@@ -296,10 +297,6 @@ class v:
             if count >5 and count2 >5 and count3 >5:
                 v.stateReport(3, 'select agent page')
                 return
-    def afk():
-        while True:
-            pyautogui.press('space')
-            time.sleep(5)
 
     def returnPreviousPosition(x,y):
         a = pyautogui.position()
@@ -393,7 +390,7 @@ class v:
             except:
                 pass
             try:
-                x,y = pyautogui.locateCenterOnScreen(v.screenshotPath+'username.png', region = (0,0,2560,1440), confidence=0.8)
+                x,y = pyautogui.locateCenterOnScreen(v.screenshotPath+'usernamee.png', region = (0,0,2560,1440), confidence=0.8)
                 if x is not None:
                     break
             except:
@@ -405,23 +402,28 @@ class v:
         pyautogui.press('tab')
         pyautogui.write(loginPassword)
         pyautogui.press('enter')
-        #press start in game
+        time.sleep(5)
         while True:
             try:
-                x,y = pyautogui.locateCenterOnScreen(v.screenshotPath+'username.png', region = (0,0,2560,1440), confidence=0.8)
+                x,y = pyautogui.locateCenterOnScreen(v.screenshotPath+'play.png', region = (0,0,2560,1440), confidence=0.8)
                 if x is not None:
+                    pyautogui.click(x,y)
                     break
             except:
                 pass
-        #press start in game
-        while True:
+            #press start in game
             try:
-                x,y = pyautogui.locateCenterOnScreen(v.screenshotPath+'username.png', region = (0,0,2560,1440), confidence=0.8)
+                x,y = pyautogui.locateCenterOnScreen(v.screenshotPath+'play.png', region = (0,0,2560,1440), confidence=0.7)
                 if x is not None:
+                    pyautogui.click(x,y)
                     break
             except:
                 pass
-        
+        time.sleep(1)
+def afk():
+    while True:
+        pyautogui.press('space')
+        time.sleep(5)
 
 """
 astra, breach, brimstone, chamber, cypher, gekko,jett, 
@@ -452,21 +454,27 @@ preference = {
     'breeze':['habor','phoenix','breach']
 }
 preference = ['sage', 'killjoy', 'cypher']
-preference = ['omen', 'breach', 'chamber']  
 preference = ['phoenix', 'reyna', 'jett']  
+preference = ['omen', 'breach', 'chamber']  
+preference = ['jett', 'reyna', 'phoenix']  
+preference = ['reyna', 'jett', 'phoenix']  
+preference = ['raze', 'reyna', 'phoenix']  
 """
 MainFlow(account, skipStart=False, random=False)
 """
 """config
 FatherSun, LaVanTor, speakEngInVal
 """
+account = 'speakEngInVal'
+account = 'LaVanTor'
+account = 'FatherSun'
 def hold():
     print('1️: main program\n2: report player\n3: requeue\n4: login & queue')
-    MainFlow = "v.MainFlow('FatherSun', skipStart='y', reQ='y')"
-    withpartyRank = "v.MainFlow('FatherSun'), skipStart='y'"
-    launchAndLogin = "v.MainFlow('FatherSun', skipStart='y', reQ='y', launchAndLogin=True)"
+    MainFlow = "v.MainFlow(account, skipStart='y', reQ='y')"
+    withpartyRank = "v.MainFlow(account), skipStart='y'"
+    launchAndLogin = "v.MainFlow(account, skipStart='y', reQ='y', launchAndLogin=True)"
     while True:
-        input_value = input("  #"*10 + f"\n1: {withpartyRank}\n2: v.reportPlayer()\n3: {MainFlow}\n4: {launchAndLogin}\n" + "  #"*10+"\nPlease input:")
+        input_value = input("  #"*10 + f"\n1: {withpartyRank}\n2: v.reportPlayer()\n3: {MainFlow}\n4: {launchAndLogin}\n" + "  #"*10+f'account: {account}'+"\nPlease input:")
         if input_value == "1":
             eval(withpartyRank)
         if input_value == "2":
@@ -485,6 +493,6 @@ def hold():
             eval(launchAndLogin)
 if __name__ == "__main__":
     hold()
-    # v.MainFlow('speakEngInVal') #waiting for match found directly
+    # v.MainFlow('speakEngInVal') #waiting for m tch found directly
     # v.MainFlow('FatherSun', random='random is on', reQ='y')
-    # v.getAgentsPosition(account='speakEngInVal')
+    # v.getAgentsPosition(account=account)
