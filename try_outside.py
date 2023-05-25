@@ -30,8 +30,12 @@ def getMousePosition():
         if keyboard.is_pressed('2'):
             print(PosList)
             return
-getMousePosition()
-
+# getMousePosition()
+reQ = [Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50), Point(x=743, y=142), Point(x=1240, y=1296)]
+for i in reQ:
+    print(i)
+    moveTo(i)
+    sleep(1)
 def afk():
     while True:
         try:

@@ -315,8 +315,22 @@ class v:
         time.sleep(0.55)
         pyautogui.click(x=1244, y=974)
         pyautogui.moveTo(a)
-    def restart():
-        pass
+    def check_if_val_message_sent():
+        #check if the message sent
+        result_pos = v.tryAndSearch('ok_button.png')
+        if result_pos is not None:
+            current_datetime = datetime.now()
+            formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H:%M:%S")
+            screenshot_path = v.screenshotPath+f'auto_sc\\{formatted_datetime}'
+            #if yes, screenshot
+            pyautogui.screenshot(screenshot_path, region = (0,0,2560,1440))
+            print('check message at: ',screenshot_path)
+            click(result_pos)
+            v.check_if_val_message_sent()
+
+        
+        
+        
     def errorChecking(agentXYposition):
         availableAgent = []
         possibleAgent = []
@@ -363,10 +377,20 @@ class v:
         return
     def requeueRank():
         a = pyautogui.position()
-        reQ = [Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50), Point(x=743, y=142), Point(x=1240, y=1296)]
+        reQ = [Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50)]
         for i in reQ:
             click(i)
             time.sleep(0.2)
+        #competitive
+        while True:
+            x = v.tryAndSearch("competitive1.png",withoutClick=False, withoutMove=False)
+            if x is not None:
+                break
+            x = v.tryAndSearch("competitive2.png",withoutClick=False, withoutMove=False)
+            if x is not None:
+                break
+        #start queuing
+        click(x=1240, y=1296)
         pyautogui.FAILSAFE = False
         """ alt tab here """
         pyautogui.keyDown('alt')
@@ -405,21 +429,21 @@ class v:
         time.sleep(5)
         while True:
             try:
-                x,y = pyautogui.locateCenterOnScreen(v.screenshotPath+'play.png', region = (0,0,2560,1440), confidence=0.8)
-                if x is not None:
-                    pyautogui.click(x,y)
+                play_x,play_y = pyautogui.locateCenterOnScreen(v.screenshotPath+'play.png', region = (0,0,2560,1440), confidence=0.8)
+                if play_x is not None:
                     break
             except:
                 pass
             #press start in game
             try:
-                x,y = pyautogui.locateCenterOnScreen(v.screenshotPath+'play.png', region = (0,0,2560,1440), confidence=0.7)
-                if x is not None:
-                    pyautogui.click(x,y)
+                play_x,play_y = pyautogui.locateCenterOnScreen(v.screenshotPath+'play.png', region = (0,0,2560,1440), confidence=0.7)
+                if play_x is not None:
                     break
             except:
                 pass
         time.sleep(1)
+        v.check_if_val_message_sent()
+        click(play_x,play_y)
 def afk():
     while True:
         pyautogui.press('space')
@@ -447,7 +471,7 @@ preference = {
     'haven': ['omen','phoenix','breach'], 
     'icebox': ['omen','phoenix','breach'], 
     'lotus': ['omen','phoenix','breach'],
-    'split': ['omen','phoenix','breach'],
+    'split': ['omen','phoenix','breach' ],
     'fracture': ['omen','breach','omen'],
     """  """
     'bind': ['omen','phoenix','breach'],
