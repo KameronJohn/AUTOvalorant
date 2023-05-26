@@ -30,12 +30,7 @@ def getMousePosition():
         if keyboard.is_pressed('2'):
             print(PosList)
             return
-# getMousePosition()
-reQ = [Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50), Point(x=743, y=142), Point(x=1240, y=1296)]
-for i in reQ:
-    print(i)
-    moveTo(i)
-    sleep(1)
+getMousePosition()
 def afk():
     while True:
         try:
@@ -117,13 +112,13 @@ def fn2():
     type = 'git push -f origin main'
 
 """  """
-while True:
-    try:
-        x,y = pyautogui.locateCenterOnScreen('username.png', region = (0,0,2560,1440), confidence=0.8)
-        if x is not None:
-            break
-    except:
-        pass
+# while True:
+#     try:
+#         x,y = pyautogui.locateCenterOnScreen('username.png', region = (0,0,2560,1440), confidence=0.8)
+#         if x is not None:
+#             break
+#     except:
+#         pass
 """  """
 # afk()
 # import os

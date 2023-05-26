@@ -21,6 +21,7 @@ import os
 import csv
 import re
 import math
+import subprocess
 class v:
     agentSelected = [] 
     currentPath = os.path.dirname(os.path.abspath(__file__))
@@ -204,6 +205,11 @@ class v:
                     yaxis = int(i['Yposition'])
                     break
         count =0
+        
+        # Compile the C++ file
+        compile_cmd = ["g++", f"{v.currentPath}selectagent.cpp", "-o", "selectagent"]
+        subprocess.run(compile_cmd, check=True)
+
         if repickAgent is False:
             v.checkIfLoadingPageDone()
         cursorPos = pyautogui.position()
@@ -212,14 +218,21 @@ class v:
         else:
             v.stateReport(4,f'agent selecting: 🕵️  {agent} 🕵️')
             v.debugger('after agent sel')
-        pyautogui.FAILSAFE = False
-        try:
-            for i in range(8):
-                pyautogui.click(xaxis, yaxis)
-                pyautogui.click(v.lockX, v.lockY)
-        except Exception as error:
-            # handle the exception
-            print("An exception occurred:", error) # An exception occurred: division by zero
+        """  """
+        # pyautogui.FAILSAFE = False
+        # try:
+        #     for i in range(8):
+        #         pyautogui.click(xaxis, yaxis)
+        #         pyautogui.click(v.lockX, v.lockY)
+        # except Exception as error:
+        #     # handle the exception
+        #     print("An exception occurred:", error) # An exception occurred: division by zero
+        """  """
+
+        # Run the compiled executable with the x and y coordinates as arguments
+        run_cmd = [f"{v.currentPath}selectagent", str(xaxis), str(yaxis), str(v.lockX), str(v.lockY)]
+        subprocess.run(run_cmd, check=True)
+        """  """
         if v.checkIfAgentLocked(agentXYposition): 
             order +=1 
             print('  ❗'* 10 + f'\n10agent {order} cant be selected\n'+'  ❗'* 10 )
@@ -442,6 +455,7 @@ class v:
             except:
                 pass
         time.sleep(1)
+        pyautogui.FAILSAFE = False
         v.check_if_val_message_sent()
         click(play_x,play_y)
 def afk():
@@ -477,25 +491,27 @@ preference = {
     'bind': ['omen','phoenix','breach'],
     'breeze':['habor','phoenix','breach']
 }
-preference = ['sage', 'killjoy', 'cypher']
-preference = ['phoenix', 'reyna', 'jett']  
-preference = ['omen', 'breach', 'chamber']  
-preference = ['jett', 'reyna', 'phoenix']  
-preference = ['reyna', 'jett', 'phoenix']  
-preference = ['raze', 'reyna', 'phoenix']  
 """
 MainFlow(account, skipStart=False, random=False)
 """
 """config
 FatherSun, LaVanTor, speakEngInVal
 """
+preference = ['sage', 'killjoy', 'cypher']
+preference = ['phoenix', 'reyna', 'jett']  
+preference = ['reyna', 'jett', 'phoenix']  
+preference = ['omen', 'breach', 'chamber']  
+preference = ['raze', 'reyna', 'phoenix'] 
+preference = ['jett', 'reyna', 'phoenix']  
+preference = ['chamber', 'omen', 'phoenix']  
+""" """
 account = 'speakEngInVal'
 account = 'LaVanTor'
 account = 'FatherSun'
 def hold():
     print('1️: main program\n2: report player\n3: requeue\n4: login & queue')
     MainFlow = "v.MainFlow(account, skipStart='y', reQ='y')"
-    withpartyRank = "v.MainFlow(account), skipStart='y'"
+    withpartyRank = "v.MainFlow(account, skipStart='y')"
     launchAndLogin = "v.MainFlow(account, skipStart='y', reQ='y', launchAndLogin=True)"
     while True:
         input_value = input("  #"*10 + f"\n1: {withpartyRank}\n2: v.reportPlayer()\n3: {MainFlow}\n4: {launchAndLogin}\n" + "  #"*10+f'account: {account}'+"\nPlease input:")
