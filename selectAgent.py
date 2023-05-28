@@ -27,6 +27,8 @@ class v:
     currentPath = os.path.dirname(os.path.abspath(__file__))
     currentPath += '\\'
     screenshotPath = currentPath+'\\source\\'
+    others_path = currentPath+'\\others\\'
+    accounts_agents_path = currentPath+'accounts_agents\\'
     lockX, lockY = 1213,1084
     accountCredentials = {
         'FatherSun': ['wonnacha','Pleasetellme3'],
@@ -110,10 +112,14 @@ class v:
             print('  !'*10)
         # exit()
         # csv_filename = v.currentPath+ 'agentXYposition.csv'
-        # with open(csv_filename) as f:
+        # with open(csv_filename) as f:BA
         #     reader = csv.DictReader(f)
         #     for row in reader:
         #         print(row)
+    def format_time(elapsed_time):
+        m, s = divmod(int(elapsed_time), 60)
+        time_format = "{:02d}:{:02d}".format(m, s)
+        return time_format
     def searchAndClick(target, needClick=True):
         while True:
             try:
@@ -136,6 +142,7 @@ class v:
                     click()
                 return x,y
         except:
+            # print('no msg found')
             return
     def getStatus(agentXYposition, secondRun=False):
         AllFiles = os.listdir(v.screenshotPath)
@@ -154,7 +161,7 @@ class v:
                 return
             else:
                 pass
-    def getVenue(venueList, agentXYposition):
+    def getVenue(venueList, agentXYposition=False):
         a = pyautogui.position()
         count = 0
         while True:
@@ -165,6 +172,8 @@ class v:
                     venue = searchingVenue.replace("venue_", "")
                     venue = venue[:int(venue.find('.'))]
                     v.stateReport(2,f'map: {venue}')
+                    if agentXYposition is False:
+                        break
                     v.selectAgent(preference, venue, agentXYposition)
                     break
             except:
@@ -207,11 +216,12 @@ class v:
         count =0
         
         # Compile the C++ file
-        compile_cmd = ["g++", f"{v.currentPath}selectagent.cpp", "-o", "selectagent"]
+        compile_cmd = ["g++", f"{v.others_path}selectagent.cpp", "-o", "selectagent"]
         subprocess.run(compile_cmd, check=True)
 
         if repickAgent is False:
-            v.checkIfLoadingPageDone()
+            # v.checkIfLoadingPageDone()
+            time.sleep(3.5)
         cursorPos = pyautogui.position()
         if v.random:
             v.stateReport(4,f'🍭🍭RANDOM🍭🍭 agent selecting: 🍭  {agent} 🍭')
@@ -228,9 +238,8 @@ class v:
         #     # handle the exception
         #     print("An exception occurred:", error) # An exception occurred: division by zero
         """  """
-
         # Run the compiled executable with the x and y coordinates as arguments
-        run_cmd = [f"{v.currentPath}selectagent", str(xaxis), str(yaxis), str(v.lockX), str(v.lockY)]
+        run_cmd = [f"{v.others_path}selectagent", str(xaxis), str(yaxis), str(v.lockX), str(v.lockY)]
         subprocess.run(run_cmd, check=True)
         """  """
         if v.checkIfAgentLocked(agentXYposition): 
@@ -330,7 +339,7 @@ class v:
         pyautogui.moveTo(a)
     def check_if_val_message_sent():
         #check if the message sent
-        result_pos = v.tryAndSearch('ok_button.png')
+        result_pos = v.tryAndSearch(f'{v.screenshotPath}ok_button.png',withoutClick=False, withoutMove=False)
         if result_pos is not None:
             current_datetime = datetime.now()
             formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H:%M:%S")
@@ -343,7 +352,7 @@ class v:
 
         
         
-        
+    
     def errorChecking(agentXYposition):
         availableAgent = []
         possibleAgent = []
@@ -411,7 +420,7 @@ class v:
         pyautogui.moveTo(a)
         pyautogui.keyUp('alt')
         """ alt tab here """
-    def login():
+    def login(loginUsername=False,loginPassword=False):
         #open riot
         pyautogui.press('win')
         time.sleep(1)
@@ -433,7 +442,8 @@ class v:
             except:
                 pass
         #retrieve login username and password
-        loginUsername, loginPassword = v.accountCredentials[v.account]
+        if loginUsername is False and loginPassword is False:
+            loginUsername, loginPassword = v.accountCredentials[v.account]
         pyautogui.click(x,y)
         pyautogui.write(loginUsername)
         pyautogui.press('tab')
@@ -458,10 +468,64 @@ class v:
         pyautogui.FAILSAFE = False
         v.check_if_val_message_sent()
         click(play_x,play_y)
+    def select_agent_page():
+        return
+    def check_all_account_available_agent():
+        account = [3,4,5,6,7,8,9]
+        for i in account:
+            account_name = 'wonnacha'+str(i)
+            password = 'Pleasetellme3'
+            v.login(account_name,password)
+            time.sleep(2)
+            # current contract
+            for each_pos in [Point(x=1004, y=46), Point(x=1569, y=47)]:
+                click(each_pos)
+                sleep(1.5)
+                current_datetime = datetime.now()
+                formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
+                screenshot_path = v.accounts_agents_path+formatted_datetime+'_'+account_name+'.png'
+                pyautogui.screenshot(screenshot_path, region = (0,0,2560,1440))
+            # go to custom game mode
+            click(x=1266, y=33)
+            poss = [Point(x=1855, y=139), Point(x=1225, y=1311), Point(x=1066, y=825)]
+            for each_pos in poss:
+                click(each_pos)
+                time.sleep(0.5)
+            v.get_venue_simple()
+            while True:
+                try:
+                    x, y = pyautogui.locateCenterOnScreen(v.screenshotPath+'agent_sage.png', region = (0,0,2500,1440), confidence=0.8)
+                    if (x, y) is not None:
+                        break
+                    else:
+                        print('nope')
+                except:
+                    pass
+            sleep(3)
+            current_datetime = datetime.now()
+            formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
+            screenshot_path = v.accounts_agents_path+formatted_datetime+'_'+account_name+'.png'
+            pyautogui.screenshot(screenshot_path, region = (0,0,2560,1440))
+            print('check screenshot at: ',screenshot_path)
+            time.sleep(0.5)
+            pyautogui.hotkey('alt', 'F4')
+            time.sleep(5)
+    def get_venue_simple():
+        AllFiles = os.listdir(v.screenshotPath)
+        venueList = []
+        for i in AllFiles:
+            if re.match(r"venue_*", i):
+                # print(i)
+                venueList.append(i)
+        v.getVenue(venueList)
 def afk():
-    while True:
-        pyautogui.press('space')
-        time.sleep(5)
+    # Compile the C++ file
+    compile_cmd = ["g++", f"{v.others_path}afk.cpp", "-o", "afk"]
+    subprocess.run(compile_cmd, check=True)
+    # Run the compiled executable with the x and y coordinates as arguments
+    run_cmd = [f"{v.others_path}afk"]
+    subprocess.run(run_cmd, check=True)
+        
 
 """
 astra, breach, brimstone, chamber, cypher, gekko,jett, 
@@ -500,24 +564,24 @@ FatherSun, LaVanTor, speakEngInVal
 preference = ['sage', 'killjoy', 'cypher']
 preference = ['phoenix', 'reyna', 'jett']  
 preference = ['reyna', 'jett', 'phoenix']  
-preference = ['omen', 'breach', 'chamber']  
 preference = ['raze', 'reyna', 'phoenix'] 
 preference = ['jett', 'reyna', 'phoenix']  
-preference = ['chamber', 'omen', 'phoenix']  
+preference = ['chamber', 'omen', 'phoenix']
+preference = ['omen', 'breach', 'chamber']
 """ """
 account = 'speakEngInVal'
 account = 'LaVanTor'
 account = 'FatherSun'
 def hold():
-    print('1️: main program\n2: report player\n3: requeue\n4: login & queue')
+    print('1️: main program\n2: report player\n3: requeue\n4: login & queue\n5.afk')
     MainFlow = "v.MainFlow(account, skipStart='y', reQ='y')"
     withpartyRank = "v.MainFlow(account, skipStart='y')"
     launchAndLogin = "v.MainFlow(account, skipStart='y', reQ='y', launchAndLogin=True)"
     while True:
-        input_value = input("  #"*10 + f"\n1: {withpartyRank}\n2: v.reportPlayer()\n3: {MainFlow}\n4: {launchAndLogin}\n" + "  #"*10+f'account: {account}'+"\nPlease input:")
+        input_value = input("  #"*10 + f"\n1: {withpartyRank}\n2: v.reportPlayer()\n3: {MainFlow}\n4: {launchAndLogin}\n5: afk()\n" + "  #"*10+f'\naccount: {account}'+"\nPlease input:")
         if input_value == "1":
             eval(withpartyRank)
-        if input_value == "2":
+        elif input_value == "2":
             print('1: report\n2: exit')
             time.sleep(1)
             while True:
@@ -527,12 +591,20 @@ def hold():
                     print('exiting..')
                     time.sleep(1)
                     break
-        if input_value == "3":
+        elif input_value == "3":
             eval(MainFlow)
-        if input_value == "4":
+        elif input_value == "4":
             eval(launchAndLogin)
+        elif input_value == "5":
+            afk()
+        elif input_value == "6":
+            time.sleep(1)
+            pyautogui.hotkey('alt', 'F4')
+        
+        
 if __name__ == "__main__":
     hold()
+    # v.check_all_account_available_agent()
     # v.MainFlow('speakEngInVal') #waiting for m tch found directly
     # v.MainFlow('FatherSun', random='random is on', reQ='y')
     # v.getAgentsPosition(account=account)

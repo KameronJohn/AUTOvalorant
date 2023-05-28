@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
             mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
 
             // Wait for a short period to avoid moving too quickly
-            Sleep(20);
+            Sleep(30);
         }
     }
 
