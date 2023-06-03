@@ -22,19 +22,23 @@ import csv
 import re
 import math
 import subprocess
+import psutil
+from PIL import ImageGrab
 class v:
     agentSelected = [] 
     currentPath = os.path.dirname(os.path.abspath(__file__))
     currentPath += '\\'
-    screenshotPath = currentPath+'\\source\\'
-    others_path = currentPath+'\\others\\'
-    accounts_agents_path = currentPath+'accounts_agents\\'
+    screenshotPath = currentPath+'source\\'
+    others_path = currentPath+'others\\'
+    accounts_info_path = currentPath+'accounts_info\\'
     lockX, lockY = 1213,1084
     accountCredentials = {
         'FatherSun': ['wonnacha','Pleasetellme3'],
         'LaVanTor': ['wonnacha3','Pleasetellme3'],
-        'speakEngInVal': ['wonnacha4','Pleasetellme3']
+        'speakEngInVal': ['wonnacha4','Pleasetellme3'],
+        'oOoOoOo': ['wonnacha6','Pleasetellme3']
     }
+    debug = 1
     #if even number= either select agent/ re queuing
     def agentXYposition(account):
         csv_filename = v.currentPath+ 'agentXYposition.csv'
@@ -45,7 +49,7 @@ class v:
                 if row['Account'] == account:
                     agentXYposition.append(row)
         if len(agentXYposition) < 4:
-            exit('SOMETIME IS NOT RIGHT')
+            exit('SOMETIME IS NOT RIGHT: len(agentXYposition) < 4')
         return agentXYposition
     def getAgentsPosition(account):
         originalLength = 0
@@ -96,7 +100,7 @@ class v:
                         except:
                         #     count+=1
                         # if count >2:
-                            print(f"-   -   -   -   failed to locate: {agent}")
+                            print(f"   -   -   -   -   -   -   failed to locate: {agent}")
                             break
             f.close()
         v.debugger('originalLength: '+str(originalLength))
@@ -220,8 +224,8 @@ class v:
         subprocess.run(compile_cmd, check=True)
 
         if repickAgent is False:
-            # v.checkIfLoadingPageDone()
-            time.sleep(3.5)
+            v.checkIfLoadingPageDone()
+            # time.sleep(3.5)
         cursorPos = pyautogui.position()
         if v.random:
             v.stateReport(4,f'🍭🍭RANDOM🍭🍭 agent selecting: 🍭  {agent} 🍭')
@@ -339,20 +343,22 @@ class v:
         pyautogui.moveTo(a)
     def check_if_val_message_sent():
         #check if the message sent
-        result_pos = v.tryAndSearch(f'{v.screenshotPath}ok_button.png',withoutClick=False, withoutMove=False)
+        result_pos = v.tryAndSearch(f'ok_button.png',withoutClick=False, withoutMove=False)
         if result_pos is not None:
             current_datetime = datetime.now()
             formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H:%M:%S")
-            screenshot_path = v.screenshotPath+f'auto_sc\\{formatted_datetime}'
-            #if yes, screenshot
-            pyautogui.screenshot(screenshot_path, region = (0,0,2560,1440))
-            print('check message at: ',screenshot_path)
+            screenshot_path = v.screenshotPath+f'auto_sc\\{formatted_datetime}.png'
+            v.screenshot(screenshot_path)
+            print('❗  ❗  ❗   check message at: ',screenshot_path)
             click(result_pos)
             v.check_if_val_message_sent()
-
-        
-        
-    
+        # v.debugger("check_if_val_message_sent: "+ result_pos)
+    def screenshot(screenshot_path):
+        # Take a screenshot of the entire screen
+        screenshot = ImageGrab.grab()
+        # Save the screenshot to a file
+        screenshot.save(screenshot_path)
+        v.wait_for_file_found(screenshot_path)
     def errorChecking(agentXYposition):
         availableAgent = []
         possibleAgent = []
@@ -377,9 +383,10 @@ class v:
                 print(availableAgent)
                 exit(f'{a} is not available in this account!!!')
     def debugger(msg):
-        v.debug = 0
         if v.debug == 1:
-            print(f'debug: {msg}')
+            current_datetime = datetime.now()
+            formatted_datetime = current_datetime.strftime("%H-%M-%S")
+            print(f'debug-[{formatted_datetime}]: {msg}')
     def MainFlow(account, skipStart=False, random=False, reQ=False,launchAndLogin=False):
         v.random = random
         v.account = account
@@ -422,11 +429,12 @@ class v:
         """ alt tab here """
     def login(loginUsername=False,loginPassword=False):
         #open riot
-        pyautogui.press('win')
-        time.sleep(1)
-        pyautogui.write('riot')
-        time.sleep(0.4)
-        pyautogui.press('enter')
+        # pyautogui.press('win')
+        # time.sleep(1)
+        # pyautogui.write('riot')
+        # time.sleep(0.4)
+        # pyautogui.press('enter')
+        os.startfile(r'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Riot Games\特戰英豪.lnk')
         #two types of username scenerio
         while True:
             try:
@@ -450,6 +458,7 @@ class v:
         pyautogui.write(loginPassword)
         pyautogui.press('enter')
         time.sleep(5)
+        start_time = time.time()
         while True:
             try:
                 play_x,play_y = pyautogui.locateCenterOnScreen(v.screenshotPath+'play.png', region = (0,0,2560,1440), confidence=0.8)
@@ -464,52 +473,100 @@ class v:
                     break
             except:
                 pass
+            elapsed_time = time.time() - start_time
+            allowed_time = 60
+            if elapsed_time > allowed_time:
+                v.debugger(f'OVER {allowed_time} SECONDS!!!!')
+                v.debugger('restarting')
+                v.exit_valorant()
+                sleep(3)
+                v.login(loginUsername,loginPassword)
+                sleep(3)
         time.sleep(1)
         pyautogui.FAILSAFE = False
         v.check_if_val_message_sent()
         click(play_x,play_y)
-    def select_agent_page():
-        return
-    def check_all_account_available_agent():
-        account = [3,4,5,6,7,8,9]
+        v.debugger(f'click({play_x},{play_y})')
+    def wait_for_file_found(file):
+        while True:
+            if os.path.isfile(file):
+                v.debugger('file found: '+ file)
+                count = 0
+                size = os.path.getsize(file)
+                while True:
+                    # time.sleep(1.5)
+                    new_size = os.path.getsize(file)
+                    if new_size == size:
+                        count += 1
+                    else:
+                        size = new_size
+                        count = 0
+                    if count == 3:
+                        break
+                return
+    def check_all_account_available_agent(secondTime=False):
+        account = ['',3,4,5,6,7]
         for i in account:
             account_name = 'wonnacha'+str(i)
             password = 'Pleasetellme3'
             v.login(account_name,password)
             time.sleep(2)
-            # current contract
-            for each_pos in [Point(x=1004, y=46), Point(x=1569, y=47)]:
-                click(each_pos)
-                sleep(1.5)
+            for pos,fileName in [
+                [[Point(x=1004, y=46)],'current_contract'],
+                [[Point(x=1569, y=47)],'collection'],
+                [[Point(x=1486, y=44),Point(x=2225, y=34)],'career&mission']
+                ]:
+                for each_pos in pos:
+                    click(each_pos)
+                    sleep(2)
                 current_datetime = datetime.now()
                 formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
-                screenshot_path = v.accounts_agents_path+formatted_datetime+'_'+account_name+'.png'
-                pyautogui.screenshot(screenshot_path, region = (0,0,2560,1440))
+                screenshot_path = v.accounts_info_path+formatted_datetime+'_'+account_name+'_'+fileName+'.png'
+                v.screenshot(screenshot_path)
             # go to custom game mode
-            click(x=1266, y=33)
-            poss = [Point(x=1855, y=139), Point(x=1225, y=1311), Point(x=1066, y=825)]
-            for each_pos in poss:
-                click(each_pos)
-                time.sleep(0.5)
-            v.get_venue_simple()
-            while True:
-                try:
-                    x, y = pyautogui.locateCenterOnScreen(v.screenshotPath+'agent_sage.png', region = (0,0,2500,1440), confidence=0.8)
-                    if (x, y) is not None:
-                        break
-                    else:
-                        print('nope')
-                except:
-                    pass
-            sleep(3)
+            v.go_to_custom_game_mode(account_name,password)
             current_datetime = datetime.now()
             formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
-            screenshot_path = v.accounts_agents_path+formatted_datetime+'_'+account_name+'.png'
-            pyautogui.screenshot(screenshot_path, region = (0,0,2560,1440))
+            screenshot_path = v.accounts_info_path+formatted_datetime+'_'+account_name+'_available agents'+'.png'
+            v.screenshot(screenshot_path)
             print('check screenshot at: ',screenshot_path)
-            time.sleep(0.5)
-            pyautogui.hotkey('alt', 'F4')
+            v.exit_valorant()
             time.sleep(5)
+    def go_to_custom_game_mode(account_name,password):
+        click(x=1266, y=33)
+        poss = [Point(x=1855, y=139), Point(x=1225, y=1311), Point(x=1066, y=825)]
+        for each_pos in poss:
+            click(each_pos)
+            time.sleep(0.5)
+        start_time = time.time()
+        for i in ['agent_sage.png','agent_phoenix.png','agent_brimstone.png']:
+            v.debugger('looking for: '+i)
+            while True:
+                try:
+                    target = v.screenshotPath+i
+                    x,y = pyautogui.locateCenterOnScreen(target, region = (0,0,2500,1440), confidence=0.9)
+                    moveTo(x,y)
+                    v.debugger(i + ' found')
+                    break
+                except:
+                    pass
+                elapsed_time = time.time() - start_time
+                allowed_time = 30
+                if elapsed_time > allowed_time:
+                    v.debugger(f'OVER {allowed_time} SECONDS!!!!')
+                    v.debugger('restarting')
+                    v.exit_valorant()
+                    sleep(3)
+                    v.login(account_name,password)
+                    sleep(3)
+                    v.go_to_custom_game_mode(account_name,password)
+                    return
+    def exit_valorant():
+        for proc in psutil.process_iter(['pid', 'name']):
+            if 'valorant' in proc.info['name'].lower():
+                pid = proc.info['pid']
+                process = psutil.Process(pid)
+                process.terminate()
     def get_venue_simple():
         AllFiles = os.listdir(v.screenshotPath)
         venueList = []
@@ -525,7 +582,20 @@ def afk():
     # Run the compiled executable with the x and y coordinates as arguments
     run_cmd = [f"{v.others_path}afk"]
     subprocess.run(run_cmd, check=True)
-        
+def print_instructions(choices):
+    for i,choice in enumerate(choices):
+        i +=1
+        print(f"{i}: {choice}")
+def print_instructions_main(choices):
+    print("  #"*10)
+    for i,choice in enumerate(choices):
+        i +=1
+        print(f"{i}: {choice}")
+    input_value = input("\nPlease input:")
+    return input_value
+    for i,choice in enumerate(choices):
+        i +=1
+        print(f"{i}: {choice}")
 
 """
 astra, breach, brimstone, chamber, cypher, gekko,jett, 
@@ -563,33 +633,39 @@ FatherSun, LaVanTor, speakEngInVal
 """
 preference = ['sage', 'killjoy', 'cypher']
 preference = ['phoenix', 'reyna', 'jett']  
-preference = ['reyna', 'jett', 'phoenix']  
-preference = ['raze', 'reyna', 'phoenix'] 
 preference = ['jett', 'reyna', 'phoenix']  
 preference = ['chamber', 'omen', 'phoenix']
 preference = ['omen', 'breach', 'chamber']
+preference = ['yoru', 'chamber', 'raze']
+preference = ['raze', 'reyna', 'phoenix'] 
+preference = ['reyna', 'jett', 'phoenix']  
 """ """
-account = 'speakEngInVal'
 account = 'LaVanTor'
+account = 'speakEngInVal'
 account = 'FatherSun'
+account = 'oOoOoOo'
 def hold():
-    print('1️: main program\n2: report player\n3: requeue\n4: login & queue\n5.afk')
     MainFlow = "v.MainFlow(account, skipStart='y', reQ='y')"
     withpartyRank = "v.MainFlow(account, skipStart='y')"
     launchAndLogin = "v.MainFlow(account, skipStart='y', reQ='y', launchAndLogin=True)"
     while True:
-        input_value = input("  #"*10 + f"\n1: {withpartyRank}\n2: v.reportPlayer()\n3: {MainFlow}\n4: {launchAndLogin}\n5: afk()\n" + "  #"*10+f'\naccount: {account}'+"\nPlease input:")
+        input_value = print_instructions_main(['main program','report player','requeue','login & queue','afk'])
         if input_value == "1":
             eval(withpartyRank)
         elif input_value == "2":
-            print('1: report\n2: exit')
+            print_instructions(['report','exit','exit & requeuing'])
             time.sleep(1)
             while True:
                 if keyboard.is_pressed('1'): 
                     v.reportPlayer()
                 elif keyboard.is_pressed('2'):
                     print('exiting..')
+                    time.sleep(0.5)
+                    break
+                elif keyboard.is_pressed('3'):
+                    print('exiting and requeuing')
                     time.sleep(1)
+                    eval(MainFlow)
                     break
         elif input_value == "3":
             eval(MainFlow)
@@ -599,12 +675,13 @@ def hold():
             afk()
         elif input_value == "6":
             time.sleep(1)
-            pyautogui.hotkey('alt', 'F4')
-        
-        
 if __name__ == "__main__":
     hold()
-    # v.check_all_account_available_agent()
+    v.check_all_account_available_agent()
+    # v.getAgentsPosition(account=account)
     # v.MainFlow('speakEngInVal') #waiting for m tch found directly
     # v.MainFlow('FatherSun', random='random is on', reQ='y')
-    # v.getAgentsPosition(account=account)
+
+
+
+# 0;P;c;1;o;1;d;1;z;1;0t;1;0a;1;1b;0

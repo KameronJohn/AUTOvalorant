@@ -18,6 +18,7 @@ import datetime
 from PIL import Image
 from pytesseract import pytesseract
 import os
+
 def getMousePosition():
     PosList = []
     while True:
