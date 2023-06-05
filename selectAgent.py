@@ -339,17 +339,60 @@ class v:
             click(result_pos)
             v.check_if_val_message_sent()
         # v.debugger("check_if_val_message_sent: "+ result_pos)
-    def screenshot(screenshot_path):
+    def full_path_name_to_three_parts(fileName):
+        dir_path, full_name = os.path.split(fileName)
+        file_name, file_ext = os.path.splitext(full_name)
+        return dir_path,file_name,file_ext
+    # def screenshot(screenshot_path,previous_file='',loop_times=0,compare_size=0):
+    #     # Take a screenshot of the entire screen
+    #     screenshot = ImageGrab.grab()
+    #     # Save the screenshot to a file
+    #     screenshot.save(screenshot_path)
+    #     current_size = v.wait_for_file_found(screenshot_path)
+    #     if loop_times != 0:
+    #         if current_size>compare_size:
+    #             print("current_size>compare_size")
+    #             os.remove(previous_file)
+    #             os.rename(screenshot_path, previous_file)
+    #             loop_times = 0
+    #         else:
+    #             print("normal")
+    #             os.remove(screenshot_path)
+    #             if loop_times > 2:
+    #                 return
+    #         screenshot_path = previous_file
+    #     dir_path,file_name,file_ext = v.full_path_name_to_three_parts(screenshot_path)
+    #     second_screenshot_path = dir_path+'\\'+file_name+'_1'+file_ext
+    #     loop_times +=1
+    #     v.screenshot(second_screenshot_path,screenshot_path,loop_times,current_size)
+    def screenshot(screenshot_path,previous_file='',loop_times=0,compare_size=0):
+        dir_path,file_name,file_ext = v.full_path_name_to_three_parts(screenshot_path)
+        tmp_screenshot_path = dir_path+'\\'+file_name+'_1'+file_ext       
         # Take a screenshot of the entire screen
         screenshot = ImageGrab.grab()
         # Save the screenshot to a file
         screenshot.save(screenshot_path)
-        if v.wait_for_file_found(screenshot_path) is False:
-            os.remove(screenshot_path)
-            print('retaking screenshot: '+ screenshot_path)
-            v.screenshot(screenshot_path)
-            sleep(1)
-        return
+        current_size = v.wait_for_file_found(screenshot_path) 
+        while True:
+            # Take a screenshot of the entire screen
+            screenshot = ImageGrab.grab()
+            # Save the screenshot to a file
+            screenshot.save(tmp_screenshot_path)
+            tmp_size = v.wait_for_file_found(tmp_screenshot_path)
+            if loop_times != 0:
+                if tmp_size>current_size:
+                    print("tmp_size>compare_size")
+                    os.remove(screenshot_path)
+                    os.rename(tmp_screenshot_path, screenshot_path)
+                    current_size = tmp_size
+                    loop_times = 0
+                else:
+                    print("normal")
+                    os.remove(tmp_screenshot_path)
+                    if loop_times > 2:
+                        print('  -  '*20)
+                        return
+            loop_times +=1
     def errorChecking(agentXYposition):
         availableAgent = []
         possibleAgent = []
@@ -488,7 +531,6 @@ class v:
                 count = 0
                 size = os.path.getsize(file)
                 while True:
-                    # time.sleep(1.5)
                     new_size = os.path.getsize(file)
                     if new_size == size:
                         count += 1
@@ -496,11 +538,7 @@ class v:
                         size = new_size
                         count = 0
                     if count == 3:
-                        break
-                if size/ 1024 < 1300:
-                    return False
-                else:
-                    return True
+                        return size
     def check_all_account_available_agent(secondTime=False):
         account = ['',3,4,5,6,7]
         for i in account:
@@ -509,8 +547,7 @@ class v:
             v.login(account_name,password,direct_launch=True)
             time.sleep(2)
             for pos,fileName in [
-                [[Point(x=1004, y=46)],'current_contract'],
-                [[Point(x=1569, y=47)],'collection'],
+                [[Point(x=1004, y=46)],'current_contract']
                 [[Point(x=1486, y=44),Point(x=2225, y=34)],'career&mission']
                 ]:
                 for each_pos in pos:
@@ -520,7 +557,6 @@ class v:
                 formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
                 screenshot_path = v.accounts_info_path+formatted_datetime+'_'+account_name+'_'+fileName+'.png'
                 v.screenshot(screenshot_path)
-            # go to custom game mode
             v.go_to_custom_game_mode(account_name,password)
             current_datetime = datetime.now()
             formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
@@ -534,7 +570,7 @@ class v:
         poss = [Point(x=1855, y=139), Point(x=1225, y=1311), Point(x=1066, y=825)]
         for each_pos in poss:
             click(each_pos)
-            time.sleep(0.5)
+            time.sleep(0.75)
         start_time = time.time()
         for i in ['agent_sage.png','agent_phoenix.png','agent_brimstone.png']:
             v.debugger('looking for: '+i)
@@ -577,18 +613,14 @@ def afk_boss(MainFlow,withpartyRank):
     eval(MainFlow)
     while True:
         process = core_afk()
-        respond = v.tryAndSearch('play_again.png', withoutClick=False, withoutMove=False)
-        respondd = v.tryAndSearch('play_after_one_game.png', withoutClick=False, withoutMove=False)
+        respond = v.tryAndSearch('play_again.png', withoutClick=True, withoutMove=False)
+        respondd = v.tryAndSearch('play_after_one_game.png', withoutClick=True, withoutMove=False)
         if respond or respondd:
-            """ debugging """
-            time.sleep(2)
-            respond = v.tryAndSearch('play_again.png', withoutClick=False, withoutMove=False)
-            respondd = v.tryAndSearch('play_after_one_game.png', withoutClick=False, withoutMove=False)
-            """ debugging """
+            v.requeueRank()
             eval(withpartyRank)
             print(f'round: {count} done')
             count +=1
-            if count >5:
+            if count >8:
                 # Get the current time
                 now = datetime.datetime.now()
 
@@ -599,21 +631,21 @@ def afk_boss(MainFlow,withpartyRank):
                 with open("current_time.txt", "w") as file:
                     # Write the current time to the file
                     file.write(current_time)
-                os.system("shutdown /s -a")
-                os.system("shutdown /s /t 1")
+                # os.system("shutdown -a")
+                # os.system("shutdown /s /t 1")
 def core_afk():
     # Compile the C++ file
     compile_cmd = ["g++", f"{v.others_path}afk.cpp", "-o", "afk"]
     subprocess.run(compile_cmd, check=True)
     # Run the compiled executable with the x and y coordinates as arguments
     """ drop,shield,abilties """
-    run_cmd = [f"{v.others_path}afk", '1', '0', '0']
+    run_cmd = [f"{v.others_path}afk", '0', '1', '0']
     """ drop,shield,abilties """
     subprocess.run(run_cmd, check=True)
     return
 def afk(buy_shield=False):
     while True:
-        core_afk(buy_shield)
+        core_afk()
 def print_instructions(choices):
     for i,choice in enumerate(choices):
         i +=1
@@ -675,20 +707,20 @@ unrated, competitive, swiftplay, spike_rush
 game_mode = 'swiftplay'
 """
 """
-preference = ['sage', 'killjoy', 'cypher']
 preference = ['phoenix', 'reyna', 'jett']  
-preference = ['jett', 'reyna', 'phoenix']  
 preference = ['yoru', 'chamber', 'raze']
 preference = ['reyna', 'jett', 'phoenix']
 preference = ['chamber', 'omen', 'phoenix']
 preference = ['omen', 'sage', 'jett']
 preference = ['raze', 'reyna', 'phoenix']
+preference = ['jett', 'reyna', 'phoenix']  
+preference = ['sage', 'brimstone', 'phoenix']
 """ """
 account = 'LaVanTor'
 account = 'FatherSun'
-account = 'speakEngInVal'
 account = 'Dear Curi'
 account = 'oOoOoOo'
+account = 'speakEngInVal'
 def hold(game_mode,available_modes):
     MainFlow = "v.MainFlow(account, skipStart='y', reQ='y')"
     withpartyRank = "v.MainFlow(account, skipStart='y')"

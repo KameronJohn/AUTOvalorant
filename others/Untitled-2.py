@@ -8,6 +8,6 @@ while True:
     subprocess.run(compile_cmd, check=True)
     # Run the compiled executable with the x and y coordinates as arguments
     """ drop,shield,abilities """
-    run_cmd = [f"{others_path}afk", '1', '0', '0']
+    run_cmd = [f"{others_path}afk", '0', '0', '0']
     """ drop,shield,abilities """
     subprocess.run(run_cmd, check=True)
