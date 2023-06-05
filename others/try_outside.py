@@ -18,14 +18,15 @@ import datetime
 from PIL import Image
 from pytesseract import pytesseract
 import os
-
 def getMousePosition():
     PosList = []
     while True:
         a = pyautogui.position()
         print(a)
         if keyboard.is_pressed('1'):
-            PosList.append(a)
+            x,y = a
+            PosList.append((x,y))
+            # PosList.append(a)112
             print(PosList)
             time.sleep(0.3)
         if keyboard.is_pressed('2'):

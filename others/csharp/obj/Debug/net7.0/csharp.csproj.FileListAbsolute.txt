@@ -1,0 +1,15 @@
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\obj\Debug\net7.0\csharp.csproj.AssemblyReference.cache
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\obj\Debug\net7.0\csharp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\obj\Debug\net7.0\csharp.AssemblyInfoInputs.cache
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\obj\Debug\net7.0\csharp.AssemblyInfo.cs
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\obj\Debug\net7.0\csharp.csproj.CoreCompileInputs.cache
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\bin\Debug\net7.0\csharp.exe
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\bin\Debug\net7.0\csharp.deps.json
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\bin\Debug\net7.0\csharp.runtimeconfig.json
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\bin\Debug\net7.0\csharp.dll
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\bin\Debug\net7.0\csharp.pdb
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\obj\Debug\net7.0\csharp.dll
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\obj\Debug\net7.0\refint\csharp.dll
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\obj\Debug\net7.0\csharp.pdb
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\obj\Debug\net7.0\csharp.genruntimeconfig.cache
+C:\Users\kamka\Documents\AUTOvalorant\others\csharp\obj\Debug\net7.0\ref\csharp.dll
