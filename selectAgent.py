@@ -381,16 +381,16 @@ class v:
             tmp_size = v.wait_for_file_found(tmp_screenshot_path)
             if loop_times != 0:
                 if tmp_size>current_size:
-                    print("tmp_size>compare_size")
+                    # print("tmp_size>compare_size")
                     os.remove(screenshot_path)
                     os.rename(tmp_screenshot_path, screenshot_path)
                     current_size = tmp_size
                     loop_times = 0
                 else:
-                    print("normal")
+                    # print("normal")
                     os.remove(tmp_screenshot_path)
                     if loop_times > 2:
-                        print('  -  '*20)
+                        # print('  -  '*20)
                         return
             loop_times +=1
     def errorChecking(agentXYposition):
@@ -616,11 +616,11 @@ def afk_boss(MainFlow,withpartyRank):
         respond = v.tryAndSearch('play_again.png', withoutClick=True, withoutMove=False)
         respondd = v.tryAndSearch('play_after_one_game.png', withoutClick=True, withoutMove=False)
         if respond or respondd:
+            print(f'round: {count} done')
             v.requeueRank()
             eval(withpartyRank)
-            print(f'round: {count} done')
             count +=1
-            if count >8:
+            if count >5:
                 # Get the current time
                 now = datetime.datetime.now()
 
@@ -631,8 +631,8 @@ def afk_boss(MainFlow,withpartyRank):
                 with open("current_time.txt", "w") as file:
                     # Write the current time to the file
                     file.write(current_time)
-                # os.system("shutdown -a")
-                # os.system("shutdown /s /t 1")
+                os.system("shutdown -a")
+                os.system("shutdown /s /t 1")
 def core_afk():
     # Compile the C++ file
     compile_cmd = ["g++", f"{v.others_path}afk.cpp", "-o", "afk"]
@@ -704,23 +704,24 @@ MainFlow(account, skipStart=False, random=False)
 FatherSun, LaVanTor, speakEngInVal
 unrated, competitive, swiftplay, spike_rush
 """
-game_mode = 'swiftplay'
+game_mode = 'unrated' 
+game_mode = 'competitive'
 """
 """
 preference = ['phoenix', 'reyna', 'jett']  
 preference = ['yoru', 'chamber', 'raze']
 preference = ['reyna', 'jett', 'phoenix']
 preference = ['chamber', 'omen', 'phoenix']
-preference = ['omen', 'sage', 'jett']
 preference = ['raze', 'reyna', 'phoenix']
 preference = ['jett', 'reyna', 'phoenix']  
 preference = ['sage', 'brimstone', 'phoenix']
+preference = ['omen', 'sage', 'jett']
 """ """
 account = 'LaVanTor'
-account = 'FatherSun'
 account = 'Dear Curi'
 account = 'oOoOoOo'
 account = 'speakEngInVal'
+account = 'FatherSun'
 def hold(game_mode,available_modes):
     MainFlow = "v.MainFlow(account, skipStart='y', reQ='y')"
     withpartyRank = "v.MainFlow(account, skipStart='y')"
