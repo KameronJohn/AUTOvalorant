@@ -161,8 +161,16 @@ class v:
             if v.tryAndSearch('matchFound.png'):
                 v.stateReport(1,f'match found')
                 v.getVenue(venueList, agentXYposition)
-            if v.tryAndSearch('inGame.png'):
+            pos = v.tryAndSearch('inGame.png')
+            if pos is not None:
                 v.stateReport(6, 'in game, have fun.')
+                try:
+                    v.afk_status
+                    for i in range(3):
+                        click(pos)
+                        sleep(1)
+                except:
+                    pass
                 return
             else:
                 pass
@@ -218,7 +226,7 @@ class v:
                     xaxis = int(i['Xposition'])
                     yaxis = int(i['Yposition'])
                     break
-        count =0
+        count = 0
         
         # Compile the C++ file
         compile_cmd = ["g++", f"{v.others_path}selectagent.cpp", "-o", "selectagent"]
@@ -547,7 +555,7 @@ class v:
             v.login(account_name,password,direct_launch=True)
             time.sleep(2)
             for pos,fileName in [
-                [[Point(x=1004, y=46)],'current_contract']
+                [[Point(x=1004, y=46)],'current_contract'],
                 [[Point(x=1486, y=44),Point(x=2225, y=34)],'career&mission']
                 ]:
                 for each_pos in pos:
@@ -609,6 +617,7 @@ class v:
                 venueList.append(i)
         v.getVenue(venueList)
 def afk_boss(MainFlow,withpartyRank):
+    v.afk_status = True
     count = 1
     eval(MainFlow)
     while True:
@@ -617,10 +626,11 @@ def afk_boss(MainFlow,withpartyRank):
         respondd = v.tryAndSearch('play_after_one_game.png', withoutClick=True, withoutMove=False)
         if respond or respondd:
             print(f'round: {count} done')
+            v.check_if_val_message_sent()
             v.requeueRank()
             eval(withpartyRank)
             count +=1
-            if count >5:
+            if count >4:
                 # Get the current time
                 now = datetime.datetime.now()
 
@@ -704,8 +714,8 @@ MainFlow(account, skipStart=False, random=False)
 FatherSun, LaVanTor, speakEngInVal
 unrated, competitive, swiftplay, spike_rush
 """
-game_mode = 'unrated' 
 game_mode = 'competitive'
+game_mode = 'unrated' 
 """
 """
 preference = ['phoenix', 'reyna', 'jett']  
@@ -714,14 +724,14 @@ preference = ['reyna', 'jett', 'phoenix']
 preference = ['chamber', 'omen', 'phoenix']
 preference = ['raze', 'reyna', 'phoenix']
 preference = ['jett', 'reyna', 'phoenix']  
-preference = ['sage', 'brimstone', 'phoenix']
 preference = ['omen', 'sage', 'jett']
+preference = ['sage', 'brimstone', 'phoenix']
 """ """
 account = 'LaVanTor'
 account = 'Dear Curi'
 account = 'oOoOoOo'
-account = 'speakEngInVal'
 account = 'FatherSun'
+account = 'speakEngInVal'
 def hold(game_mode,available_modes):
     MainFlow = "v.MainFlow(account, skipStart='y', reQ='y')"
     withpartyRank = "v.MainFlow(account, skipStart='y')"
