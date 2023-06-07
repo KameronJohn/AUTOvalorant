@@ -723,11 +723,11 @@ game_mode = 'competitive'
 preference = ['phoenix', 'reyna', 'jett']  
 preference = ['yoru', 'chamber', 'raze']
 preference = ['reyna', 'jett', 'phoenix']
-preference = ['chamber', 'omen', 'phoenix']
 preference = ['raze', 'reyna', 'phoenix']
 preference = ['jett', 'reyna', 'phoenix']  
 preference = ['sage', 'brimstone', 'phoenix']
 preference = ['omen', 'sage', 'jett']
+preference = ['chamber', 'omen', 'phoenix']
 """ """
 account = 'LaVanTor'
 account = 'Dear Curi'
