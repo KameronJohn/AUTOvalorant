@@ -4,6 +4,8 @@ import numpy as np
 import pyautogui
 import os
 
+currentPath = os.path.dirname(os.path.abspath(__file__))
+currentPath += "\\"
 def locate_text(image_path, text):
     # Load the image and convert it to grayscale
     image = cv2.imread(image_path)
@@ -21,9 +23,12 @@ def locate_text(image_path, text):
         x, y, w, h = cv2.boundingRect(contour)
         # Extract the region of interest (ROI) of the contour
         roi = image[y:y+h, x:x+w]
-        pytesseract.tesseract_cmd = r"C:\Users\kamka\Documents\AUTOvalorant\Tesseract\tesseract.exe"
+
+        pytesseract.tesseract_cmd = currentPath + "\\Tesseract\\tesseract.exe"
         # Apply OCR to the ROI to get the text
         detected_text = pytesseract.image_to_string(roi)
+        print(type(detected_text))
+        print("detected_text:\n"+detected_text)
         # Convert all elements to lowercase and remove spaces
         detected_text = [element.lower().replace(" ", "") for element in detected_text]
         # Check if the text matches what we're looking for
@@ -41,7 +46,8 @@ def locate_text(image_path, text):
 
     # If the text is not found, return None
     return None
-screenshot = pyautogui.screenshot(r"C:\Users\kamka\Documents\AUTOvalorant\removeMe.png")
-pos = locate_text(r"C:\Users\kamka\Documents\AUTOvalorant\removeMe.png", "chatgpt")
+# screenshot = pyautogui.screenshot(currentPath + "removeMe.png")
+# pos = locate_text(currentPath + "removeMe.png", "chatgpt")
+pos = locate_text(r"C:\Users\John\Documents\John\AUTOvalorant\source\testing12.png", "chatgpt")
 print(pos)
 pyautogui.click(pos)
