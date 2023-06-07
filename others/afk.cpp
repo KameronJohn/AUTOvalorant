@@ -67,26 +67,27 @@ int random_sleep()
         
         // Generate a random number between 500 and 2500
         // generate a random number between 500 and 2500
-        int num = rand() % 1001 + 500;
+        int num = random_number(1000,500);
         // int num = std::rand() % 2001 + 500;
         Sleep(num);
         return num;
     }
 int main(int argc, char* argv[])
+// int main(int argc, char* argv[])
 {
+
     /* declare parameters */
-    int drop = std::stoi(argv[1]);
-    int shield = std::stoi(argv[2]);
-    int abilities = std::stoi(argv[3]);
+    // int drop = std::stoi(argv[1]);
+    // int shield = std::stoi(argv[2]);
+    // int abilities = std::stoi(argv[3]);
+
+    int drop = 1;
+    int shield = 1;
+    int abilities = 1;
     
     // std::cout << drop << std::endl;
     // std::cout << shield << std::endl;
     // std::cout << abilities << std::endl;
-    /* declare parameters */
-
-    INPUT input;
-    ZeroMemory(&input, sizeof(input));
-    input.type = INPUT_KEYBOARD;
     // Seed the random number generatorwaw
     std::srand(std::time(nullptr));
 
@@ -94,23 +95,20 @@ int main(int argc, char* argv[])
     Sleep(1000);
     // std::cout << "starting" << std::endl;
     key_press("6",500);
+
     //create an array of number
-    const int VK_ARRAY[] = {VK_SPACE,'A', 'W', 'D'};
-    for (int i = 0; i < 3; i++)
+    char aqrr[] = {'A','D','W','A','D','A','D','W','S'};
+    for (int i = 0; i < 30; i++)
     {
         
-        std::cout << "cehckl"<< std::endl;
         // Select a random element from the array
-        int number = rand() % 5;
+        int number = rand() % 10;
         //select key
-        input.ki.wVk = VK_ARRAY[number];
-        std::cout << "pressed: " << number << std::endl;
-        input.ki.dwFlags = 0;
-        SendInput(1, &input, sizeof(INPUT));
         int num = random_sleep();
-        input.ki.dwFlags = KEYEVENTF_KEYUP;
-        SendInput(1, &input, sizeof(INPUT));
-        random_sleep();
+        std::cout << "hi" << std::endl;
+        int ran_slp_time = random_number(2000,1000);
+        afk_hotkey_press(aqrr[number],aqrr[number],ran_slp_time);
+        // random_sleep();
     }
     // std::cout << "loop_times " << std::endl;
     int loop_times = 0;

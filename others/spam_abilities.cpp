@@ -17,6 +17,7 @@ int spamming()
     }
 int main()
 {
+    std::cout << "Press F7 to spam" << std::endl;
     while (true)
     {
         /* if '1' is input */

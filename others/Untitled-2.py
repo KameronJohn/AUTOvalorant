@@ -3,7 +3,7 @@ import time
 time.sleep(2)
 others_path = r'C:\Users\kamka\Documents\AUTOvalorant\others'+'\\'
 while True:
-    # Compile the C++ filwe
+    # Compile the C++ filwe6
     compile_cmd = ["g++", f"{others_path}afk.cpp", "-o", "afk"]
     subprocess.run(compile_cmd, check=True)
     # Run the compiled executable with the x and y coordinates as arguments

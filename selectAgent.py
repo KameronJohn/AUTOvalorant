@@ -39,7 +39,7 @@ class v:
         'oOoOoOo': ['wonnacha6','Pleasetellme3'],
         'Dear Curi': ['wonnacha7','Pleasetellme3'],
     }
-    debugging = 0
+    debugging = 1
     #if even number= either select agent/ re queuing
     def agentXYposition(account):
         csv_filename = v.currentPath+ 'agentXYposition.csv'
@@ -337,7 +337,7 @@ class v:
         pyautogui.moveTo(a)
     def check_if_val_message_sent():
         #check if the message sent
-        result_pos = v.tryAndSearch(f'ok_button.png',withoutClick=False, withoutMove=False)
+        result_pos = v.tryAndSearch(f'ok_button.png',withoutClick=True, withoutMove=True)
         if result_pos is not None:
             current_datetime = datetime.now()
             formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H:%M:%S")
@@ -346,6 +346,7 @@ class v:
             alert_msg('check message at: '+screenshot_path)
             click(result_pos)
             v.check_if_val_message_sent()
+        return
         # v.debugger("check_if_val_message_sent: "+ result_pos)
     def full_path_name_to_three_parts(fileName):
         dir_path, full_name = os.path.split(fileName)
@@ -630,9 +631,9 @@ def afk_boss(MainFlow,withpartyRank):
             v.requeueRank()
             eval(withpartyRank)
             count +=1
-            if count >4:
+            if count > 8:
                 # Get the current time
-                now = datetime.datetime.now()
+                now = datetime.now()
 
                 # Format the time as a string
                 current_time = now.strftime("%H:%M:%S")
@@ -714,8 +715,9 @@ MainFlow(account, skipStart=False, random=False)
 FatherSun, LaVanTor, speakEngInVal
 unrated, competitive, swiftplay, spike_rush
 """
-game_mode = 'competitive'
 game_mode = 'unrated' 
+game_mode = 'spike_rush' 
+game_mode = 'competitive'
 """
 """
 preference = ['phoenix', 'reyna', 'jett']  
@@ -724,14 +726,14 @@ preference = ['reyna', 'jett', 'phoenix']
 preference = ['chamber', 'omen', 'phoenix']
 preference = ['raze', 'reyna', 'phoenix']
 preference = ['jett', 'reyna', 'phoenix']  
-preference = ['omen', 'sage', 'jett']
 preference = ['sage', 'brimstone', 'phoenix']
+preference = ['omen', 'sage', 'jett']
 """ """
 account = 'LaVanTor'
 account = 'Dear Curi'
+account = 'speakEngInVal'
 account = 'oOoOoOo'
 account = 'FatherSun'
-account = 'speakEngInVal'
 def hold(game_mode,available_modes):
     MainFlow = "v.MainFlow(account, skipStart='y', reQ='y')"
     withpartyRank = "v.MainFlow(account, skipStart='y')"
