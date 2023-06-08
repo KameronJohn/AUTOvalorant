@@ -14,6 +14,11 @@ int main(int argc, char* argv[])
     // Parse the x and y coordinates from the arguments
     int pos1_x = std::stoi(argv[1]);
     int pos1_y = std::stoi(argv[2]);
+    if (pos1_x == 999 && pos1_y == 999)
+    {
+        std::cout << "test run done" << std::endl;
+        return 0;
+    }
     int pos2_x = std::stoi(argv[3]);
     int pos2_y = std::stoi(argv[4]);
 

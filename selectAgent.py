@@ -160,6 +160,7 @@ class v:
         while True: 
             if v.tryAndSearch('matchFound.png'):
                 v.stateReport(1,f'match found')
+                v.cpp_select_agent(999,999)
                 v.getVenue(venueList, agentXYposition)
             pos = v.tryAndSearch('inGame.png')
             if pos is not None:
@@ -204,6 +205,16 @@ class v:
         print('✅'*tick+'❌'*cross+' '+msg)
         v.debugger('stateReport ends')
         return
+    def cpp_select_agent(xaxis,yaxis):
+        """ dry run """
+        # Compile the C++ file
+        compile_cmd = ["g++", f"{v.others_path}selectagent.cpp", "-o", "selectagent"]
+        subprocess.run(compile_cmd, check=True)
+        """  """
+        # Run the compiled executable with the x and y coordinates as arguments
+        run_cmd = [f"{v.others_path}selectagent", str(xaxis), str(yaxis), str(v.lockX), str(v.lockY)]
+        subprocess.run(run_cmd, check=True)
+        """  """
     def selectAgent(preference, venue, agentXYposition, order=0, repickAgent=False):
         if v.random:
             systemChoice = random.choice(agentXYposition)
@@ -227,11 +238,6 @@ class v:
                     yaxis = int(i['Yposition'])
                     break
         count = 0
-        
-        # Compile the C++ file
-        compile_cmd = ["g++", f"{v.others_path}selectagent.cpp", "-o", "selectagent"]
-        subprocess.run(compile_cmd, check=True)
-
         if repickAgent is False:
             v.checkIfLoadingPageDone()
             # time.sleep(3.5)
@@ -250,11 +256,7 @@ class v:
         # except Exception as error:
         #     # handle the exception
         #     print("An exception occurred:", error) # An exception occurred: division by zero
-        """  """
-        # Run the compiled executable with the x and y coordinates as arguments
-        run_cmd = [f"{v.others_path}selectagent", str(xaxis), str(yaxis), str(v.lockX), str(v.lockY)]
-        subprocess.run(run_cmd, check=True)
-        """  """
+        v.cpp_select_agent(xaxis,yaxis)
         if v.checkIfAgentLocked(agentXYposition): 
             order +=1
             alert_msg(f'agent {order} cant be selected')
@@ -314,7 +316,7 @@ class v:
                 count3 = 0
             else:
                 count3 +=1
-            if count >5 and count2 >5 and count3 >5:
+            if count >3 and count2 >3 and count3 >3:
                 v.stateReport(3, 'select agent page')
                 return
 
@@ -335,17 +337,21 @@ class v:
         time.sleep(0.55)
         pyautogui.click(x=1244, y=974)
         pyautogui.moveTo(a)
-    def check_if_val_message_sent():
+    def check_if_val_message_sent(loginUsername):
         #check if the message sent
         result_pos = v.tryAndSearch(f'ok_button.png',withoutClick=True, withoutMove=True)
-        if result_pos is not None:
+        result_poss = v.tryAndSearch(f'understand.png',withoutClick=True, withoutMove=True)
+        if result_pos is not None or result_poss is not None:
             current_datetime = datetime.now()
-            formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H:%M:%S")
-            screenshot_path = v.screenshotPath+f'auto_sc\\{formatted_datetime}.png'
+            formatted_datetime = current_datetime.strftime("%Y%m%d_%H%M%S")+f"_{loginUsername}"
+            screenshot_path = v.currentPath+f'auto_sc\\{formatted_datetime}.png'
             v.screenshot(screenshot_path)
             alert_msg('check message at: '+screenshot_path)
-            click(result_pos)
-            v.check_if_val_message_sent()
+            try:
+                click(result_poss)
+            except:
+                click(result_pos)
+            v.check_if_val_message_sent(loginUsername)
         return
         # v.debugger("check_if_val_message_sent: "+ result_pos)
     def full_path_name_to_three_parts(fileName):
@@ -528,9 +534,10 @@ class v:
                 sleep(3)
                 v.login(loginUsername,loginPassword,direct_launch=True)
                 sleep(3)
+                break
         time.sleep(1)
         pyautogui.FAILSAFE = False
-        v.check_if_val_message_sent()
+        v.check_if_val_message_sent(loginUsername)
         click(play_x,play_y)
         v.debugger(f'click({play_x},{play_y})')
     def wait_for_file_found(file):
@@ -549,7 +556,7 @@ class v:
                     if count == 3:
                         return size
     def check_all_account_available_agent(secondTime=False):
-        account = ['',3,4,5,6,7]
+        account = [4,5,6,7]
         for i in account:
             account_name = 'wonnacha'+str(i)
             password = 'Pleasetellme3'
@@ -617,7 +624,7 @@ class v:
                 # print(i)
                 venueList.append(i)
         v.getVenue(venueList)
-def afk_boss(MainFlow,withpartyRank):
+def afk_boss(MainFlow,withpartyRank,loginUsername):
     v.afk_status = True
     count = 1
     eval(MainFlow)
@@ -627,7 +634,7 @@ def afk_boss(MainFlow,withpartyRank):
         respondd = v.tryAndSearch('play_after_one_game.png', withoutClick=True, withoutMove=False)
         if respond or respondd:
             print(f'round: {count} done')
-            v.check_if_val_message_sent()
+            v.check_if_val_message_sent(loginUsername)
             v.requeueRank()
             eval(withpartyRank)
             count +=1
@@ -704,7 +711,6 @@ preference = {
     'lotus': ['omen','phoenix','breach'],
     'split': ['omen','phoenix','breach' ],
     'fracture': ['omen','breach','omen'],
-    """  """
     'bind': ['omen','phoenix','breach'],
     'breeze':['habor','phoenix','breach']
 }
@@ -716,24 +722,24 @@ FatherSun, LaVanTor, speakEngInVal
 unrated, competitive, swiftplay, spike_rush
 """
 game_mode = 'unrated' 
-game_mode = 'spike_rush' 
 game_mode = 'competitive'
+game_mode = 'spike_rush' 
 """
 """
 preference = ['phoenix', 'reyna', 'jett']  
 preference = ['yoru', 'chamber', 'raze']
 preference = ['reyna', 'jett', 'phoenix']
-preference = ['raze', 'reyna', 'phoenix']
 preference = ['jett', 'reyna', 'phoenix']  
-preference = ['sage', 'brimstone', 'phoenix']
-preference = ['omen', 'sage', 'jett']
 preference = ['chamber', 'omen', 'phoenix']
+preference = ['omen', 'sage', 'jett']
+preference = ['raze', 'reyna', 'phoenix']
+preference = ['sage', 'brimstone', 'phoenix']
 """ """
 account = 'LaVanTor'
 account = 'Dear Curi'
-account = 'speakEngInVal'
 account = 'oOoOoOo'
 account = 'FatherSun'
+account = 'speakEngInVal'
 def hold(game_mode,available_modes):
     MainFlow = "v.MainFlow(account, skipStart='y', reQ='y')"
     withpartyRank = "v.MainFlow(account, skipStart='y')"
@@ -766,7 +772,7 @@ def hold(game_mode,available_modes):
         elif input_value == "6":
             v.check_all_account_available_agent()
         elif input_value == "7":
-            afk_boss(MainFlow,withpartyRank)
+            afk_boss(MainFlow,withpartyRank,account)
         elif input_value in available_agents:
             insert_agent(preference, input_value)
         else:
