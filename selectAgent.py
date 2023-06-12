@@ -29,7 +29,7 @@ class v:
         'oOoOoOo': ['wonnacha6','Pleasetellme3'],
         'Dear Curi': ['wonnacha7','Pleasetellme3'],
     }
-    debugging = 1
+    debugging = 0
     #if even number= either select agent/ re queuing
     def agentXYposition(account):
         csv_filename = v.currentPath+ 'agentXYposition.csv'
