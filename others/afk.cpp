@@ -104,6 +104,7 @@ int main(int argc, char* argv[])
     // int shield = 1;
     // int abilities = 1;
     int print_parameters = std::stoi(argv[1]);
+    std::cout << "print_parameters:　" << print_parameters << std::endl;
     if (print_parameters == 0){
         std::cout << "input: " << "-drop-" << drop << "-shield-" << shield << "-abilities-"  << abilities << std::endl;
         std::cout << "abilities1: " << abilities1 << "-abilities2-" << abilities2 << "-abilities3-"  << abilities3 << std::endl;

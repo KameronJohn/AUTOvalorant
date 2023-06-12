@@ -700,7 +700,7 @@ def core_afk(print_parameters=0,drop=0,shield=0,abilties=0,abilties1=1,abilties2
     subprocess.run(compile_cmd, check=True)
     # Run the compiled executable with the x and y coordinates as arguments
     """ drop,shield,abilties """
-    run_cmd = [f"{v.others_path}afk", str(drop),str(shield),str(abilties),str(abilties1),str(abilties2),str(abilties3),str(abilties4)]
+    run_cmd = [f"{v.others_path}afk", str(print_parameters), str(drop),str(shield),str(abilties),str(abilties1),str(abilties2),str(abilties3),str(abilties4)]
     """ drop,shield,abilties """
     subprocess.run(run_cmd, check=True)
     return
