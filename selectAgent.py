@@ -3,19 +3,8 @@ import pyautogui
 import time
 import keyboard
 import random
-# import webbrowser
 import os
-# import pyperclip
-# from openpyxl import Workbook, load_workbook
-# from datetime import date
-# from openpyxl.utils import get_column_letter
-# import pandas as pd
-# import numpy as np
-# import sys
-# import pygetwindow
 from datetime import datetime, timedelta, timezone
-# from PIL import Image
-# from pytesseract import pytesseract
 import os
 import os
 import csv
@@ -24,6 +13,7 @@ import math
 import subprocess
 import psutil
 from PIL import ImageGrab
+print("initiating...")
 class v:
     agentSelected = [] 
     currentPath = os.path.dirname(os.path.abspath(__file__))
@@ -157,10 +147,10 @@ class v:
                 # print(i)
                  venueList.append(i)
         v.stateReport(0,f'queuing')
+        v.cpp_select_agent(999,999)
         while True: 
             if v.tryAndSearch('matchFound.png'):
                 v.stateReport(1,f'match found')
-                v.cpp_select_agent(999,999)
                 v.getVenue(venueList, agentXYposition)
             pos = v.tryAndSearch('inGame.png')
             if pos is not None:
@@ -210,7 +200,6 @@ class v:
         # Compile the C++ file
         compile_cmd = ["g++", f"{v.others_path}selectagent.cpp", "-o", "selectagent"]
         subprocess.run(compile_cmd, check=True)
-        """  """
         # Run the compiled executable with the x and y coordinates as arguments
         run_cmd = [f"{v.others_path}selectagent", str(xaxis), str(yaxis), str(v.lockX), str(v.lockY)]
         subprocess.run(run_cmd, check=True)
@@ -222,14 +211,14 @@ class v:
             xaxis = int(systemChoice['Xposition'])
             yaxis = int(systemChoice['Yposition'])
         else:
-            if type(preference) is dict:
+            if type(v.preference) is dict:
                 try:
-                    agent = preference[venue][order]
+                    agent = v.preference[venue][order]
                 except:
                     print('out of order la')
                     return
             else:
-                agent = preference[order]
+                agent = v.preference[order]
             v.agentSelected.append(agent)
             for i in agentXYposition:
                 if i['Agent'] == agent:
@@ -408,7 +397,7 @@ class v:
                         # print('  -  '*20)
                         return
             loop_times +=1
-    def errorChecking(agentXYposition):
+    def errorChecking(agentXYposition,preference):
         availableAgent = []
         possibleAgent = []
         for i in agentXYposition:
@@ -422,7 +411,7 @@ class v:
                     mySet.add(i)
             possibleAgent = list(mySet)
         elif type(preference) is list:
-            print('🕵️  '+str(preference[0])+ ' 🕵️')
+            print('🕵️  '+str(preference)+ ' 🕵️')
             possibleAgent = preference
         else:
             exit('UNKNOWN DATA TYPE')
@@ -454,14 +443,24 @@ class v:
             v.searchAndClick('start.png')
         v.getStatus(agentXYposition)
         return
+    def next_match(hard_loop,withoutClick=True, withoutMove=True):
+        while True:
+            responddd = v.tryAndSearch('play_in_lobby.png', withoutClick, withoutMove)
+            if responddd is not None:
+                return responddd
+            respond = v.tryAndSearch('play_again.png', withoutClick, withoutMove)
+            if respond is not None:
+                return respond
+            respondd = v.tryAndSearch('play_after_one_game.png', withoutClick, withoutMove)
+            if respondd is not None:
+                return respondd
+            if hard_loop is False:
+                return None
     def requeueRank():
         a = pyautogui.position()
-        reQ = [Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50), Point(x=1219, y=50)]
-        for i in reQ:
-            click(i)
-            time.sleep(0.2)
+        v.next_match(hard_loop=True,withoutClick=False, withoutMove=False)
         #GAME MODE
-        game_mode_image = [f"{game_mode}1.png", f"{game_mode}2.png"]
+        game_mode_image = [f"{v.game_mode}1.png", f"{v.game_mode}2.png"]
         break_loop = False
         while not break_loop:
             for i in game_mode_image:
@@ -563,12 +562,11 @@ class v:
             v.login(account_name,password,direct_launch=True)
             time.sleep(2)
             for pos,fileName in [
-                [[Point(x=1004, y=46)],'current_contract'],
-                [[Point(x=1486, y=44),Point(x=2225, y=34)],'career&mission']
+                [[Point(x=1004, y=46),Point(1243, 1075),Point(x=2225, y=34)],'current_contract&mission']
                 ]:
                 for each_pos in pos:
                     click(each_pos)
-                    sleep(2)
+                    sleep(1)
                 current_datetime = datetime.now()
                 formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
                 screenshot_path = v.accounts_info_path+formatted_datetime+'_'+account_name+'_'+fileName+'.png'
@@ -624,15 +622,50 @@ class v:
                 # print(i)
                 venueList.append(i)
         v.getVenue(venueList)
+    def change_settings():
+        pyautogui.press("esc")
+        poss = [(1278, 557), (1125, 33), (1409, 125), (1444, 364)]
+        for i in poss:
+            click(i)
+            sleep(0.25)
+        pyautogui.press("F6")
+        poss = [(1278, 557), (1125, 33), (1433, 952)]
+        for i in poss:
+            click(i)
+            sleep(0.25)
+        pyautogui.press("5")
+        sleep(0.25)
+        click(1438, 1021)
+        sleep(0.25)
+        pyautogui.press("6")
+        sleep(0.25)
+        pyautogui.press("esc")
+
 def afk_boss(MainFlow,withpartyRank,loginUsername):
     v.afk_status = True
+    drop = input('drop: ')
+    shield = input('shield: ')
+    abilties = input('abilties: ')
+    if abilties == "1":
+        print("1 = click, 2 = double tap key")
+        abilties1 = input('abilties1: ')
+        abilties2 = input('abilties2: ')
+        abilties3 = input('abilties3: ')
+        abilties4 = input('abilties4: ')
+    else:
+        abilties1 = 1
+        abilties2 = 1
+        abilties3 = 1
+        abilties4 = 1
     count = 1
     eval(MainFlow)
+    print_parameters = 0
     while True:
-        process = core_afk()
-        respond = v.tryAndSearch('play_again.png', withoutClick=True, withoutMove=False)
-        respondd = v.tryAndSearch('play_after_one_game.png', withoutClick=True, withoutMove=False)
-        if respond or respondd:
+        process = core_afk(print_parameters,drop,shield,abilties,abilties1,abilties2,abilties3,abilties4)
+        print_parameters+=1
+        respond_pos = v.next_match(hard_loop=False,withoutClick=True, withoutMove=True)
+        v.debugger(respond_pos)
+        if respond_pos:
             print(f'round: {count} done')
             v.check_if_val_message_sent(loginUsername)
             v.requeueRank()
@@ -651,43 +684,95 @@ def afk_boss(MainFlow,withpartyRank,loginUsername):
                     file.write(current_time)
                 os.system("shutdown -a")
                 os.system("shutdown /s /t 1")
-def core_afk():
+def spammer():
+    # Compile the C++ file
+    compile_cmd = ["g++", f"{v.others_path}spammer.cpp", "-o", "spammer"]
+    subprocess.run(compile_cmd, check=True)
+    # Run the compiled executable with the x and y coordinates as arguments
+    """ drop,shield,abilties """
+    run_cmd = [f"{v.others_path}spammer"]
+    """ drop,shield,abilties """
+    subprocess.run(run_cmd, check=True)
+    return
+def core_afk(print_parameters=0,drop=0,shield=0,abilties=0,abilties1=1,abilties2=1,abilties3=1,abilties4=1):
     # Compile the C++ file
     compile_cmd = ["g++", f"{v.others_path}afk.cpp", "-o", "afk"]
     subprocess.run(compile_cmd, check=True)
     # Run the compiled executable with the x and y coordinates as arguments
     """ drop,shield,abilties """
-    run_cmd = [f"{v.others_path}afk", '0', '1', '0']
+    run_cmd = [f"{v.others_path}afk", str(drop),str(shield),str(abilties),str(abilties1),str(abilties2),str(abilties3),str(abilties4)]
     """ drop,shield,abilties """
     subprocess.run(run_cmd, check=True)
     return
-def afk(buy_shield=False):
+def afk(drop=0,shield=0,abilties=0):
+    print_parameters = 0
     while True:
-        core_afk()
-def print_instructions(choices):
-    for i,choice in enumerate(choices):
-        i +=1
-        print(f"{i}: {choice}")
+        core_afk(print_parameters,drop,shield,abilties)
+        print_parameters+=1
+def print_instructions(choices,each_line=0):
+    for i, agent in enumerate(choices, start=1):
+        if each_line == 0 :
+            print(f"{i}: {agent}\n")
+        else:
+            if i % each_line == 0:
+                print("{:<2}: {:<14}".format(i, agent))
+            else:
+                print("{:<2}: {:<14}".format(i, agent), end="")
+                if len(choices) == i:
+                    print("\n")
+def starting():
+    choice = ["self-define","default"]
+    print_instructions(choice,4)
+    ans = input()
+    if ans == "1":
+        v.account, v.game_mode, v.preference = get_parameters()
+    elif ans == "2":
+        return
 def alert_msg(msg):
     print('❗❗❗'* 10 +'\n'+ msg +'\n'+'❗❗❗'* 10 )
 def insert_agent(preference, input_value):
     preference.insert(0, input_value)
-    alert_msg('new preference: ', str(preference))
-def insert_agent(preference, input_value):
-    preference.insert(0, input_value)
-    alert_msg('new preference: '+ str(preference))
-def print_instructions_main(account,choices,game_mode):
+    alert_msg('new preference: '+str(preference))
+def print_instructions_main(account,choices,game_mode,preference):
     print("  #"*10)
     print('🎅 '+ account+' 🎅')
     print('🧠 '+ game_mode+' 🧠')
     agentXYposition = v.agentXYposition(account)
-    v.errorChecking(agentXYposition)
+    v.errorChecking(agentXYposition,preference)
     for i,choice in enumerate(choices):
         i +=1
         print(f"{i}: {choice}")
     input_value = input("\nPlease input:")
     return input_value
-available_modes = ['unrated','competitive','spike_rush','swiftplay']
+def get_parameters():
+    print_instructions(account_list,2)
+    account = input()
+    print("  ^"*15)
+    account = account_list[int(account)-1]
+    print_instructions(available_modes,2)
+    game_mode = input()
+    print("  ^"*15)
+    game_mode = available_modes[int(game_mode)-1]
+    agentXYposition = v.agentXYposition(account)
+    availableAgent = []
+    for i in agentXYposition:
+        availableAgent.append(i['Agent'])
+    print_instructions(availableAgent,4)
+    preference = list()
+    while True:
+        agent = input()
+        if agent in availableAgent:
+            preference.append(agent)
+        else:
+            try:
+                preference.append(availableAgent[int(agent)-1])
+            except:
+                print(f'Enter again current: {str(preference)}')
+        print("  ^"*15)
+        if len(preference) >=2:
+            break
+    return account, game_mode, preference
+available_modes = ['unrated','competitive','swiftplay','spike_rush']
 available_agents = ['astra','breach','brimstone','chamber',
                     'cypher','gekko','jett','kayo','killjoy',
                     'neon','omen','phoenix','raze','reyna','sage',
@@ -696,7 +781,7 @@ preference = {
     # 'ascent':['omen','phoenix','breach'],
     # 'haven': ['omen','phoenix','breach'],
     # 'icebox': ['omen','phoenix','breach'], 
-    # 'lotus': ['omen','phoenix','breach'],
+    # 'lotus': ['omen','phoenix','wbreach'],
     # 'pearl': ['habor','phoenix','breach'],
     # 'split': ['omen','phoenix','breach'],`
     # 'fracture': ['phoenix','breach','omen'],`
@@ -721,31 +806,34 @@ MainFlow(account, skipStart=False, random=False)
 FatherSun, LaVanTor, speakEngInVal
 unrated, competitive, swiftplay, spike_rush
 """
-game_mode = 'unrated' 
-game_mode = 'competitive'
-game_mode = 'spike_rush' 
+v.game_mode = 'spike_rush' 
+v.game_mode = 'competitive'
+v.game_mode = 'unrated' 
+v.game_mode = 'swiftplay'
 """
 """
-preference = ['phoenix', 'reyna', 'jett']  
-preference = ['yoru', 'chamber', 'raze']
-preference = ['reyna', 'jett', 'phoenix']
-preference = ['jett', 'reyna', 'phoenix']  
-preference = ['chamber', 'omen', 'phoenix']
-preference = ['omen', 'sage', 'jett']
-preference = ['raze', 'reyna', 'phoenix']
-preference = ['sage', 'brimstone', 'phoenix']
+v.preference = ['reyna', 'jett', 'phoenix']
+v.preference = ['yoru', 'chamber', 'raze']
+v.preference = ['jett', 'reyna', 'phoenix']  
+v.preference = ['omen', 'sage', 'jett']
+v.preference = ['sage', 'brimstone', 'phoenix']
+v.preference = ['raze', 'reyna', 'phoenix']
+v.preference = ['chamber', 'omen', 'phoenix']
+v.preference = ['phoenix', 'reyna', 'jett']  
 """ """
-account = 'LaVanTor'
-account = 'Dear Curi'
-account = 'oOoOoOo'
-account = 'FatherSun'
-account = 'speakEngInVal'
+account_list = ['FatherSun','LaVanTor','speakEngInVal','Dear Curi','oOoOoOo']
+v.account = 'LaVanTor'
+v.account = 'Dear Curi'
+v.account = 'FatherSun'
+v.account = 'oOoOoOo'
+v.account = 'speakEngInVal'
 def hold(game_mode,available_modes):
-    MainFlow = "v.MainFlow(account, skipStart='y', reQ='y')"
-    withpartyRank = "v.MainFlow(account, skipStart='y')"
-    launchAndLogin = "v.MainFlow(account, skipStart='y', reQ='y', launchAndLogin=True)"
+    MainFlow = "v.MainFlow(v.account, skipStart='y', reQ='y')"
+    withpartyRank = "v.MainFlow(v.account, skipStart='y')"
+    launchAndLogin = "v.MainFlow(v.account, skipStart='y', reQ='y', launchAndLogin=True)"
+    starting()
     while True:
-        input_value = print_instructions_main(account,['main program','report player','requeue','login & queue','afk','check_all_account_available_agent','afk_boss'],game_mode)
+        input_value = print_instructions_main(v.account,['main program','report player','requeue','login & queue','afk','check_all_account_available_agent','afk_boss','spammer'],v.game_mode,v.preference)
         if input_value == "1":
             eval(withpartyRank)
         elif input_value == "2":
@@ -768,11 +856,13 @@ def hold(game_mode,available_modes):
         elif input_value == "4":
             eval(launchAndLogin)
         elif input_value == "5":
-            afk()
+            afk(drop=1,shield=0,abilties=0)
         elif input_value == "6":
             v.check_all_account_available_agent()
         elif input_value == "7":
-            afk_boss(MainFlow,withpartyRank,account)
+            afk_boss(MainFlow,withpartyRank,v.account)
+        elif input_value == "8":
+            spammer()
         elif input_value in available_agents:
             insert_agent(preference, input_value)
         else:
@@ -781,9 +871,14 @@ def hold(game_mode,available_modes):
                     game_mode = input_value
                     alert_msg('mode changed: ' + game_mode)
 if __name__ == "__main__":
-    hold(game_mode,available_modes)
-    # v.getAgentsPosition(account=account)
+    # afk(drop=0,shield=0,abilties=1)
+    # v.change_settings()
+    hold(v.game_mode,available_modes)
+    # v.getAgentsPosition(account=v.account)
     # v.MainFlow('speakEngInVal') #waiting for m tch found directly
     # v.MainFlow('FatherSun', random='random is on', reQ='y')
 
-# 0;P;c;1;o;1;d;1;z;1;0t;1;0a;1;1b;0
+# """ 0;P;c;1;o;1;d;1;z;1;0t;1;0a;1;1b;0 """
+""" 
+
+"""

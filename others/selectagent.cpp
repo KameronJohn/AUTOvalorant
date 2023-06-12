@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
     int pos1_y = std::stoi(argv[2]);
     if (pos1_x == 999 && pos1_y == 999)
     {
-        std::cout << "test run done" << std::endl;
+        // std::cout << "test run done" << std::endl;
         return 0;
     }
     int pos2_x = std::stoi(argv[3]);

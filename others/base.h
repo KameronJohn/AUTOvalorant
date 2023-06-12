@@ -10,13 +10,14 @@ int random_number(int start, int end)
     int num = rand() % start + end + 1;
     return num;
 }
-void key_press(std::string input_key, int sleep_time)
+void key_press(std::string input_key, int sleep_time, int hold_time=0)
 {
     INPUT input = { 0 };
     input.type = INPUT_KEYBOARD;
     input.ki.wVk = static_cast<WORD>(input_key[0]);
     input.ki.dwFlags = 0;
     SendInput(1, &input, sizeof(INPUT));
+    Sleep(hold_time);
     input.ki.dwFlags = KEYEVENTF_KEYUP;
     SendInput(1, &input, sizeof(INPUT));
 
