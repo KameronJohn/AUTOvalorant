@@ -66,4 +66,14 @@ void double_click(int x, int y)
     mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
     mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
 }
+void quadra_click(int x, int y)
+{
+    for (int i = 0; i < 4; i++){
+        SetCursorPos(x, y);
+        mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
+        mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+        Sleep(30); // Wait a short time between clicks
+    }
+
+}
 

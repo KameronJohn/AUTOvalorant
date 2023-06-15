@@ -445,9 +445,6 @@ class v:
         return
     def next_match(hard_loop,withoutClick=True, withoutMove=True):
         while True:
-            responddd = v.tryAndSearch('play_in_lobby.png', withoutClick, withoutMove)
-            if responddd is not None:
-                return responddd
             respond = v.tryAndSearch('play_again.png', withoutClick, withoutMove)
             if respond is not None:
                 return respond
@@ -458,7 +455,11 @@ class v:
                 return None
     def requeueRank():
         a = pyautogui.position()
-        v.next_match(hard_loop=True,withoutClick=False, withoutMove=False)
+        while True:
+            a = v.tryAndSearch('play_in_lobby.png', withoutClick=False, withoutMove=False)
+            if a is not None:
+                break
+            v.tryAndSearch('play_again.png', withoutClick=False, withoutMove=False)
         #GAME MODE
         game_mode_image = [f"{v.game_mode}1.png", f"{v.game_mode}2.png"]
         break_loop = False
@@ -469,7 +470,8 @@ class v:
                     break_loop = True
                     break
         #start queuing
-        click(x=1240, y=1296)
+        v.tryAndSearch('start.png', withoutClick=False, withoutMove=False)
+        # click(x=1240, y=1296)
         pyautogui.FAILSAFE = False
         """ alt tab here """
         pyautogui.keyDown('alt')
@@ -778,17 +780,6 @@ available_agents = ['astra','breach','brimstone','chamber',
                     'neon','omen','phoenix','raze','reyna','sage',
                     'skye','sova','viper','yoru']
 preference = {
-    # 'ascent':['omen','phoenix','breach'],
-    # 'haven': ['omen','phoenix','breach'],
-    # 'icebox': ['omen','phoenix','breach'], 
-    # 'lotus': ['omen','phoenix','wbreach'],
-    # 'pearl': ['habor','phoenix','breach'],
-    # 'split': ['omen','phoenix','breach'],`
-    # 'fracture': ['phoenix','breach','omen'],`
-    # 'bind': ['omen','phoenix','breach'],
-    # 'breeze':['habor','phoenix','breach']
-
-
     'pearl': ['habor','phoenix','breach'],
     'ascent':['omen','phoenix','breach'],
     'haven': ['omen','phoenix','breach'], 
@@ -799,17 +790,10 @@ preference = {
     'bind': ['omen','phoenix','breach'],
     'breeze':['habor','phoenix','breach']
 }
-"""
-MainFlow(account, skipStart=False, random=False)
-"""
-"""config
-FatherSun, LaVanTor, speakEngInVal
-unrated, competitive, swiftplay, spike_rush
-"""
-v.game_mode = 'spike_rush' 
-v.game_mode = 'competitive'
 v.game_mode = 'unrated' 
 v.game_mode = 'swiftplay'
+v.game_mode = 'spike_rush' 
+v.game_mode = 'competitive'
 """
 """
 v.preference = ['reyna', 'jett', 'phoenix']
@@ -817,16 +801,16 @@ v.preference = ['yoru', 'chamber', 'raze']
 v.preference = ['jett', 'reyna', 'phoenix']  
 v.preference = ['omen', 'sage', 'jett']
 v.preference = ['sage', 'brimstone', 'phoenix']
-v.preference = ['raze', 'reyna', 'phoenix']
-v.preference = ['chamber', 'omen', 'phoenix']
 v.preference = ['phoenix', 'reyna', 'jett']  
+v.preference = ['chamber', 'omen', 'phoenix']
+v.preference = ['raze', 'reyna', 'phoenix']
 """ """
 account_list = ['FatherSun','LaVanTor','speakEngInVal','Dear Curi','oOoOoOo']
 v.account = 'LaVanTor'
 v.account = 'Dear Curi'
-v.account = 'FatherSun'
-v.account = 'oOoOoOo'
 v.account = 'speakEngInVal'
+v.account = 'oOoOoOo'
+v.account = 'FatherSun'
 def hold(game_mode,available_modes):
     MainFlow = "v.MainFlow(v.account, skipStart='y', reQ='y')"
     withpartyRank = "v.MainFlow(v.account, skipStart='y')"

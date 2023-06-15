@@ -19,14 +19,13 @@ void spam_purchase()
 {
     for (int i = 0; i<5; i++)
     {
-        click(644,425);
-        // double_click(644, 425);
-        // double_click(644, 425);
-        Sleep(100);
-        key_press("G",100);
-        double_click(616, 261);
-        double_click(616, 261);
-        Sleep(100);
+        // click(644,425);
+        quadra_click(644, 425);
+        Sleep(30);
+        key_press("G",30);
+        quadra_click(616, 261);
+        Sleep(30);
+        key_press("G",30);
     }
 /*     for (int i = 0; i<4; i++)
     {
