@@ -196,15 +196,11 @@ class v:
         v.debugger('stateReport ends')
         return
     def cpp_select_agent(xaxis,yaxis):
-        """ dry run """
-        # Compile the C++ file
         compile_cmd = ["g++", f"{v.others_path}selectagent.cpp", "-o", "selectagent"]
-        subprocess.run(compile_cmd, check=True)
+        subprocess.run(compile_cmd, shell=True, check=True)
         # Run the compiled executable with the x and y coordinates as arguments
-        run_cmd = [f"{v.others_path}selectagent.cpp", str(xaxis), str(yaxis), str(v.lockX), str(v.lockY)]
-        run_cmd = r"C:\Users\User\Documents\GitHub\AUTOvalorant\others\selectagent.cpp"
-        subprocess.run(run_cmd, check=True)
-        """  """
+        run_cmd = [f"{v.others_path}selectagent.exe", str(xaxis), str(yaxis), str(v.lockX), str(v.lockY)]
+        subprocess.run(run_cmd, shell=True, check=True)
     def selectAgent(preference, venue, agentXYposition, order=0, repickAgent=False):
         if v.random:
             systemChoice = random.choice(agentXYposition)
@@ -690,22 +686,22 @@ def afk_boss(MainFlow,withpartyRank,loginUsername):
 def spammer():
     # Compile the C++ file
     compile_cmd = ["g++", f"{v.others_path}spammer.cpp", "-o", "spammer"]
-    subprocess.run(compile_cmd, check=True)
+    subprocess.run(compile_cmd, shell=True, check=True)
     # Run the compiled executable with the x and y coordinates as arguments
     """ drop,shield,abilties """
     run_cmd = [f"{v.others_path}spammer"]
     """ drop,shield,abilties """
-    subprocess.run(run_cmd, check=True)
+    subprocess.run(run_cmd, shell=True, check=True)
     return
 def core_afk(print_parameters=0,drop=0,shield=0,abilties=0,abilties1=1,abilties2=1,abilties3=1,abilties4=1):
     # Compile the C++ file
     compile_cmd = ["g++", f"{v.others_path}afk.cpp", "-o", "afk"]
-    subprocess.run(compile_cmd, check=True)
+    subprocess.run(compile_cmd, shell=True, check=True)
     # Run the compiled executable with the x and y coordinates as arguments
     """ drop,shield,abilties """
     run_cmd = [f"{v.others_path}afk", str(print_parameters), str(drop),str(shield),str(abilties),str(abilties1),str(abilties2),str(abilties3),str(abilties4)]
     """ drop,shield,abilties """
-    subprocess.run(run_cmd, check=True)
+    subprocess.run(run_cmd, shell=True, check=True)
     return
 def afk(drop=0,shield=0,abilties=0):
     print_parameters = 0
