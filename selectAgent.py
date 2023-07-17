@@ -201,7 +201,8 @@ class v:
         compile_cmd = ["g++", f"{v.others_path}selectagent.cpp", "-o", "selectagent"]
         subprocess.run(compile_cmd, check=True)
         # Run the compiled executable with the x and y coordinates as arguments
-        run_cmd = [f"{v.others_path}selectagent", str(xaxis), str(yaxis), str(v.lockX), str(v.lockY)]
+        run_cmd = [f"{v.others_path}selectagent.cpp", str(xaxis), str(yaxis), str(v.lockX), str(v.lockY)]
+        run_cmd = r"C:\Users\User\Documents\GitHub\AUTOvalorant\others\selectagent.cpp"
         subprocess.run(run_cmd, check=True)
         """  """
     def selectAgent(preference, venue, agentXYposition, order=0, repickAgent=False):
@@ -857,8 +858,10 @@ def hold(game_mode,available_modes):
 if __name__ == "__main__":
     # afk(drop=0,shield=0,abilties=1)
     # v.change_settings()
-    hold(v.game_mode,available_modes)
+    # hold(v.game_mode,available_modes)
     # v.getAgentsPosition(account=v.account)
+
+    v.MainFlow(v.account, skipStart='y')
     # v.MainFlow('speakEngInVal') #waiting for m tch found directly
     # v.MainFlow('FatherSun', random='random is on', reQ='y')
 

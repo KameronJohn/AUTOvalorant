@@ -60,6 +60,7 @@ int main()
     std::cout << "sleeping" << std::endl;
     Sleep(2000);
     std::cout << "starting" << std::endl;
+    return 0;
 
     while (true)
     {
@@ -85,6 +86,5 @@ int main()
         buy_for_team();
     }
 
-    return 0;
     
     }
