@@ -796,18 +796,18 @@ v.game_mode = 'competitive'
 v.preference = ['reyna', 'jett', 'phoenix']
 v.preference = ['yoru', 'chamber', 'raze']
 v.preference = ['jett', 'reyna', 'phoenix']  
-v.preference = ['omen', 'sage', 'jett']
 v.preference = ['sage', 'brimstone', 'phoenix']
 v.preference = ['phoenix', 'reyna', 'jett']  
 v.preference = ['chamber', 'omen', 'phoenix']
 v.preference = ['raze', 'reyna', 'phoenix']
+v.preference = ['omen', 'sage', 'jett']
 """ """
 account_list = ['FatherSun','LaVanTor','speakEngInVal','Dear Curi','oOoOoOo']
-v.account = 'LaVanTor'
 v.account = 'Dear Curi'
 v.account = 'speakEngInVal'
 v.account = 'oOoOoOo'
 v.account = 'FatherSun'
+v.account = 'LaVanTor'
 def hold(game_mode,available_modes):
     MainFlow = "v.MainFlow(v.account, skipStart='y', reQ='y')"
     withpartyRank = "v.MainFlow(v.account, skipStart='y')"
@@ -854,10 +854,10 @@ def hold(game_mode,available_modes):
 if __name__ == "__main__":
     # afk(drop=0,shield=0,abilties=1)
     # v.change_settings()
-    # hold(v.game_mode,available_modes)
+    hold(v.game_mode,available_modes)
     # v.getAgentsPosition(account=v.account)
 
-    v.MainFlow(v.account, skipStart='y')
+    # v.MainFlow(v.account, skipStart='y')
     # v.MainFlow('speakEngInVal') #waiting for m tch found directly
     # v.MainFlow('FatherSun', random='random is on', reQ='y')
 
