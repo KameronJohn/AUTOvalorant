@@ -13,6 +13,10 @@ import math
 import subprocess
 import psutil
 from PIL import ImageGrab
+currentPath = os.path.dirname(os.path.abspath(__file__))
+dc_path = currentPath +r'\..\..\kmjAUTO\core'
+sys.path.insert(0, dc_path)
+import discord_send_msg as d
 print("initiating...")
 class v:
     agentSelected = [] 
@@ -162,6 +166,8 @@ class v:
                         sleep(1)
                 except:
                     pass
+                v.searchAndClick('buy_phase.png', needClick=False, confidence=0.6)
+                v.send_to_discord('in game')
                 return
             else:
                 pass
@@ -176,6 +182,7 @@ class v:
                     venue = searchingVenue.replace("venue_", "")
                     venue = venue[:int(venue.find('.'))]
                     v.stateReport(2,f'map: {venue}')
+                    v.send_to_discord(f'map: {venue}')
                     if agentXYposition is False:
                         break
                     v.selectAgent(preference, venue, agentXYposition)
@@ -621,24 +628,9 @@ class v:
                 # print(i)
                 venueList.append(i)
         v.getVenue(venueList)
-    def change_settings():
-        pyautogui.press("esc")
-        poss = [(1278, 557), (1125, 33), (1409, 125), (1444, 364)]
-        for i in poss:
-            click(i)
-            sleep(0.25)
-        pyautogui.press("F6")
-        poss = [(1278, 557), (1125, 33), (1433, 952)]
-        for i in poss:
-            click(i)
-            sleep(0.25)
-        pyautogui.press("5")
-        sleep(0.25)
-        click(1438, 1021)
-        sleep(0.25)
-        pyautogui.press("6")
-        sleep(0.25)
-        pyautogui.press("esc")
+    def send_to_discord(self,msg,channel=0):
+        d.send("Val", msg,channel)
+        return
 
 def afk_boss(MainFlow,withpartyRank,loginUsername):
     v.afk_status = True
@@ -794,13 +786,13 @@ v.game_mode = 'competitive'
 """
 """
 v.preference = ['reyna', 'jett', 'phoenix']
-v.preference = ['yoru', 'chamber', 'raze']
 v.preference = ['jett', 'reyna', 'phoenix']  
 v.preference = ['sage', 'brimstone', 'phoenix']
 v.preference = ['phoenix', 'reyna', 'jett']  
-v.preference = ['chamber', 'omen', 'phoenix']
-v.preference = ['raze', 'reyna', 'phoenix']
 v.preference = ['omen', 'sage', 'jett']
+v.preference = ['raze', 'reyna', 'phoenix']
+v.preference = ['chamber', 'omen', 'phoenix']
+v.preference = ['yoru', 'chamber', 'raze']
 """ """
 account_list = ['FatherSun','LaVanTor','speakEngInVal','Dear Curi','oOoOoOo']
 v.account = 'Dear Curi'
