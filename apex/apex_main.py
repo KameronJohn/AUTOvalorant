@@ -24,7 +24,7 @@ class apex:
             "in_dropshipp.png":"☄️ dropping ☄️",
             "squad_eliminated.png":"☠️ squad eliminated ☠️",
             "respawning.png":"🍀 respawning 🍀",
-            "gameFound.png":"🫡 game found 🫡",
+            "gameFound.png":f"🫡 game found 🫡",
             "you_are_jumpmaster.png":"❗️ you are jumpmaster ❗️",
             "assigned":"🤦‍♀️ you are jumpmaster 🤦‍♀️"
         }
@@ -63,10 +63,8 @@ class apex:
                 self.pick_order_count = time.time()
                 break
             self.tryAndSearch('ready.png', withoutClick=False, withoutMove=False)
-        elapsed_time = time.time() - start_time
-        self.send_to_discord(self.d_message['gameFound.png'])
-        msg = f"Queue time: {self.format_time(elapsed_time)}"
-        print(msg)
+        self.queue_time = time.time() - start_time
+        self.send_to_discord(self.d_message['gameFound.png']+f"({self.queue_time})")
         # self.send_to_discord(msg)
         self.select_legends()
         self.if_in_game()
