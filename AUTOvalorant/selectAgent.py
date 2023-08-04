@@ -628,10 +628,19 @@ class v:
                 # print(i)
                 venueList.append(i)
         v.getVenue(venueList)
-    def send_to_discord(self,msg,channel=0):
+    def send_to_discord(msg,channel=0):
         d.send("Val", msg,channel)
         return
-
+    def if_buying_phase():
+        print("waiting for next phase...")
+        while True:
+            if v.tryAndSearch('buy_phase.png', withoutClick=True, withoutMove=True):
+                v.send_to_discord('buying_phase')
+                while True:
+                    if v.tryAndSearch('buy_phase.png', withoutClick=True, withoutMove=True):
+                        pass
+                    else:
+                        break
 def afk_boss(MainFlow,withpartyRank,loginUsername):
     v.afk_status = True
     drop = input('drop: ')
@@ -806,7 +815,7 @@ def hold(game_mode,available_modes):
     launchAndLogin = "v.MainFlow(v.account, skipStart='y', reQ='y', launchAndLogin=True)"
     starting()
     while True:
-        input_value = print_instructions_main(v.account,['main program','report player','requeue','login & queue','afk','check_all_account_available_agent','afk_boss','spammer'],v.game_mode,v.preference)
+        input_value = print_instructions_main(v.account,['main program','report player','requeue','login & queue','afk','check_all_account_available_agent','afk_boss','spammer','if_buying_phase'],v.game_mode,v.preference)
         if input_value == "1":
             eval(withpartyRank)
         elif input_value == "2":
@@ -836,6 +845,8 @@ def hold(game_mode,available_modes):
             afk_boss(MainFlow,withpartyRank,v.account)
         elif input_value == "8":
             spammer()
+        elif input_value == "9":
+            v.if_buying_phase()
         elif input_value in available_agents:
             insert_agent(preference, input_value)
         else:

@@ -199,7 +199,7 @@ class apex:
         """ config """
         """ preferences """
         self.preferences = dict()
-        self.preferences["support"] = "loba"
+        self.preferences["support"] = "lifeline"
         self.preferences["controller"] = "rampart"
         self.preferences["skirmisher"] = "pathfinder"
         self.preferences["assault"] = "ash"
