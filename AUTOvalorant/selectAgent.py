@@ -119,10 +119,10 @@ class v:
         m, s = divmod(int(elapsed_time), 60)
         time_format = "{:02d}:{:02d}".format(m, s)
         return time_format
-    def searchAndClick(target, needClick=True):
+    def searchAndClick(target, needClick=True, confidence=0.8):
         while True:
             try:
-                x, y = pyautogui.locateCenterOnScreen(v.screenshotPath+target, region = (0,0,2500,1440), confidence=0.8)
+                x, y = pyautogui.locateCenterOnScreen(v.screenshotPath+target, region = (0,0,2500,1440), confidence=confidence)
                 if (x, y) is not None:
                     if needClick is True:
                         v.returnPreviousPosition(x,y)
@@ -167,7 +167,6 @@ class v:
                 except:
                     pass
                 v.searchAndClick('buy_phase.png', needClick=False, confidence=0.6)
-                v.send_to_discord('in game')
                 return
             else:
                 pass
@@ -182,7 +181,6 @@ class v:
                     venue = searchingVenue.replace("venue_", "")
                     venue = venue[:int(venue.find('.'))]
                     v.stateReport(2,f'map: {venue}')
-                    v.send_to_discord(f'map: {venue}')
                     if agentXYposition is False:
                         break
                     v.selectAgent(preference, venue, agentXYposition)
@@ -199,8 +197,9 @@ class v:
         total = 6
         cross = total - tick
         print("   ="* 20)
-        print('✅'*tick+'❌'*cross+' '+msg)
-        v.debugger('stateReport ends')
+        msg = '✅'*tick+'❌'*cross+' '+msg
+        print(msg)
+        v.send_to_discord(msg)
         return
     def cpp_select_agent(xaxis,yaxis):
         compile_cmd = ["g++", f"{v.others_path}selectagent.cpp", "-o", "selectagent"]
@@ -458,12 +457,12 @@ class v:
             if hard_loop is False:
                 return None
     def requeueRank():
-        a = pyautogui.position()
+        bb = pyautogui.position()
         while True:
             a = v.tryAndSearch('play_in_lobby.png', withoutClick=False, withoutMove=False)
             if a is not None:
                 break
-            v.tryAndSearch('play_again.png', withoutClick=False, withoutMove=False)
+            v.tryAndSearch('play_after_one_game.png', withoutClick=False, withoutMove=False)
         #GAME MODE
         game_mode_image = [f"{v.game_mode}1.png", f"{v.game_mode}2.png"]
         break_loop = False
@@ -480,7 +479,7 @@ class v:
         """ alt tab here """
         pyautogui.keyDown('alt')
         pyautogui.press('tab')
-        pyautogui.moveTo(a)
+        pyautogui.moveTo(bb)
         pyautogui.keyUp('alt')
         """ alt tab here """
     def login(loginUsername=False,loginPassword=False,direct_launch=False):
@@ -631,16 +630,27 @@ class v:
     def send_to_discord(msg,channel=0):
         d.send("Val", msg,channel)
         return
-    def if_buying_phase():
+    def dc_notification():
         print("waiting for next phase...")
-        while True:
-            if v.tryAndSearch('buy_phase.png', withoutClick=True, withoutMove=True):
-                v.send_to_discord('buying_phase')
-                while True:
-                    if v.tryAndSearch('buy_phase.png', withoutClick=True, withoutMove=True):
-                        pass
-                    else:
-                        break
+        x = 1307  # X-coordinate of the pixel
+        y = 258   # Y-coordinate of the pixel
+
+        # Get the RGB color value of the pixel at the specified coordinates
+        pixel_color = pyautogui.pixel(x, y)
+
+        # Check if the pixel color is red
+        if pixel_color == (255, 0, 0):
+            print("The pixel color is red.")
+        else:
+            print("The pixel color is not red.")
+        # while True:
+        #     if v.tryAndSearch('buy_phase.png', withoutClick=True, withoutMove=True):
+        #         v.send_to_discord('buying_phase')
+        #         while True:
+        #             if v.tryAndSearch('buy_phase.png', withoutClick=True, withoutMove=True):
+        #                 pass
+        #             else:
+        #                 break
 def afk_boss(MainFlow,withpartyRank,loginUsername):
     v.afk_status = True
     drop = input('drop: ')
@@ -777,6 +787,7 @@ available_agents = ['astra','breach','brimstone','chamber',
                     'cypher','gekko','jett','kayo','killjoy',
                     'neon','omen','phoenix','raze','reyna','sage',
                     'skye','sova','viper','yoru']
+account_list = ['FatherSun','LaVanTor','speakEngInVal','Dear Curi','oOoOoOo']
 preference = {
     'pearl': ['habor','phoenix','breach'],
     'ascent':['omen','phoenix','breach'],
@@ -798,24 +809,23 @@ v.preference = ['reyna', 'jett', 'phoenix']
 v.preference = ['jett', 'reyna', 'phoenix']  
 v.preference = ['sage', 'brimstone', 'phoenix']
 v.preference = ['phoenix', 'reyna', 'jett']  
-v.preference = ['omen', 'sage', 'jett']
-v.preference = ['raze', 'reyna', 'phoenix']
 v.preference = ['chamber', 'omen', 'phoenix']
 v.preference = ['yoru', 'chamber', 'raze']
+v.preference = ['omen', 'sage', 'jett']
+v.preference = ['raze', 'reyna', 'phoenix']
 """ """
-account_list = ['FatherSun','LaVanTor','speakEngInVal','Dear Curi','oOoOoOo']
 v.account = 'Dear Curi'
 v.account = 'speakEngInVal'
 v.account = 'oOoOoOo'
-v.account = 'FatherSun'
 v.account = 'LaVanTor'
+v.account = 'FatherSun'
 def hold(game_mode,available_modes):
     MainFlow = "v.MainFlow(v.account, skipStart='y', reQ='y')"
     withpartyRank = "v.MainFlow(v.account, skipStart='y')"
     launchAndLogin = "v.MainFlow(v.account, skipStart='y', reQ='y', launchAndLogin=True)"
     starting()
     while True:
-        input_value = print_instructions_main(v.account,['main program','report player','requeue','login & queue','afk','check_all_account_available_agent','afk_boss','spammer','if_buying_phase'],v.game_mode,v.preference)
+        input_value = print_instructions_main(v.account,['main program','report player','requeue','login & queue','afk','check_all_account_available_agent','afk_boss','spammer','dc_notification'],v.game_mode,v.preference)
         if input_value == "1":
             eval(withpartyRank)
         elif input_value == "2":
@@ -846,7 +856,7 @@ def hold(game_mode,available_modes):
         elif input_value == "8":
             spammer()
         elif input_value == "9":
-            v.if_buying_phase()
+            v.dc_notification()
         elif input_value in available_agents:
             insert_agent(preference, input_value)
         else:
