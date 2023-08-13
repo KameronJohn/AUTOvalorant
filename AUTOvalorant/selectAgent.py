@@ -150,23 +150,24 @@ class v:
             if re.match(r"venue_*", i):
                 # print(i)
                  venueList.append(i)
-        v.stateReport(0,f'queuing')
+        v.stateReport(0,f'queuing',send_dc=0)
         v.cpp_select_agent(999,999)
         while True: 
             if v.tryAndSearch('matchFound.png'):
-                v.stateReport(1,f'match found')
+                v.stateReport(1,f'match found',send_dc=False)
                 v.getVenue(venueList, agentXYposition)
             pos = v.tryAndSearch('inGame.png')
             if pos is not None:
-                v.stateReport(6, 'in game, have fun.')
+                v.stateReport(6, 'in game, have fun.',send_dc=False)
                 try:
                     v.afk_status
                     for i in range(3):
-                        click(pos)
+                        click(pos) 
                         sleep(1)
                 except:
                     pass
                 v.searchAndClick('buy_phase.png', needClick=False, confidence=0.6)
+                v.stateReport(7, 'buying phase',send_dc=0)
                 return
             else:
                 pass
@@ -180,10 +181,10 @@ class v:
                 if x is not None:
                     venue = searchingVenue.replace("venue_", "")
                     venue = venue[:int(venue.find('.'))]
-                    v.stateReport(2,f'map: {venue}')
+                    v.stateReport(2,f'map: {venue}',send_dc=0)
                     if agentXYposition is False:
                         break
-                    v.selectAgent(preference, venue, agentXYposition)
+                    v.selectAgent(v.preference, venue, agentXYposition)
                     break
             except:
                 count+=1
@@ -193,17 +194,19 @@ class v:
         # pyautogui.moveTo(a)
         # pyautogui.keyUp('alt')
         # """ alt tab here """
-    def stateReport(tick, msg):
-        total = 6
+    def stateReport(tick, msg,send_dc=True):
+        total = 7
         cross = total - tick
         print("   ="* 20)
         msg = '✅'*tick+'❌'*cross+' '+msg
         print(msg)
-        v.send_to_discord(msg)
+        if send_dc:
+            v.send_to_discord(msg,send_dc)
         return
     def cpp_select_agent(xaxis,yaxis):
-        compile_cmd = ["g++", f"{v.others_path}selectagent.cpp", "-o", "selectagent"]
-        subprocess.run(compile_cmd, shell=True, check=True)
+        if xaxis == 999 and yaxis == 999:
+            compile_cmd = ["g++", f"{v.others_path}selectagent.cpp", "-o", "selectagent"]
+            subprocess.run(compile_cmd, shell=True, check=True)
         # Run the compiled executable with the x and y coordinates as arguments
         run_cmd = [f"{v.others_path}selectagent.exe", str(xaxis), str(yaxis), str(v.lockX), str(v.lockY)]
         subprocess.run(run_cmd, shell=True, check=True)
@@ -214,18 +217,18 @@ class v:
             xaxis = int(systemChoice['Xposition'])
             yaxis = int(systemChoice['Yposition'])
         else:
-            if type(v.preference) is dict:
+            if type(preference) is dict:
                 try:
-                    agent = v.preference[venue][order]
+                    agent = preference[venue][order]
                 except:
                     print('out of order la')
                     return
             else:
-                agent = v.preference[order]
+                agent = preference[order]
             v.agentSelected.append(agent)
             for i in agentXYposition:
                 if i['Agent'] == agent:
-                    # agnetPosition = i
+                    # agnetPosition = i2
                     xaxis = int(i['Xposition'])
                     yaxis = int(i['Yposition'])
                     break
@@ -235,9 +238,9 @@ class v:
             # time.sleep(3.5)
         cursorPos = pyautogui.position()
         if v.random:
-            v.stateReport(4,f'🍭🍭RANDOM🍭🍭 agent selecting: 🍭  {agent} 🍭')
+            v.stateReport(4,f'🍭🍭RANDOM🍭🍭 agent selecting: 🍭  {agent} 🍭',send_dc=False)
         else:
-            v.stateReport(4,f'agent selecting: 🕵️  {agent} 🕵️')
+            v.stateReport(4,f'agent selecting: 🕵️  {agent} 🕵️',send_dc=False)
             v.debugger('after agent sel')
         """  """
         # pyautogui.FAILSAFE = False
@@ -254,7 +257,7 @@ class v:
             alert_msg(f'agent {order} cant be selected')
             v.selectAgent(preference, venue, agentXYposition, order, repickAgent=True)
         else:
-            v.stateReport(5,f'agent selected')
+            v.stateReport(5,f'agent selected',send_dc=False)
             pyautogui.FAILSAFE = False
             """ alt tab here """
             pyautogui.keyDown('alt')
@@ -292,9 +295,8 @@ class v:
         b2 = pyautogui.pixel(pixellx,pixellY)
         b3 = pyautogui.pixel(pixelllx,pixelllY)
         count = 0
-        count2 = 0
-        count3 = 0
-        tolerance = 35
+        count2 = 0  
+        tolerance = 5
         while True:
             if pyautogui.pixelMatchesColor(pixelx, pixelY, b, tolerance=tolerance):
                 count = 0
@@ -308,8 +310,8 @@ class v:
                 count3 = 0
             else:
                 count3 +=1
-            if count >3 and count2 >3 and count3 >3:
-                v.stateReport(3, 'select agent page')
+            if count >1 and count2 >1 and count3 >1:
+                v.stateReport(3, 'select agent page',send_dc=False)
                 return
 
     def returnPreviousPosition(x,y):
@@ -326,7 +328,7 @@ class v:
         reportPos = [Point(x=949, y=368), Point(x=952, y=439), Point(x=939, y=730), Point(x=949, y=825), Point(x=945, y=894), Point(x=1239, y=1133)]
         for i in reportPos:
             pyautogui.click(i)
-        time.sleep(0.55)
+        time.sleep(0.75)
         pyautogui.click(x=1244, y=974)
         pyautogui.moveTo(a)
     def check_if_val_message_sent(loginUsername):
@@ -439,9 +441,9 @@ class v:
         if reQ:
             v.requeueRank()
         if v.random:
-            v.stateReport(0,f'autoSelect initiated: {v.account}'+ '\n'+v.random)
+            v.stateReport(0,f'autoSelect initiated: {v.account}'+ '\n'+v.random,send_dc=False)
         else:
-            v.stateReport(0, f'autoSelect initiated: {v.account}')
+            v.stateReport(0, f'autoSelect initiated: {v.account}',send_dc=False)
         if skipStart is False:  
             v.searchAndClick('start.png')
         v.getStatus(agentXYposition)
@@ -631,26 +633,22 @@ class v:
         d.send("Val", msg,channel)
         return
     def dc_notification():
-        print("waiting for next phase...")
-        x = 1307  # X-coordinate of the pixel
-        y = 258   # Y-coordinate of the pixel
+        # print("waiting for next phase...")
+        # x = 1307  # X-coordinate of the pixel
+        # y = 258   # Y-coordinate of the pixel
 
-        # Get the RGB color value of the pixel at the specified coordinates
-        pixel_color = pyautogui.pixel(x, y)
+        # # Get the RGB color value of the pixel at the specified coordinates
+        # pixel_color = pyautogui.pixel(x, y)
 
-        # Check if the pixel color is red
-        if pixel_color == (255, 0, 0):
-            print("The pixel color is red.")
-        else:
-            print("The pixel color is not red.")
-        # while True:
-        #     if v.tryAndSearch('buy_phase.png', withoutClick=True, withoutMove=True):
-        #         v.send_to_discord('buying_phase')
-        #         while True:
-        #             if v.tryAndSearch('buy_phase.png', withoutClick=True, withoutMove=True):
-        #                 pass
-        #             else:
-        #                 break
+        # # Check if the pixel color is red
+        # if pixel_color == (255, 0, 0):
+        #     print("The pixel color is red.")
+        # else:
+        #     print("The pixel color is not red.")
+        while True:
+            if v.tryAndSearch('buy_phase.png', withoutClick=True, withoutMove=True):
+                v.send_to_discord('buying_phase')
+                time.sleep(50)
 def afk_boss(MainFlow,withpartyRank,loginUsername):
     v.afk_status = True
     drop = input('drop: ')
@@ -788,7 +786,7 @@ available_agents = ['astra','breach','brimstone','chamber',
                     'neon','omen','phoenix','raze','reyna','sage',
                     'skye','sova','viper','yoru']
 account_list = ['FatherSun','LaVanTor','speakEngInVal','Dear Curi','oOoOoOo']
-preference = {
+v.preference = {
     'pearl': ['habor','phoenix','breach'],
     'ascent':['omen','phoenix','breach'],
     'haven': ['omen','phoenix','breach'], 
@@ -858,7 +856,7 @@ def hold(game_mode,available_modes):
         elif input_value == "9":
             v.dc_notification()
         elif input_value in available_agents:
-            insert_agent(preference, input_value)
+            insert_agent(v.preference, input_value)
         else:
             for mode in available_modes:
                 if re.match(mode, input_value):

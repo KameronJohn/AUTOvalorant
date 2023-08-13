@@ -16,7 +16,7 @@ class apex:
         self.screenshotPath = self.currentPath+'apex_source\\'
         self.others_path = self.currentPath+'others\\'
         self.accounts_info_path = self.currentPath+'accounts_info\\'
-        self.debugging = 0
+        self.debugging = 1
         self.solo_agent = 'seer'
         self.d_message = {
             "in_apex_game.png":"loading in game",
@@ -111,20 +111,38 @@ class apex:
                 return
         #preference by class
         if type(self.preferences) is dict:
-            for pclass,plegend in self.preferences.items():
-                for alegend in self.all_agents[pclass]:
-                    if self.tryAndSearch("\\legends\\available\\"+alegend+".png", withoutClick=True, withoutMove=False, confidence=0.96):
-                        pass
+            if self.class_based is True:
+                for pclass,plegend in self.preferences.items():
+                    for alegend in self.all_agents[pclass]:
+                        if self.tryAndSearch("\\legends\\hard\\"+alegend+".png", withoutClick=True, withoutMove=False, confidence=0.96):
+                            pass
+                        else:
+                            msg = f"{alegend}({pclass}) is 100% picked"
+                            print(msg)
+                            self.screenshot(msg)
+                            break
                     else:
-                        msg = f"{alegend}({pclass}) is picked"
-                        print(msg)
-                        self.screenshot(msg)
-                        break
-                else:
-                    """ return to neutral position """
-                    pyautogui.move(1200,350)
-                    self.actual_pick(plegend)
-                    return
+                        """ return to neutral position """
+                        pyautogui.move(1200,350)
+                        self.actual_pick(plegend)
+                        return
+            else:
+                for pclass,plegend in self.preferences.items():
+                    for alegend in self.all_agents[pclass]:
+                        if self.tryAndSearch("\\legends\\soft\\"+alegend+".png", withoutClick=True, withoutMove=False, confidence=0.96):
+                            pass
+                        else:
+                            msg = f"{alegend}({pclass}) might be picked"
+                            print(msg)
+                            self.screenshot(msg)
+                            # break
+                    else:
+                        """ return to neutral position """
+                        pyautogui.move(1200,350)
+                        self.actual_pick(plegend)
+                        if not self.tryAndSearch('agent_picked.png'):
+                            self.debugger("pick failed")
+                            return
     def screenshot(self,details):
         current_datetime = datetime.now()
         formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
@@ -187,24 +205,6 @@ class apex:
         m, s = divmod(int(elapsed_time), 60)
         time_format = "{:02d}:{:02d}".format(m, s)
         return time_format
-    def legends_preference(self):
-        """ config """
-        self.all_agents = {
-            "skirmisher": ["horizon", "pathfinder","wraith"],
-            "assault": ["bangalore", "fuse", "ash", "maggie"],
-            "recon": ["bloodhound", "seer"],
-            "support": ["gibraltar", "lifeline","loba"],
-            "controller": ["rampart"]
-        }
-        """ config """
-        """ preferences """
-        self.preferences = dict()
-        self.preferences["support"] = "lifeline"
-        self.preferences["controller"] = "rampart"
-        self.preferences["skirmisher"] = "pathfinder"
-        self.preferences["assault"] = "ash"
-        self.preferences["recon"] = "seer"
-        """ preferences """
     def respawning_check(self):
         try:
             x, y = pyautogui.locateCenterOnScreen(self.screenshotPath+'respawning.png', region = (0,150,2500,1000), confidence=0.9)
@@ -220,9 +220,12 @@ class apex:
         except:
             return
         time.sleep(20)
+    def error_checking(self):
+        return
     def checkScenerio(self):
         self.send_to_discord("initiated...")
         game_end = False
+        self.error_checking(self)
         while True:
             if self.tryAndSearch('ready.png') or self.tryAndSearch('gameFound.png'):
                 self.if_game_found()
@@ -231,6 +234,25 @@ class apex:
                 self.send_to_discord(self.d_message['squad_eliminated.png'])
                 game_end = True
             self.respawning_check()
+    def legends_preference(self):
+        """ config """
+        self.all_agents = {
+            "skirmisher": ["horizon", "pathfinder","wraith"],
+            "assault": ["bangalore", "fuse", "ash", "maggie"],
+            "recon": ["bloodhound", "seer","vantage"],
+            "support": ["gibraltar", "lifeline","loba"],
+            "controller": ["rampart"]
+        }
+        """ config """
+        """ preferences """
+        self.preferences = dict()
+        self.class_based = False
+        self.preferences["skirmisher"] = "horizon"
+        self.preferences["assault"] = "bangalore"
+        self.preferences["recon"] = "vantage"
+        self.preferences["support"] = "loba"
+        self.preferences["controller"] = "rampart"
+        """ preferences """
 def main():
     a = apex()
     a.checkScenerio()
