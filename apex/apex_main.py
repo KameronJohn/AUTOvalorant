@@ -53,13 +53,13 @@ class apex:
                     pyautogui.click()
                 return x,y
         except:
-            return
+            return False
     def if_game_found(self):
         self.legends_preference()
         start_time = time.time()
         self.send_to_discord("\n⬇️️  ⬇️  ⬇️  ⬇️  queuing  ⬇️  ⬇️  ⬇️  ⬇️")
         while True:
-            if self.tryAndSearch('gameFound.png', withoutClick=True, withoutMove=True):
+            if self.tryAndSearch('gameFound.png', withoutClick=True, withoutMove=True) is not False:
                 self.pick_order_count = time.time()
                 break
             self.tryAndSearch('ready.png', withoutClick=False, withoutMove=False)
@@ -78,7 +78,10 @@ class apex:
             formatted_datetime = current_datetime.strftime("%H-%M-%S")
             print(f'debug-[{formatted_datetime}]: {msg}')
     def actual_pick(self,legend):
-        x,y = self.searchAndClick("\\legends\\available\\"+legend+".png")
+        try:
+            x,y = self.tryAndSearch("\\legends\\soft\\"+legend+".png")
+        except:
+            return False
         start_time = time.time()
         while True:
             pyautogui.doubleClick(x,y)
@@ -88,7 +91,7 @@ class apex:
         msg = f"selected: {legend}"
         print(msg)
         # self.send_to_discord(msg)
-        return
+        return True
     def select_legends(self):
         self.searchAndClick("selecting_agent.png")
         pick_time = time.time() - self.pick_order_count
@@ -103,7 +106,7 @@ class apex:
             self.send_to_discord(f"pick_order = 4, pick_time: {pick_time}")
         print('selecting agents')
         if self.pick_order <= 2:
-            if self.tryAndSearch("not_3.png", confidence=0.9):
+            if self.tryAndSearch("not_3.png", confidence=0.9) is not False:
                 msg = 'not a full team'
                 self.send_to_discord(msg)
                 self.screenshot(msg)
@@ -112,20 +115,17 @@ class apex:
         #preference by class
         if type(self.preferences) is dict:
             if self.class_based is True:
+                picked = self.check_what_picked()
+                print('picked')
+                print(picked)
                 for pclass,plegend in self.preferences.items():
-                    for alegend in self.all_agents[pclass]:
-                        if self.tryAndSearch("\\legends\\hard\\"+alegend+".png", withoutClick=True, withoutMove=False, confidence=0.96):
-                            pass
-                        else:
-                            msg = f"{alegend}({pclass}) is 100% picked"
-                            print(msg)
-                            self.screenshot(msg)
-                            break
-                    else:
-                        """ return to neutral position """
-                        pyautogui.move(1200,350)
-                        self.actual_pick(plegend)
+                    """ return to neutral position """
+                    pyautogui.FAILSAFE = False
+                    pyautogui.move(1200,350)
+                    if self.actual_pick(plegend) is False or self.tryAndSearch('agent_picked.png') is not False:
                         return
+                    else:
+                        print("pick failed 1")
             else:
                 for pclass,plegend in self.preferences.items():
                     for alegend in self.all_agents[pclass]:
@@ -135,22 +135,57 @@ class apex:
                             msg = f"{alegend}({pclass}) might be picked"
                             print(msg)
                             self.screenshot(msg)
-                            # break
+                            break
                     else:
                         """ return to neutral position """
+                        pyautogui.FAILSAFE = False
                         pyautogui.move(1200,350)
                         self.actual_pick(plegend)
-                        if not self.tryAndSearch('agent_picked.png'):
+                        if self.tryAndSearch('agent_picked.png') is not False:
                             self.debugger("pick failed")
                             return
     def screenshot(self,details):
         current_datetime = datetime.now()
         formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
         pyautogui.screenshot(self.screenshotPath+formatted_datetime+f"_{details}.png")
-    def testing(self):
-        AllFiles = os.listdir(self.screenshotPath+'//legends//picked')
-        for i in AllFiles:
-            print(i)
+    def check_what_picked(self):
+        line_1 = [626,730,840,944,1060,1283,1390,1478,1598,1710,1829]
+        line_2 = [449,577,675,769,994,1115,1222,1337,1457,1674,1773,1911,2000]
+        yellow = (245,165,35)
+        green = (125,175,10)
+        blue = (10,180,180)
+        y1 = 948
+        y2 = 1134
+        picked = []
+        """  """
+        for i,x in enumerate(line_1):
+            if pyautogui.pixelMatchesColor(x, y1, yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, y1, green, tolerance=0) or pyautogui.pixelMatchesColor(x, y1, blue, tolerance=0):
+                if i <=4:
+                    picked.append("assault")
+                else:
+                    picked.append("skirmisher")
+        for i,x in enumerate(line_2):
+            if pyautogui.pixelMatchesColor(x, y2, yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, y2, green, tolerance=0) or pyautogui.pixelMatchesColor(x, y2, blue, tolerance=0):
+                if i <=3:
+                    picked.append("recon")
+                elif i <=8:
+                    picked.append("support")
+                else:
+                    picked.append("controller")
+        for i in picked:
+            del self.preferences[i]
+        return picked
+        """ while True:
+            print("+++++++++++++++++++++++++++++++++++++++++++++++")
+            for x in line_1:
+                r, g, b = pyautogui.pixel(x, y1)
+                # r, g, b = pyautogui.pixel(1478, 948)
+                print(r, g, b)
+            print("-------------------------")
+            for x in line_2:
+                r, g, b = pyautogui.pixel(x, y2)
+                # r, g, b = pyautogui.pixel(1478, 948)
+                print(r, g, b) """
     def if_in_game(self): 
         self.searchAndClick('in_apex_game.png',needClick=False)
         # self.send_to_discord(self.d_message['in_apex_game.png'])
@@ -223,14 +258,17 @@ class apex:
     def error_checking(self):
         return
     def checkScenerio(self):
+        if self.class_based is False:
+            print("not yet implemented")
+            return 
         self.send_to_discord("initiated...")
         game_end = False
-        self.error_checking(self)
+        self.error_checking()
         while True:
-            if self.tryAndSearch('ready.png') or self.tryAndSearch('gameFound.png'):
+            if self.tryAndSearch('ready.png') is not False or self.tryAndSearch('gameFound.png') is not False:
                 self.if_game_found()
                 game_end is False
-            elif self.tryAndSearch('squad_eliminated.png') and game_end is False:
+            elif self.tryAndSearch('squad_eliminated.png') is not False and game_end is False:
                 self.send_to_discord(self.d_message['squad_eliminated.png'])
                 game_end = True
             self.respawning_check()
@@ -246,7 +284,7 @@ class apex:
         """ config """
         """ preferences """
         self.preferences = dict()
-        self.class_based = False
+        self.class_based = True
         self.preferences["skirmisher"] = "horizon"
         self.preferences["assault"] = "bangalore"
         self.preferences["recon"] = "vantage"
@@ -255,6 +293,7 @@ class apex:
         """ preferences """
 def main():
     a = apex()
+    # a.check_what_picked()
     a.checkScenerio()
 if __name__ == '__main__':
     main()

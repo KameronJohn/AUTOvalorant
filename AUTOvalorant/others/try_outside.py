@@ -16,7 +16,7 @@ import sys
 import pygetwindow
 import datetime
 from PIL import Image
-from pytesseract import pytesseract
+# from pytesseract import pytesseract
 import os
 def getMousePosition():
     PosList = []
