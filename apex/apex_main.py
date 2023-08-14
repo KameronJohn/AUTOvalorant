@@ -2,7 +2,7 @@ import pyautogui
 import keyboard
 import os
 import sys
-import csv
+# import csv
 from datetime import datetime
 import time
 currentPath = os.path.dirname(os.path.abspath(__file__))
@@ -16,8 +16,8 @@ class apex:
         self.screenshotPath = self.currentPath+'apex_source\\'
         self.others_path = self.currentPath+'others\\'
         self.accounts_info_path = self.currentPath+'accounts_info\\'
-        self.debugging = 1
-        self.solo_agent = 'seer'
+        self.debugging = 0
+        self.solo_agent = 'vantage'
         self.d_message = {
             "in_apex_game.png":"loading in game",
             "in_dropship.png":"🚢 in drop ship 🚢",
@@ -79,8 +79,10 @@ class apex:
             print(f'debug-[{formatted_datetime}]: {msg}')
     def actual_pick(self,legend):
         try:
-            x,y = self.tryAndSearch("\\legends\\soft\\"+legend+".png")
+            img_path = "\\legends\\soft\\"+legend+".png"
+            x,y = self.tryAndSearch(img_path)
         except:
+            print(f"failed to find {img_path}")
             return False
         start_time = time.time()
         while True:
@@ -116,34 +118,54 @@ class apex:
         if type(self.preferences) is dict:
             if self.class_based is True:
                 picked = self.check_what_picked()
-                print('picked')
+                print('picked:')
                 print(picked)
                 for pclass,plegend in self.preferences.items():
                     """ return to neutral position """
                     pyautogui.FAILSAFE = False
                     pyautogui.move(1200,350)
-                    if self.actual_pick(plegend) is False or self.tryAndSearch('agent_picked.png') is not False:
+                    a = self.actual_pick(plegend)
+                    b = self.tryAndSearch('agent_picked.png')
+                    if a is not False:
                         return
                     else:
-                        print("pick failed 1")
+                        pass
+                    if b is not False:
+                        print()
+                        return
+                    else:
+                        print("agent_picked.png not found")
+                else:
+                    ValueError("gg lor")
             else:
                 for pclass,plegend in self.preferences.items():
-                    for alegend in self.all_agents[pclass]:
-                        if self.tryAndSearch("\\legends\\soft\\"+alegend+".png", withoutClick=True, withoutMove=False, confidence=0.96):
-                            pass
-                        else:
-                            msg = f"{alegend}({pclass}) might be picked"
-                            print(msg)
-                            self.screenshot(msg)
-                            break
+                    """ return to neutral position """
+                    pyautogui.FAILSAFE = False
+                    pyautogui.move(1200,350)
+                    self.actual_pick(plegend)
+                    if self.tryAndSearch('agent_picked.png') is not False:
+                        msg = f"{pclass} might be picked"
+                        print(msg)
+                        self.screenshot(msg)
+                        return
                     else:
-                        """ return to neutral position """
-                        pyautogui.FAILSAFE = False
-                        pyautogui.move(1200,350)
-                        self.actual_pick(plegend)
-                        if self.tryAndSearch('agent_picked.png') is not False:
-                            self.debugger("pick failed")
-                            return
+                        print('agent cant pick')
+                else:
+                    InterruptedError("GG")
+                    # for alegend in self.all_agents[pclass]:
+                    #     if self.tryAndSearch("\\legends\\soft\\"+alegend+".png", withoutClick=True, withoutMove=False, confidence=0.96):
+                    #         pass
+                    #     else:
+                            
+                    #         break
+                    # else:
+                    #     """ return to neutral position """
+                    #     pyautogui.FAILSAFE = False
+                    #     pyautogui.move(1200,350)
+                    #     self.actual_pick(plegend)
+                    #     if self.tryAndSearch('agent_picked.png') is not False:
+                    #         self.debugger("pick failed")
+                    #         return
     def screenshot(self,details):
         current_datetime = datetime.now()
         formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
@@ -156,7 +178,7 @@ class apex:
         blue = (10,180,180)
         y1 = 948
         y2 = 1134
-        picked = []
+        picked = set()
         """  """
         for i,x in enumerate(line_1):
             if pyautogui.pixelMatchesColor(x, y1, yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, y1, green, tolerance=0) or pyautogui.pixelMatchesColor(x, y1, blue, tolerance=0):
@@ -255,12 +277,14 @@ class apex:
         except:
             return
         time.sleep(20)
+    def open_apex_packs(self):
+        while True:
+            if self.tryAndSearch("apex_packs.png", withoutClick=False, withoutMove=False) is not False:
+                time.sleep(19)
+                self.screenshot("apex_packs")
     def error_checking(self):
         return
     def checkScenerio(self):
-        if self.class_based is False:
-            print("not yet implemented")
-            return 
         self.send_to_discord("initiated...")
         game_end = False
         self.error_checking()
@@ -285,15 +309,15 @@ class apex:
         """ preferences """
         self.preferences = dict()
         self.class_based = True
-        self.preferences["skirmisher"] = "horizon"
-        self.preferences["assault"] = "bangalore"
+        self.preferences["skirmisher"] = "pathfinder"
         self.preferences["recon"] = "vantage"
+        self.preferences["assault"] = "bangalore"
         self.preferences["support"] = "loba"
         self.preferences["controller"] = "rampart"
         """ preferences """
 def main():
     a = apex()
-    # a.check_what_picked()
+    # a.open_apex_packs()
     a.checkScenerio()
 if __name__ == '__main__':
     main()
