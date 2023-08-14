@@ -1,3 +1,4 @@
+print(0)
 import pyautogui
 import keyboard
 import os
@@ -144,12 +145,11 @@ class apex:
                     pyautogui.move(1200,350)
                     self.actual_pick(plegend)
                     if self.tryAndSearch('agent_picked.png') is not False:
+                        return
+                    else:
                         msg = f"{pclass} might be picked"
                         print(msg)
                         self.screenshot(msg)
-                        return
-                    else:
-                        print('agent cant pick')
                 else:
                     InterruptedError("GG")
                     # for alegend in self.all_agents[pclass]:
@@ -183,17 +183,17 @@ class apex:
         for i,x in enumerate(line_1):
             if pyautogui.pixelMatchesColor(x, y1, yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, y1, green, tolerance=0) or pyautogui.pixelMatchesColor(x, y1, blue, tolerance=0):
                 if i <=4:
-                    picked.append("assault")
+                    picked.add("assault")
                 else:
-                    picked.append("skirmisher")
+                    picked.add("skirmisher")
         for i,x in enumerate(line_2):
             if pyautogui.pixelMatchesColor(x, y2, yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, y2, green, tolerance=0) or pyautogui.pixelMatchesColor(x, y2, blue, tolerance=0):
                 if i <=3:
-                    picked.append("recon")
+                    picked.add("recon")
                 elif i <=8:
-                    picked.append("support")
+                    picked.add("support")
                 else:
-                    picked.append("controller")
+                    picked.add("controller")
         for i in picked:
             del self.preferences[i]
         return picked
@@ -308,15 +308,17 @@ class apex:
         """ config """
         """ preferences """
         self.preferences = dict()
-        self.class_based = True
-        self.preferences["skirmisher"] = "pathfinder"
+        self.class_based = False
         self.preferences["recon"] = "vantage"
-        self.preferences["assault"] = "bangalore"
+        self.preferences["skirmisher"] = "pathfinder"
         self.preferences["support"] = "loba"
+        self.preferences["assault"] = "bangalore"
         self.preferences["controller"] = "rampart"
         """ preferences """
 def main():
+    print(1)
     a = apex()
+    print(2)
     # a.open_apex_packs()
     a.checkScenerio()
 if __name__ == '__main__':
