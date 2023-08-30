@@ -12,6 +12,7 @@ sys.path.insert(0, dc_path)
 import discord_send_msg as d
 class apex:
     def __init__(self):
+        self.netural_pos = (1200,350)
         self.currentPath = os.path.dirname(os.path.abspath(__file__))
         self.currentPath += '\\'
         self.screenshotPath = self.currentPath+'apex_source\\'
@@ -19,6 +20,7 @@ class apex:
         self.accounts_info_path = self.currentPath+'accounts_info\\'
         self.debugging = 0
         self.solo_agent = 'vantage'
+        self.last_pos = (1,1)
         self.d_message = {
             "in_apex_game.png":"loading in game",
             "in_dropship.png":"🚢 in drop ship 🚢",
@@ -87,9 +89,10 @@ class apex:
             return False
         start_time = time.time()
         while True:
+            pyautogui.move(self.netural_pos)
             pyautogui.doubleClick(x,y)
             elapsed_time = time.time() - start_time
-            if elapsed_time > 3:
+            if elapsed_time > 2:
                 break
         msg = f"selected: {legend}"
         print(msg)
@@ -121,16 +124,18 @@ class apex:
                 picked = self.check_what_picked()
                 print('picked:')
                 print(picked)
+                print("self.preferences")
+                print(self.preferences)
                 for pclass,plegend in self.preferences.items():
                     """ return to neutral position """
                     pyautogui.FAILSAFE = False
-                    pyautogui.move(1200,350)
+                    pyautogui.move(self.netural_pos)
                     a = self.actual_pick(plegend)
                     b = self.tryAndSearch('agent_picked.png')
                     if a is not False:
                         return
                     else:
-                        pass
+                        pass  
                     if b is not False:
                         print()
                         return
@@ -139,6 +144,8 @@ class apex:
                 else:
                     ValueError("gg lor")
             else:
+                print("self.class_based")
+                print(self.class_based)
                 for pclass,plegend in self.preferences.items():
                     """ return to neutral position """
                     pyautogui.FAILSAFE = False
@@ -308,12 +315,12 @@ class apex:
         """ config """
         """ preferences """
         self.preferences = dict()
-        self.class_based = False
+        self.class_based = True
         self.preferences["recon"] = "vantage"
-        self.preferences["skirmisher"] = "pathfinder"
         self.preferences["support"] = "loba"
-        self.preferences["assault"] = "bangalore"
         self.preferences["controller"] = "rampart"
+        self.preferences["skirmisher"] = "pathfinder"
+        self.preferences["assault"] = "bangalore"
         """ preferences """
 def main():
     print(1)
@@ -321,5 +328,5 @@ def main():
     print(2)
     # a.open_apex_packs()
     a.checkScenerio()
-if __name__ == '__main__':
+if __name__ == '__main__' :
     main()

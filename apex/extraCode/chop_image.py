@@ -22,7 +22,7 @@ def separate_image(image_path,filename):
 
     # Save the bottom part
     bottom_part.save(r'C:\Users\User\Documents\GitHub\inGameSelection\apex\apex_source\legends\hard'+"\\"+filename)
-
+    print(f"Done: {image_path}")
 # Example usage
 # image_path = r'C:\Users\User\Documents\GitHub\inGameSelection\apex\apex_source\2023-07-24_00-07-11_gibraltar(support) is picked.png'
 # separate_image(image_path)
