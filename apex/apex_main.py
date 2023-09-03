@@ -6,13 +6,14 @@ import sys
 # import csv
 from datetime import datetime
 import time
+from extraCode import chop_image
 currentPath = os.path.dirname(os.path.abspath(__file__))
 dc_path = currentPath +r'\..\..\kmjAUTO\core'
 sys.path.insert(0, dc_path)
 import discord_send_msg as d
 class apex:
     def __init__(self):
-        self.netural_pos = (1200,350)
+        self.netural_pos = 1200,350
         self.currentPath = os.path.dirname(os.path.abspath(__file__))
         self.currentPath += '\\'
         self.screenshotPath = self.currentPath+'apex_source\\'
@@ -87,10 +88,14 @@ class apex:
         except:
             print(f"failed to find {img_path}")
             return False
-        start_time = time.time()
+        start_time = time.time() 
         while True:
+            pyautogui.FAILSAFE = False
             pyautogui.move(self.netural_pos)
-            pyautogui.doubleClick(x,y)
+            for i in range(6):
+                pyautogui.mouseDown(x,y)
+                time.sleep(0.1)
+                pyautogui.mouseUp(x,y)
             elapsed_time = time.time() - start_time
             if elapsed_time > 2:
                 break
@@ -143,36 +148,36 @@ class apex:
                         print("agent_picked.png not found")
                 else:
                     ValueError("gg lor")
-            else:
+            elif self.class_based is False:
                 print("self.class_based")
                 print(self.class_based)
                 for pclass,plegend in self.preferences.items():
                     """ return to neutral position """
                     pyautogui.FAILSAFE = False
-                    pyautogui.move(1200,350)
+                    pyautogui.move(self.netural_pos)
                     self.actual_pick(plegend)
                     if self.tryAndSearch('agent_picked.png') is not False:
                         return
                     else:
-                        msg = f"{pclass} might be picked"
+                        msg = f"{plegend} is picked"
                         print(msg)
                         self.screenshot(msg)
                 else:
                     InterruptedError("GG")
-                    # for alegend in self.all_agents[pclass]:
-                    #     if self.tryAndSearch("\\legends\\soft\\"+alegend+".png", withoutClick=True, withoutMove=False, confidence=0.96):
-                    #         pass
-                    #     else:
-                            
-                    #         break
-                    # else:
-                    #     """ return to neutral position """
-                    #     pyautogui.FAILSAFE = False
-                    #     pyautogui.move(1200,350)
-                    #     self.actual_pick(plegend)
-                    #     if self.tryAndSearch('agent_picked.png') is not False:
-                    #         self.debugger("pick failed")
-                    #         return
+        elif type(self.preferences) is list:
+            for plegend in self.preferences:
+                """ return to neutral position """
+                pyautogui.FAILSAFE = False
+                pyautogui.move(self.netural_pos)
+                self.actual_pick(plegend)
+                if self.tryAndSearch('agent_picked.png') is not False:
+                    return
+                else:
+                    msg = f"{plegend} is picked"
+                    print(msg)
+                    self.screenshot(msg)
+            else:
+                InterruptedError("GG")
     def screenshot(self,details):
         current_datetime = datetime.now()
         formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
@@ -310,17 +315,19 @@ class apex:
             "assault": ["bangalore", "fuse", "ash", "maggie"],
             "recon": ["bloodhound", "seer","vantage"],
             "support": ["gibraltar", "lifeline","loba"],
-            "controller": ["rampart"]
+            "controller": ["rampart", "caustic", "catalyst"]
         }
         """ config """
         """ preferences """
         self.preferences = dict()
-        self.class_based = True
+        self.class_based = False
+        self.preferences["support"] = "lifeline"
         self.preferences["recon"] = "vantage"
-        self.preferences["support"] = "loba"
         self.preferences["controller"] = "rampart"
         self.preferences["skirmisher"] = "pathfinder"
         self.preferences["assault"] = "bangalore"
+        """  """
+        self.preferences = ["vantage","caustic", "rampart","seer"]
         """ preferences """
 def main():
     print(1)
@@ -330,3 +337,4 @@ def main():
     a.checkScenerio()
 if __name__ == '__main__' :
     main()
+    # chop_image.main()

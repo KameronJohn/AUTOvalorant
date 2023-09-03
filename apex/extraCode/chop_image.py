@@ -33,6 +33,9 @@ def process_files_in_directory(directory):
         if os.path.isfile(os.path.join(directory, filename)):
             file_path_name = os.path.join(directory, filename)
             separate_image(file_path_name,filename)
-# Example usage
-directory_path = r'C:\Users\User\Documents\GitHub\inGameSelection\apex\apex_source\legends\available'
-process_files_in_directory(directory_path)
+def main():
+    # Example usage
+    directory_path = r'C:\Users\User\Documents\GitHub\inGameSelection\apex\apex_source\legends\available'
+    process_files_in_directory(directory_path)
+if __name__ == '__main__':
+    main()
