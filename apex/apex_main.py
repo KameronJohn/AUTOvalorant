@@ -330,9 +330,7 @@ class apex:
         self.preferences = ["vantage","caustic", "rampart","seer"]
         """ preferences """
 def main():
-    print(1)
     a = apex()
-    print(2)
     # a.open_apex_packs()
     a.checkScenerio()
 if __name__ == '__main__' :

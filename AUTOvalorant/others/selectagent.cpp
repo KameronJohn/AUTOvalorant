@@ -1,6 +1,30 @@
 #include <Windows.h>
 #include <iostream>
+void holdLeftMouseClick(int durationMs)
+{
+    INPUT input;
+    input.type = INPUT_MOUSE;
+    input.mi.dwFlags = MOUSEEVENTF_LEFTDOWN; // Press the left mouse button
 
+    // Send the input
+    SendInput(1, &input, sizeof(INPUT));
+
+    // Wait for the specified duration
+    Sleep(durationMs);
+
+    // Release the left mouse button
+    input.mi.dwFlags = MOUSEEVENTF_LEFTUP;
+    SendInput(1, &input, sizeof(INPUT));
+
+    return;
+}
+void click(int x, int y){
+    // Move the mouse to the current coordinate
+    SetCursorPos(x, y);
+    //Simulate a left mouse button click
+    mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+    mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+}
 int main(int argc, char* argv[])
 {
     // std::cout << "halo" << std::endl;
@@ -16,7 +40,7 @@ int main(int argc, char* argv[])
     int pos1_y = std::stoi(argv[2]);
     if (pos1_x == 999 && pos1_y == 999)
     {
-        // std::cout << "test run done" << std::endl;z
+        // std::cout << "test run done" << std::endl;
         return 0;
     }
     int pos2_x = std::stoi(argv[3]);
@@ -32,14 +56,18 @@ int main(int argc, char* argv[])
 
     // Define the two coordinates to move to
     POINT coords[] = {
-        {pos1_x, pos1_y},
-        {pos2_x, pos2_y}
+        {pos2_x, pos2_y},
+        {pos1_x, pos1_y}
+        
     };
     int numCoords = sizeof(coords) / sizeof(coords[0]);
-
+    for (int i = 0; i < 2; i++)
+    {
+        click(pos2_x,pos2_y);
+        Sleep(50);
+    }
     // Get the current tick count
     DWORD startTick = GetTickCount();
-
     // Loop 10 times and move to each coordinate in turn
     for (int i = 0; i < 10000000; i++)
     {
@@ -52,15 +80,10 @@ int main(int argc, char* argv[])
                 return 0;
             }
 
-            // Move the mouse to the current coordinate
-            SetCursorPos(coords[j].x, coords[j].y);
-
-            //Simulate a left mouse button click
-            mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-
+            // std::cout << "22" << std::endl;
+            click(coords[j].x, coords[j].y);
             // Wait for a short period to avoid moving too quickly
-            Sleep(30);
+            Sleep(10);
         }
     }
 

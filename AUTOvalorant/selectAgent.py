@@ -52,6 +52,7 @@ class v:
         column = ['Date','Account','Agent', 'Xposition', 'Yposition']
         csvFile = f'{v.currentPath}\\agentXYposition.csv'
         lines = list()
+        """ get ALL ACCOUNTS' agents positions, except the target account """
         with open(csvFile, 'r', newline='') as f:
             writer = csv.writer(f)
             for line in csv.reader(f):
@@ -71,10 +72,6 @@ class v:
             print('previous record has found')
             print('  !'*10)
         with open(csvFile, 'a', newline='') as f:
-            # create the csv writer
-            # writer = csv.writer(f)
-            # write a row to the csv file
-            # writer.writerow(column)
             AllFiles = os.listdir(v.screenshotPath)
             for i in AllFiles:
                 if re.match(r"agent_*", i):
@@ -101,20 +98,23 @@ class v:
         v.debugger('originalLength: '+str(originalLength))
         v.debugger('len(lines): '+ str(len(lines)))
         if originalLength < len(lines):
-            with open(csvFile, 'w', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerows(lines)
-                f.close()
+            v.writerows(csvFile, lines)
         else:
             print('  !'*10)
             print('nothing executed: originalLength < new length')
             print('  !'*10)
-        # exit()
-        # csv_filename = v.currentPath+ 'agentXYposition.csv'
-        # with open(csv_filename) as f:BA
-        #     reader = csv.DictReader(f)
-        #     for row in reader:
-        #         print(row)
+        inputt = input(print_instructions(["overwite", "pass"]))
+        if inputt == "1":
+            v.writerows(csvFile, lines)
+            print('overwritten')
+        elif inputt == "2":
+            print('passed')
+            pass
+    def writerows(csvFile, lines):
+        with open(csvFile, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerows(lines)
+                f.close()
     def format_time(elapsed_time):
         m, s = divmod(int(elapsed_time), 60)
         time_format = "{:02d}:{:02d}".format(m, s)
@@ -153,12 +153,12 @@ class v:
         v.stateReport(0,f'queuing',send_dc=0)
         v.cpp_select_agent(999,999)
         while True: 
-            if v.tryAndSearch('matchFound.png'):
+            if v.tryAndSearch('matchFound.png'):                                                                    
                 v.stateReport(1,f'match found',send_dc=False)
                 v.getVenue(venueList, agentXYposition)
             pos = v.tryAndSearch('inGame.png')
             if pos is not None:
-                v.stateReport(6, 'in game, have fun.',send_dc=False)
+                v.stateReport(6, 'in game, have fun.',send_dc=0)
                 try:
                     v.afk_status
                     for i in range(3):
@@ -181,7 +181,8 @@ class v:
                 if x is not None:
                     venue = searchingVenue.replace("venue_", "")
                     venue = venue[:int(venue.find('.'))]
-                    v.stateReport(2,f'map: {venue}',send_dc=0)
+                    v.stateReport(2,f'map: {venue}',send_dc=False)
+                    # click(x, y)                                                                   
                     if agentXYposition is False:
                         break
                     v.selectAgent(v.preference, venue, agentXYposition)
@@ -200,11 +201,12 @@ class v:
         print("   ="* 20)
         msg = '✅'*tick+'❌'*cross+' '+msg
         print(msg)
-        if send_dc:
+        if type(send_dc) == int:
             v.send_to_discord(msg,send_dc)
         return
     def cpp_select_agent(xaxis,yaxis):
         if xaxis == 999 and yaxis == 999:
+            # os.remove(f"{v.others_path}selectagent.exe")
             compile_cmd = ["g++", f"{v.others_path}selectagent.cpp", "-o", "selectagent"]
             subprocess.run(compile_cmd, shell=True, check=True)
         # Run the compiled executable with the x and y coordinates as arguments
@@ -234,8 +236,9 @@ class v:
                     break
         count = 0
         if repickAgent is False:
+            # time.sleep(1)
             v.checkIfLoadingPageDone()
-            # time.sleep(3.5)
+            # time.sleep(1)
         cursorPos = pyautogui.position()
         if v.random:
             v.stateReport(4,f'🍭🍭RANDOM🍭🍭 agent selecting: 🍭  {agent} 🍭',send_dc=False)
@@ -296,41 +299,94 @@ class v:
         b3 = pyautogui.pixel(pixelllx,pixelllY)
         count = 0
         count2 = 0  
-        tolerance = 5
+        tolerance = 1
         while True:
-            if pyautogui.pixelMatchesColor(pixelx, pixelY, b, tolerance=tolerance):
-                count = 0
-            else:
-                count +=1
-            if pyautogui.pixelMatchesColor(pixellx, pixellY, b2, tolerance=tolerance):
-                count2 = 0
-            else:
-                count2 +=1
-            if pyautogui.pixelMatchesColor(pixelllx, pixelllY, b3, tolerance=tolerance):
-                count3 = 0
-            else:
-                count3 +=1
-            if count >1 and count2 >1 and count3 >1:
+            if pyautogui.pixelMatchesColor(pixelx, pixelY, (0,0,0), tolerance=tolerance):
+                break
+        while True:
+            if not pyautogui.pixelMatchesColor(pixelx, pixelY, (0,0,0), tolerance=tolerance):
                 v.stateReport(3, 'select agent page',send_dc=False)
                 return
+                count +=1
+                print(count)
+                if count >50:
+                    v.stateReport(3, 'select agent page',send_dc=False)
+                    return
+            # else:
+            #     count +=1
+            # if pyautogui.pixelMatchesColor(pixellx, pixellY, (0,0,0), tolerance=tolerance):
+            #     count2 = 0
+            # else:
+            #     count2 +=1
+            # if pyautogui.pixelMatchesColor(pixelllx, pixelllY, (0,0,0), tolerance=tolerance):
+            #     count3 = 0
+            # else:
+            #     count3 +=1
+            # if count >1 and count2 >1 and count3 >1:
+            #     v.stateReport(3, 'select agent page',send_dc=False)
+            #     return
 
     def returnPreviousPosition(x,y):
         a = pyautogui.position()
         pyautogui.click(x, y)
         pyautogui.moveTo(a)
-    def reportPlayer():
+    def slow_click(x,y):
+        pyautogui.FAILSAFE = False
+        pyautogui.moveTo(x,y)
+        pyautogui.click()
+    def reportPlayer_first_move():
         print('fuction: reportPlayer is running...')
         pyautogui.click()
         pyautogui.click()
         pyautogui.click(button='right')
         pyautogui.click()
+        return True, pyautogui.position()
+    def reportPlayer():
+        print_instructions(['toxic','sabotaging','afk','submit','breakLoop', 'F1: requeue'])
         a = pyautogui.position()
-        reportPos = [Point(x=949, y=368), Point(x=952, y=439), Point(x=939, y=730), Point(x=949, y=825), Point(x=945, y=894), Point(x=1239, y=1133)]
-        for i in reportPos:
-            pyautogui.click(i)
-        time.sleep(0.75)
-        pyautogui.click(x=1244, y=974)
-        pyautogui.moveTo(a)
+        first_move_already = False
+        while True:
+            if keyboard.is_pressed('1'):
+                if first_move_already is False:
+                    first_move_already, a = v.reportPlayer_first_move()
+                    # time.sleep(0.25)
+                for x,y in [(523, 547), (521, 587), (525, 684), (528, 721)]:
+                    v.slow_click(x,y)
+            elif keyboard.is_pressed('2'):
+                v.slow_click(1068, 641)
+            elif keyboard.is_pressed('3'):
+                v.slow_click(1600, 546)
+            elif keyboard.is_pressed('4'):
+                first_move_already = False
+                pyautogui.mouseDown(1282, 1033, duration=0.2)
+                pyautogui.mouseUp(1282, 1033)
+                time.sleep(0.5)
+                v.slow_click(1263, 828)
+                pyautogui.moveTo(a)
+            elif keyboard.is_pressed('5'):
+                break
+            elif keyboard.is_pressed('F1'):
+                return 1
+        return
+    # def reportPlayer():
+    #     a = pyautogui.position()
+    #     first_move_already = False
+    #     action_list = set()
+    #     while True:
+    #         if keyboard.is_pressed('1'):
+    #             action_list.add(1)
+    #         elif keyboard.is_pressed('2'):
+    #             action_list.add(2)
+    #         elif keyboard.is_pressed('3'):
+    #             action_list.add(3)
+    #         elif keyboard.is_pressed('4'):
+    #             action_list.add(4)
+    #             print(action_list)
+    #             time.sleep(1)
+    #             action_list = set()
+    #         elif keyboard.is_pressed('5'):
+    #             action_list.add(5)
+    #     pyautogui.moveTo(a)
     def check_if_val_message_sent(loginUsername):
         #check if the message sent
         result_pos = v.tryAndSearch(f'ok_button.png',withoutClick=True, withoutMove=True)
@@ -441,7 +497,7 @@ class v:
         if reQ:
             v.requeueRank()
         if v.random:
-            v.stateReport(0,f'autoSelect initiated: {v.account}'+ '\n'+v.random,send_dc=False)
+            v.stateReport(0,f'autoSelect initiated: {v.account}'+ '\n'+v.random,send_dc=0)
         else:
             v.stateReport(0, f'autoSelect initiated: {v.account}',send_dc=False)
         if skipStart is False:  
@@ -692,6 +748,7 @@ def afk_boss(MainFlow,withpartyRank,loginUsername):
                     file.write(current_time)
                 os.system("shutdown -a")
                 os.system("shutdown /s /t 1")
+        
 def spammer():
     # Compile the C++ file
     compile_cmd = ["g++", f"{v.others_path}spammer.cpp", "-o", "spammer"]
@@ -788,14 +845,15 @@ available_agents = ['astra','breach','brimstone','chamber',
 account_list = ['FatherSun','LaVanTor','speakEngInVal','Dear Curi','oOoOoOo']
 v.preference = {
     'pearl': ['habor','phoenix','breach'],
+    'breeze':['habor','phoenix','breach'],
     'ascent':['omen','phoenix','breach'],
+    'sunset':['omen','phoenix','breach'],
     'haven': ['omen','phoenix','breach'], 
-    'icebox': ['omen','phoenix','breach'], 
     'lotus': ['omen','phoenix','breach'],
     'split': ['omen','phoenix','breach' ],
-    'fracture': ['omen','breach','omen'],
     'bind': ['omen','phoenix','breach'],
-    'breeze':['habor','phoenix','breach']
+    'icebox': ['omen','phoenix','breach'], 
+    'fracture': ['omen','breach','omen']
 }
 v.game_mode = 'unrated' 
 v.game_mode = 'swiftplay'
@@ -803,19 +861,19 @@ v.game_mode = 'spike_rush'
 v.game_mode = 'competitive'
 """
 """
-v.preference = ['reyna', 'jett', 'phoenix']
 v.preference = ['jett', 'reyna', 'phoenix']  
-v.preference = ['sage', 'brimstone', 'phoenix']
-v.preference = ['phoenix', 'reyna', 'jett']  
+v.preference = ['brimstone', 'sage', 'phoenix']
 v.preference = ['chamber', 'omen', 'phoenix']
-v.preference = ['yoru', 'chamber', 'raze']
 v.preference = ['omen', 'sage', 'jett']
+v.preference = ['yoru', 'chamber', 'raze']
+v.preference = ['phoenix', 'reyna', 'jett']  
+v.preference = ['reyna', 'jett', 'phoenix']
 v.preference = ['raze', 'reyna', 'phoenix']
 """ """
 v.account = 'Dear Curi'
+v.account = 'LaVanTor'
 v.account = 'speakEngInVal'
 v.account = 'oOoOoOo'
-v.account = 'LaVanTor'
 v.account = 'FatherSun'
 def hold(game_mode,available_modes):
     MainFlow = "v.MainFlow(v.account, skipStart='y', reQ='y')"
@@ -823,24 +881,15 @@ def hold(game_mode,available_modes):
     launchAndLogin = "v.MainFlow(v.account, skipStart='y', reQ='y', launchAndLogin=True)"
     starting()
     while True:
-        input_value = print_instructions_main(v.account,['main program','report player','requeue','login & queue','afk','check_all_account_available_agent','afk_boss','spammer','dc_notification'],v.game_mode,v.preference)
+        input_value = print_instructions_main(v.account,['main program','report player','requeue','login & queue','afk','check_all_account_available_agent','afk_boss','spammer','dc_notification',"getAgentsPosition"],v.game_mode,v.preference)
         if input_value == "1":
             eval(withpartyRank)
         elif input_value == "2":
-            print_instructions(['report','exit','exit & requeuing'])
-            time.sleep(1)
-            while True:
-                if keyboard.is_pressed('1'): 
-                    v.reportPlayer()
-                elif keyboard.is_pressed('2'):
-                    print('exiting..')
-                    time.sleep(0.5)
-                    break
-                elif keyboard.is_pressed('3'):
-                    print('exiting and requeuing')
-                    time.sleep(1)
-                    eval(MainFlow)
-                    break
+            if v.reportPlayer() == 1:
+                print('exiting and requeuing')
+                time.sleep(1)
+                eval(MainFlow)
+                break
         elif input_value == "3":
             eval(MainFlow)
         elif input_value == "4":
@@ -855,6 +904,8 @@ def hold(game_mode,available_modes):
             spammer()
         elif input_value == "9":
             v.dc_notification()
+        elif input_value == "0":
+            v.getAgentsPosition(account=v.account)
         elif input_value in available_agents:
             insert_agent(v.preference, input_value)
         else:
@@ -864,7 +915,7 @@ def hold(game_mode,available_modes):
                     alert_msg('mode changed: ' + game_mode)
 if __name__ == "__main__":
     # afk(drop=0,shield=0,abilties=1)
-    # v.change_settings()
+    # v.reportPlayer()
     hold(v.game_mode,available_modes)
     # v.getAgentsPosition(account=v.account)
 
@@ -873,6 +924,3 @@ if __name__ == "__main__":
     # v.MainFlow('FatherSun', random='random is on', reQ='y')
 
 # """ 0;P;c;1;o;1;d;1;z;1;0t;1;0a;1;1b;0 """
-""" 
-
-"""
