@@ -19,6 +19,7 @@ sys.path.insert(0, dc_path)
 import discord_send_msg as d
 print("initiating...")
 class v:
+    debugging = 0
     agentSelected = [] 
     currentPath = os.path.dirname(os.path.abspath(__file__))
     currentPath += '\\'
@@ -33,8 +34,9 @@ class v:
         'oOoOoOo': ['wonnacha6','Pleasetellme3'],
         'Dear Curi': ['wonnacha7','Pleasetellme3'],
     }
-    debugging = 0
+    """ OLD METHOD"""
     #if even number= either select agent/ re queuing
+    # saving each account's agent's XY position
     def agentXYposition(account):
         csv_filename = v.currentPath+ 'agentXYposition.csv'
         agentXYposition = []
@@ -45,6 +47,22 @@ class v:
                     agentXYposition.append(row)
         if len(agentXYposition) < 4:
             exit('SOMETIME IS NOT RIGHT: len(agentXYposition) < 4')
+        print(agentXYposition)
+        return agentXYposition
+    """ OLD METHOD"""
+    #if even number= either select agent/ re queuing
+    # saving each account's agent's XY position
+    def agentXYpositionOLD(account):
+        csv_filename = v.currentPath+ 'agentXYposition.csv'
+        agentXYposition = []
+        with open(csv_filename) as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row['Account'] == account:
+                    agentXYposition.append(row)
+        if len(agentXYposition) < 4:
+            exit('SOMETIME IS NOT RIGHT: len(agentXYposition) < 4')
+        print(agentXYposition)
         return agentXYposition
     def getAgentsPosition(account):
         originalLength = 0
@@ -838,7 +856,7 @@ def get_parameters():
             break
     return account, game_mode, preference
 available_modes = ['unrated','competitive','swiftplay','spike_rush']
-available_agents = ['astra','breach','brimstone','chamber',
+available_agents = ['harbor','deadlock','iso','astra','breach','brimstone','chamber',
                     'cypher','gekko','jett','kayo','killjoy',
                     'neon','omen','phoenix','raze','reyna','sage',
                     'skye','sova','viper','yoru']
