@@ -26,11 +26,12 @@ class v:
     screenshotPath = currentPath+'source\\'
     others_path = currentPath+'others\\'
     accounts_info_path = currentPath+'accounts_info\\'
-    lockX, lockY = 1213,1084
+    lockX, lockY = 1268, 968
     accountCredentials = {
         'FatherSun': ['wonnacha','Pleasetellme3'],
         'LaVanTor': ['wonnacha3','Pleasetellme3'],
         'speakEngInVal': ['wonnacha4','Pleasetellme3'],
+        'xav1er': ['wonnacha5','Pleasetellme3'],
         'oOoOoOo': ['wonnacha6','Pleasetellme3'],
         'Dear Curi': ['wonnacha7','Pleasetellme3'],
     }
@@ -64,7 +65,7 @@ class v:
             exit('SOMETIME IS NOT RIGHT: len(agentXYposition) < 4')
         print(agentXYposition)
         return agentXYposition
-    def getAgentsPosition(account):
+    def getAgentsPosition(account,auto=False):
         originalLength = 0
         today = datetime.today().strftime(f'%Y%m%d')
         column = ['Date','Account','Agent', 'Xposition', 'Yposition']
@@ -114,14 +115,18 @@ class v:
                             break
             f.close()
         v.debugger('originalLength: '+str(originalLength))
-        v.debugger('len(lines): '+ str(len(lines)))
+        v.debugger('new len(lines): '+ str(len(lines)))
+        if auto is True:
+            v.writerows(csvFile, lines)
+            return
         if originalLength < len(lines):
             v.writerows(csvFile, lines)
         else:
             print('  !'*10)
             print('nothing executed: originalLength < new length')
             print('  !'*10)
-        inputt = input(print_instructions(["overwite", "pass"]))
+        print_instructions(["overwite", "pass"],1)
+        inputt = input()
         if inputt == "1":
             v.writerows(csvFile, lines)
             print('overwritten')
@@ -418,7 +423,12 @@ class v:
             try:
                 click(result_poss)
             except:
+                pass
+            try:
                 click(result_pos)
+            except:
+                pass
+            time.sleep(0.5)
             v.check_if_val_message_sent(loginUsername)
         return
         # v.debugger("check_if_val_message_sent: "+ result_pos)
@@ -472,7 +482,7 @@ class v:
                 else:
                     # print("normal")
                     os.remove(tmp_screenshot_path)
-                    if loop_times > 2:
+                    if loop_times > 1:
                         # print('  -  '*20)
                         return
             loop_times +=1
@@ -558,6 +568,7 @@ class v:
         pyautogui.moveTo(bb)
         pyautogui.keyUp('alt')
         """ alt tab here """
+    """ in window 10, old home pc"""
     def login(loginUsername=False,loginPassword=False,direct_launch=False):
         if direct_launch:
             os.startfile(r'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Riot Games\特戰英豪.lnk')
@@ -567,7 +578,6 @@ class v:
             pyautogui.write('riot')
             time.sleep(0.4)
             pyautogui.press('enter')
-
         while True:
             try:
                 x,y = pyautogui.locateCenterOnScreen(v.screenshotPath+'username.png', region = (0,0,2560,1440), confidence=0.8)
@@ -581,9 +591,12 @@ class v:
                     break
             except:
                 pass
+            """ handling: connection error """
+
         #retrieve login username and password
         if loginUsername is False and loginPassword is False:
             loginUsername, loginPassword = v.accountCredentials[v.account]
+        time.sleep(0.5)
         pyautogui.click(x,y)
         pyautogui.write(loginUsername)
         pyautogui.press('tab')
@@ -614,7 +627,7 @@ class v:
                 sleep(3)
                 v.login(loginUsername,loginPassword,direct_launch=True)
                 sleep(3)
-                break
+                return
         time.sleep(1)
         pyautogui.FAILSAFE = False
         v.check_if_val_message_sent(loginUsername)
@@ -636,36 +649,41 @@ class v:
                     if count == 3:
                         return size
     def check_all_account_available_agent(secondTime=False):
-        account = [4,5,6,7]
-        for i in account:
-            account_name = 'wonnacha'+str(i)
-            password = 'Pleasetellme3'
+        for displayName, credential in v.accountCredentials.items():
+            account_name = credential[0]
+            password = credential[1]
             v.login(account_name,password,direct_launch=True)
             time.sleep(2)
             for pos,fileName in [
-                [[Point(x=1004, y=46),Point(1243, 1075),Point(x=2225, y=34)],'current_contract&mission']
+                [[(1216, 38), 
+                 (1488, 30)],'rank_mission_lv']
                 ]:
                 for each_pos in pos:
                     click(each_pos)
                     sleep(1)
+                sleep(1)
+                pyautogui.moveTo(2095, 32)
                 current_datetime = datetime.now()
                 formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
-                screenshot_path = v.accounts_info_path+formatted_datetime+'_'+account_name+'_'+fileName+'.png'
+                screenshot_path = v.accounts_info_path+formatted_datetime+'_'+account_name+f"[{displayName}]"+'_'+fileName+'.png'
                 v.screenshot(screenshot_path)
             v.go_to_custom_game_mode(account_name,password)
             current_datetime = datetime.now()
             formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
-            screenshot_path = v.accounts_info_path+formatted_datetime+'_'+account_name+'_available agents'+'.png'
+            screenshot_path = v.accounts_info_path+formatted_datetime+'_'+account_name+f"[{displayName}]"+'_available agents'+'.png'
             v.screenshot(screenshot_path)
             print('check screenshot at: ',screenshot_path)
+            v.getAgentsPosition(account_name,auto=True)
             v.exit_valorant()
             time.sleep(2)
     def go_to_custom_game_mode(account_name,password):
         click(x=1266, y=33)
-        poss = [Point(x=1855, y=139), Point(x=1225, y=1311), Point(x=1066, y=825)]
+        poss = [(1272, 22), (2044, 115), (1211, 1319),(1056, 1000),(1056, 1000),(1056, 1000),(1056, 827),(1056, 827),(1056, 827)]
         for each_pos in poss:
             click(each_pos)
-            time.sleep(0.75)
+            click(each_pos)
+            click(each_pos)
+            time.sleep(1)
         start_time = time.time()
         for i in ['agent_sage.png','agent_phoenix.png','agent_brimstone.png']:
             v.debugger('looking for: '+i)
@@ -692,6 +710,11 @@ class v:
     def exit_valorant():
         for proc in psutil.process_iter(['pid', 'name']):
             if 'valorant' in proc.info['name'].lower():
+                pid = proc.info['pid']
+                process = psutil.Process(pid)
+                process.terminate()
+                continue
+            if 'riot' in proc.info['name'].lower():
                 pid = proc.info['pid']
                 process = psutil.Process(pid)
                 process.terminate()
@@ -862,8 +885,20 @@ available_agents = ['harbor','deadlock','iso','astra','breach','brimstone','cham
                     'skye','sova','viper','yoru']
 account_list = ['FatherSun','LaVanTor','speakEngInVal','Dear Curi','oOoOoOo']
 v.preference = {
+    'breeze':['neon','phoenix','breach'],
+    'ascent':['raze','phoenix','breach'],
+    'sunset':['pheonix','phoenix','breach'],
+    'haven': ['pheonix','phoenix','breach'], 
+    'lotus': ['pheonix','phoenix','breach'],
+    'split': ['pheonix','phoenix','breach' ],
+    'bind': ['pheonix','phoenix','breach'],
+    'icebox': ['omen','phoenix','breach'], 
     'pearl': ['habor','phoenix','breach'],
-    'breeze':['habor','phoenix','breach'],
+    'fracture': ['omen','breach','omen']
+}
+v.preference = {
+    'pearl': ['habor','phoenix','breach'],
+    'breeze':['viper','phoenix','breach'],
     'ascent':['omen','phoenix','breach'],
     'sunset':['omen','phoenix','breach'],
     'haven': ['omen','phoenix','breach'], 
@@ -873,25 +908,28 @@ v.preference = {
     'icebox': ['omen','phoenix','breach'], 
     'fracture': ['omen','breach','omen']
 }
-v.game_mode = 'unrated' 
 v.game_mode = 'swiftplay'
 v.game_mode = 'spike_rush' 
+v.game_mode = 'unrated' 
 v.game_mode = 'competitive'
 """
 """
-v.preference = ['jett', 'reyna', 'phoenix']  
-v.preference = ['brimstone', 'sage', 'phoenix']
-v.preference = ['chamber', 'omen', 'phoenix']
-v.preference = ['omen', 'sage', 'jett']
-v.preference = ['yoru', 'chamber', 'raze']
-v.preference = ['phoenix', 'reyna', 'jett']  
-v.preference = ['reyna', 'jett', 'phoenix']
-v.preference = ['raze', 'reyna', 'phoenix']
+# v.preference = ['chamber', 'omen', 'phoenix']
+# v.preference = ['raze', 'reyna', 'phoenix']
+# v.preference = ['brimstone', 'sage', 'phoenix']
+# v.preference = ['yoru', 'chamber', 'raze']
+# v.preference = ['gekko', 'phoenix', 'jett']  
+# v.preference = ['jett', 'reyna', 'phoenix']
+# v.preference = ['omen', 'sage', 'jett']
+# v.preference = ['skye', 'jett', 'phoenix']
+# v.preference = ['reyna', 'jett', 'phoenix']
+# v.preference = ['phoenix', 'jett', 'sage']
 """ """
-v.account = 'Dear Curi'
+v.account = 'oOoOoOo'
 v.account = 'LaVanTor'
 v.account = 'speakEngInVal'
-v.account = 'oOoOoOo'
+v.account = 'xav1er'
+v.account = 'Dear Curi'
 v.account = 'FatherSun'
 def hold(game_mode,available_modes):
     MainFlow = "v.MainFlow(v.account, skipStart='y', reQ='y')"
@@ -942,3 +980,4 @@ if __name__ == "__main__":
     # v.MainFlow('FatherSun', random='random is on', reQ='y')
 
 # """ 0;P;c;1;o;1;d;1;z;1;0t;1;0a;1;1b;0 """
+# 0;P;c;5;h;0;0l;1;0o;1;0a;1;0f;0;1b;0

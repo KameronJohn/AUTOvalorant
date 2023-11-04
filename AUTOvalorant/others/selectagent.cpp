@@ -64,6 +64,10 @@ int main(int argc, char* argv[])
     for (int i = 0; i < 2; i++)
     {
         click(pos2_x,pos2_y);
+        Sleep(30);
+        click(pos2_x,pos2_y);
+        Sleep(40);
+        click(pos2_x,pos2_y);
         Sleep(50);
     }
     // Get the current tick count
