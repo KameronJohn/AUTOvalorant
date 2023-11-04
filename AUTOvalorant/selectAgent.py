@@ -13,6 +13,7 @@ import math
 import subprocess
 import psutil
 from PIL import ImageGrab
+import pandas as pd
 currentPath = os.path.dirname(os.path.abspath(__file__))
 dc_path = currentPath +r'\..\..\kmjAUTO\core'
 sys.path.insert(0, dc_path)
@@ -27,18 +28,20 @@ class v:
     others_path = currentPath+'others\\'
     accounts_info_path = currentPath+'accounts_info\\'
     lockX, lockY = 1268, 968
+    columns_position = [835,954,1058,1176,1272,1388,1499,1615,1731]
+    rows_position = [1121,1228,1340]
     accountCredentials = {
         'FatherSun': ['wonnacha','Pleasetellme3'],
         'LaVanTor': ['wonnacha3','Pleasetellme3'],
         'speakEngInVal': ['wonnacha4','Pleasetellme3'],
         'xav1er': ['wonnacha5','Pleasetellme3'],
         'oOoOoOo': ['wonnacha6','Pleasetellme3'],
-        'Dear Curi': ['wonnacha7','Pleasetellme3'],
+        'Dear Curi': ['wonnacha7','Pleasetellme3']
     }
     """ OLD METHOD"""
     #if even number= either select agent/ re queuing
     # saving each account's agent's XY position
-    def agentXYposition(account):
+    def agentXYpositionOLD(account):
         csv_filename = v.currentPath+ 'agentXYposition.csv'
         agentXYposition = []
         with open(csv_filename) as f:
@@ -50,6 +53,34 @@ class v:
             exit('SOMETIME IS NOT RIGHT: len(agentXYposition) < 4')
         print(agentXYposition)
         return agentXYposition
+    def getAgentList(account):
+        # Read Excel file
+        df = pd.read_excel(v.currentPath+'\\availableAgents.xlsx')
+        # Display the DataFrame
+        # print(df)
+        filtered_values = df.loc[df['FatherSun'] == 'o', 'Agent'].tolist()
+        # Display the list of values
+        # print(filtered_values)
+        return filtered_values
+    def agentXYposition(account):
+        agentList = v.getAgentList(account)
+        rows = 3
+        columns = 9
+        agentList.sort()
+        selectedAgent = list()
+        for agentName in agentList:
+            iIndex = agentList.index(agentName)
+            # Calculate the row and column
+            row = (iIndex) // columns
+            column = (iIndex) % columns
+            if (row > rows):
+                print('something went wrong')
+                exit()
+            Xposition = v.rows_position[row]
+            Yposition = v.columns_position[column]
+            selectedAgent.append({'Agent': agentName, 'Xposition':Xposition,'Yposition':Yposition})
+        return selectedAgent    
+    """ example {'Date': '20230709', 'Account': 'FatherSun', 'Agent': 'astra', 'Xposition': '710', 'Yposition': '1233'}"""
     """ OLD METHOD"""
     #if even number= either select agent/ re queuing
     # saving each account's agent's XY position
@@ -893,11 +924,11 @@ v.preference = {
     'split': ['pheonix','phoenix','breach' ],
     'bind': ['pheonix','phoenix','breach'],
     'icebox': ['omen','phoenix','breach'], 
-    'pearl': ['habor','phoenix','breach'],
+    'pearl': ['harbor','phoenix','breach'],
     'fracture': ['omen','breach','omen']
 }
 v.preference = {
-    'pearl': ['habor','phoenix','breach'],
+    'pearl': ['harbor','phoenix','breach'],
     'breeze':['viper','phoenix','breach'],
     'ascent':['omen','phoenix','breach'],
     'sunset':['omen','phoenix','breach'],
@@ -914,28 +945,28 @@ v.game_mode = 'unrated'
 v.game_mode = 'competitive'
 """
 """
-# v.preference = ['chamber', 'omen', 'phoenix']
-# v.preference = ['raze', 'reyna', 'phoenix']
-# v.preference = ['brimstone', 'sage', 'phoenix']
-# v.preference = ['yoru', 'chamber', 'raze']
-# v.preference = ['gekko', 'phoenix', 'jett']  
-# v.preference = ['jett', 'reyna', 'phoenix']
-# v.preference = ['omen', 'sage', 'jett']
-# v.preference = ['skye', 'jett', 'phoenix']
-# v.preference = ['reyna', 'jett', 'phoenix']
-# v.preference = ['phoenix', 'jett', 'sage']
+v.preference = ['chamber', 'omen', 'phoenix']
+v.preference = ['raze', 'reyna', 'phoenix']
+v.preference = ['brimstone', 'sage', 'phoenix']
+v.preference = ['gekko', 'phoenix', 'jett']  
+v.preference = ['jett', 'reyna', 'phoenix']
+v.preference = ['omen', 'sage', 'jett']
+v.preference = ['skye', 'jett', 'phoenix']
+v.preference = ['reyna', 'jett', 'phoenix']
+v.preference = ['phoenix', 'jett', 'sage']
+v.preference = ['yoru', 'chamber', 'raze']
 """ """
 v.account = 'oOoOoOo'
 v.account = 'LaVanTor'
 v.account = 'speakEngInVal'
 v.account = 'xav1er'
-v.account = 'Dear Curi'
 v.account = 'FatherSun'
+v.account = 'Dear Curi'
 def hold(game_mode,available_modes):
     MainFlow = "v.MainFlow(v.account, skipStart='y', reQ='y')"
     withpartyRank = "v.MainFlow(v.account, skipStart='y')"
     launchAndLogin = "v.MainFlow(v.account, skipStart='y', reQ='y', launchAndLogin=True)"
-    starting()
+    # starting()
     while True:
         input_value = print_instructions_main(v.account,['main program','report player','requeue','login & queue','afk','check_all_account_available_agent','afk_boss','spammer','dc_notification',"getAgentsPosition"],v.game_mode,v.preference)
         if input_value == "1":
