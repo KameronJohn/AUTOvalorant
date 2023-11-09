@@ -76,8 +76,8 @@ class v:
             if (row > rows):
                 print('something went wrong')
                 exit()
-            Xposition = v.rows_position[row]
-            Yposition = v.columns_position[column]
+            Xposition = v.columns_position[column]
+            Yposition = v.rows_position[row]
             selectedAgent.append({'Agent': agentName, 'Xposition':Xposition,'Yposition':Yposition})
         return selectedAgent    
     """ example {'Date': '20230709', 'Account': 'FatherSun', 'Agent': 'astra', 'Xposition': '710', 'Yposition': '1233'}"""
@@ -957,11 +957,11 @@ v.preference = ['phoenix', 'jett', 'sage']
 v.preference = ['yoru', 'chamber', 'raze']
 """ """
 v.account = 'oOoOoOo'
-v.account = 'LaVanTor'
 v.account = 'speakEngInVal'
 v.account = 'xav1er'
 v.account = 'FatherSun'
 v.account = 'Dear Curi'
+v.account = 'LaVanTor'
 def hold(game_mode,available_modes):
     MainFlow = "v.MainFlow(v.account, skipStart='y', reQ='y')"
     withpartyRank = "v.MainFlow(v.account, skipStart='y')"
@@ -1000,9 +1000,16 @@ def hold(game_mode,available_modes):
                 if re.match(mode, input_value):
                     game_mode = input_value
                     alert_msg('mode changed: ' + game_mode)
+def testing():
+    thelist = v.agentXYposition("FatherSun")
+    for i in thelist:
+        print(i["Agent"])
+        xaxis = int(i['Xposition'])
+        yaxis = int(i['Yposition'])
+        pyautogui.moveTo(xaxis,yaxis)
 if __name__ == "__main__":
     # afk(drop=0,shield=0,abilties=1)
-    # v.reportPlayer()
+    # testing()
     hold(v.game_mode,available_modes)
     # v.getAgentsPosition(account=v.account)
 
