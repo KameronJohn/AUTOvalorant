@@ -58,7 +58,7 @@ class v:
         df = pd.read_excel(v.currentPath+'\\availableAgents.xlsx')
         # Display the DataFrame
         # print(df)
-        filtered_values = df.loc[df['FatherSun'] == 'o', 'Agent'].tolist()
+        filtered_values = df.loc[df[account].notnull(), 'Agent'].tolist()
         # Display the list of values
         # print(filtered_values)
         return filtered_values
@@ -212,7 +212,7 @@ class v:
                 v.getVenue(venueList, agentXYposition)
             pos = v.tryAndSearch('inGame.png')
             if pos is not None:
-                v.stateReport(6, 'in game, have fun.',send_dc=0)
+                v.stateReport(6, 'loading in game, have fun.',send_dc=0)
                 try:
                     v.afk_status
                     for i in range(3):
@@ -395,6 +395,12 @@ class v:
         pyautogui.click(button='right')
         pyautogui.click()
         return True, pyautogui.position()
+    def inner_function(a):
+        pyautogui.mouseDown(1282, 1033, duration=0.2)
+        pyautogui.mouseUp(1282, 1033)
+        time.sleep(0.5)
+        v.slow_click(1263, 828)
+        pyautogui.moveTo(a)
     def reportPlayer():
         print_instructions(['toxic','sabotaging','afk','submit','breakLoop', 'F1: requeue'])
         a = pyautogui.position()
@@ -404,7 +410,7 @@ class v:
                 if first_move_already is False:
                     first_move_already, a = v.reportPlayer_first_move()
                     # time.sleep(0.25)
-                for x,y in [(523, 547), (521, 587), (525, 684), (528, 721)]:
+                for x,y in [(523, 547), (521, 587), (525, 684), (528, 721),(1068, 641),(1600, 546),(648, 935)]:
                     v.slow_click(x,y)
             elif keyboard.is_pressed('2'):
                 v.slow_click(1068, 641)
@@ -412,12 +418,9 @@ class v:
                 v.slow_click(1600, 546)
             elif keyboard.is_pressed('4'):
                 first_move_already = False
-                pyautogui.mouseDown(1282, 1033, duration=0.2)
-                pyautogui.mouseUp(1282, 1033)
-                time.sleep(0.5)
-                v.slow_click(1263, 828)
-                pyautogui.moveTo(a)
+                v.inner_function(a)
             elif keyboard.is_pressed('5'):
+                v.inner_function(a)
                 break
             elif keyboard.is_pressed('F1'):
                 return 1
@@ -453,13 +456,19 @@ class v:
             alert_msg('check message at: '+screenshot_path)
             try:
                 click(result_poss)
+                click(result_poss)
+                click(result_poss)
             except:
                 pass
             try:
                 click(result_pos)
+                click(result_pos)
+                click(result_pos)
             except:
                 pass
-            time.sleep(0.5)
+            for i in range(3):
+                click(1280, 450)
+            time.sleep(1)
             v.check_if_val_message_sent(loginUsername)
         return
         # v.debugger("check_if_val_message_sent: "+ result_pos)
@@ -541,7 +550,8 @@ class v:
                 print(possibleAgent)
                 print('availableAgent:  ')
                 print(availableAgent)
-                exit(f'{a} is not available in this account!!!')
+                print(f'{a} is not available in this account!!!')
+                exit()
     def debugger(msg):
         if v.debugging == 1:
             current_datetime = datetime.now()
@@ -637,16 +647,21 @@ class v:
         start_time = time.time()
         while True:
             try:
-                play_x,play_y = pyautogui.locateCenterOnScreen(v.screenshotPath+'play.png', region = (0,0,2560,1440), confidence=0.8)
+                play_x,play_y = pyautogui.locateCenterOnScreen(v.screenshotPath+'play.png', region = (0,0,2560,1440), confidence=0.7)
                 if play_x is not None:
                     break
             except:
                 pass
-            #press start in game
             try:
-                play_x,play_y = pyautogui.locateCenterOnScreen(v.screenshotPath+'play.png', region = (0,0,2560,1440), confidence=0.7)
-                if play_x is not None:
-                    break
+                xx = pyautogui.locateCenterOnScreen(v.screenshotPath+'riot_client_valorant_icon.png', region = (0,0,2560,1440), confidence=0.7)
+                if xx is not None:
+                    click(xx)
+            except:
+                pass
+            try:
+                aa = pyautogui.locateCenterOnScreen(v.screenshotPath+'riot_client_play_icon.png', region = (0,0,2560,1440), confidence=0.7)
+                if aa is not None:
+                    click(aa)
             except:
                 pass
             elapsed_time = time.time() - start_time
@@ -916,6 +931,18 @@ available_agents = ['harbor','deadlock','iso','astra','breach','brimstone','cham
                     'skye','sova','viper','yoru']
 account_list = ['FatherSun','LaVanTor','speakEngInVal','Dear Curi','oOoOoOo']
 v.preference = {
+    'pearl': ['harbor','phoenix','breach'],
+    'breeze':['viper','phoenix','breach'],
+    'ascent':['omen','phoenix','breach'],
+    'sunset':['omen','phoenix','breach'],
+    'haven': ['omen','phoenix','breach'], 
+    'lotus': ['omen','phoenix','breach'],
+    'split': ['omen','phoenix','breach' ],
+    'bind': ['omen','phoenix','breach'],
+    'icebox': ['omen','phoenix','breach'], 
+    'fracture': ['omen','breach','omen']
+}
+v.preference = {
     'breeze':['neon','phoenix','breach'],
     'ascent':['raze','phoenix','breach'],
     'sunset':['pheonix','phoenix','breach'],
@@ -928,15 +955,15 @@ v.preference = {
     'fracture': ['omen','breach','omen']
 }
 v.preference = {
-    'pearl': ['harbor','phoenix','breach'],
-    'breeze':['viper','phoenix','breach'],
-    'ascent':['omen','phoenix','breach'],
-    'sunset':['omen','phoenix','breach'],
-    'haven': ['omen','phoenix','breach'], 
-    'lotus': ['omen','phoenix','breach'],
-    'split': ['omen','phoenix','breach' ],
-    'bind': ['omen','phoenix','breach'],
+    'breeze':['neon','phoenix','breach'],
+    'ascent':['yoru','phoenix','breach'],
+    'sunset':['yoru','phoenix','breach'],
+    'haven': ['yoru','phoenix','breach'], 
+    'lotus': ['yoru','phoenix','breach'],
+    'split': ['yoru','phoenix','breach' ],
+    'bind': ['yoru','phoenix','breach'],
     'icebox': ['omen','phoenix','breach'], 
+    'pearl': ['harbor','phoenix','breach'],
     'fracture': ['omen','breach','omen']
 }
 v.game_mode = 'swiftplay'
@@ -954,7 +981,9 @@ v.preference = ['omen', 'sage', 'jett']
 v.preference = ['skye', 'jett', 'phoenix']
 v.preference = ['reyna', 'jett', 'phoenix']
 v.preference = ['phoenix', 'jett', 'sage']
-v.preference = ['yoru', 'chamber', 'raze']
+v.preference = ['iso', 'yoru', 'omen']
+v.preference = ['gekko', 'yoru', 'omen']
+v.preference = ['yoru', 'gekko', 'omen']
 """ """
 v.account = 'oOoOoOo'
 v.account = 'speakEngInVal'
@@ -1010,7 +1039,7 @@ def testing():
 if __name__ == "__main__":
     # afk(drop=0,shield=0,abilties=1)
     # testing()
-    hold(v.game_mode,available_modes)
+    hold(v.game_mode,available_modes)   
     # v.getAgentsPosition(account=v.account)
 
     # v.MainFlow(v.account, skipStart='y')
