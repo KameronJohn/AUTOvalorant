@@ -19,6 +19,12 @@ dc_path = currentPath +r'\..\..\kmjAUTO\core'
 sys.path.insert(0, dc_path)
 import discord_send_msg as d
 print("initiating...")
+wonna = 'FatherSun'
+wonna3 = 'LaVanTor'
+wonna4 = 'yodasgini'
+wonna6 = 'LatdaWn'
+wonna7 = 'Dear Curi'
+wonna5 = 'xav1er'
 class v:
     debugging = 0
     agentSelected = [] 
@@ -30,13 +36,14 @@ class v:
     lockX, lockY = 1268, 968
     columns_position = [835,954,1058,1176,1272,1388,1499,1615,1731]
     rows_position = [1121,1228,1340]
+    # FaiDeLah
     accountCredentials = {
-        'FatherSun': ['wonnacha','Pleasetellme3'],
-        'LaVanTor': ['wonnacha3','Pleasetellme3'],
-        'speakEngInVal': ['wonnacha4','Pleasetellme3'],
-        'xav1er': ['wonnacha5','Pleasetellme3'],
-        'oOoOoOo': ['wonnacha6','Pleasetellme3'],
-        'Dear Curi': ['wonnacha7','Pleasetellme3']
+        wonna: ['wonnacha','Pleasetellme3'],
+        wonna3: ['wonnacha3','Pleasetellme3'],
+        wonna4: ['wonnacha4','Pleasetellme3'],
+        wonna5: ['wonnacha5','Pleasetellme3'],
+        wonna6: ['wonnacha6','Pleasetellme3'],
+        wonna7: ['wonnacha7','Pleasetellme3']
     }
     """ OLD METHOD"""
     #if even number= either select agent/ re queuing
@@ -80,7 +87,7 @@ class v:
             Yposition = v.rows_position[row]
             selectedAgent.append({'Agent': agentName, 'Xposition':Xposition,'Yposition':Yposition})
         return selectedAgent    
-    """ example {'Date': '20230709', 'Account': 'FatherSun', 'Agent': 'astra', 'Xposition': '710', 'Yposition': '1233'}"""
+    """ example {'Date': '20230709', 'Account': wonna, 'Agent': 'astra', 'Xposition': '710', 'Yposition': '1233'}"""
     """ OLD METHOD"""
     #if even number= either select agent/ re queuing
     # saving each account's agent's XY position
@@ -652,12 +659,12 @@ class v:
                     break
             except:
                 pass
-            try:
-                xx = pyautogui.locateCenterOnScreen(v.screenshotPath+'riot_client_valorant_icon.png', region = (0,0,2560,1440), confidence=0.7)
-                if xx is not None:
-                    click(xx)
-            except:
-                pass
+            # try:
+            #     xx = pyautogui.locateCenterOnScreen(v.screenshotPath+'riot_client_valorant_icon.png', region = (0,0,2560,1440), confidence=0.7)
+            #     if xx is not None:
+            #         click(xx)
+            # except:
+            #     pass
             try:
                 aa = pyautogui.locateCenterOnScreen(v.screenshotPath+'riot_client_play_icon.png', region = (0,0,2560,1440), confidence=0.7)
                 if aa is not None:
@@ -679,6 +686,7 @@ class v:
         v.check_if_val_message_sent(loginUsername)
         click(play_x,play_y)
         v.debugger(f'click({play_x},{play_y})')
+        return
     def wait_for_file_found(file):
         while True:
             if os.path.isfile(file):
@@ -700,13 +708,10 @@ class v:
             password = credential[1]
             v.login(account_name,password,direct_launch=True)
             time.sleep(2)
-            for pos,fileName in [
-                [[(1216, 38), 
-                 (1488, 30)],'rank_mission_lv']
+            for fileName in [
+                'rank_mission_lv'
                 ]:
-                for each_pos in pos:
-                    click(each_pos)
-                    sleep(1)
+                v.searchAndClick('career.png', needClick=True, confidence=0.8)
                 sleep(1)
                 pyautogui.moveTo(2095, 32)
                 current_datetime = datetime.now()
@@ -719,7 +724,7 @@ class v:
             screenshot_path = v.accounts_info_path+formatted_datetime+'_'+account_name+f"[{displayName}]"+'_available agents'+'.png'
             v.screenshot(screenshot_path)
             print('check screenshot at: ',screenshot_path)
-            v.getAgentsPosition(account_name,auto=True)
+            # v.getAgentsPosition(account_name,auto=True)
             v.exit_valorant()
             time.sleep(2)
     def go_to_custom_game_mode(account_name,password):
@@ -929,7 +934,7 @@ available_agents = ['harbor','deadlock','iso','astra','breach','brimstone','cham
                     'cypher','gekko','jett','kayo','killjoy',
                     'neon','omen','phoenix','raze','reyna','sage',
                     'skye','sova','viper','yoru']
-account_list = ['FatherSun','LaVanTor','speakEngInVal','Dear Curi','oOoOoOo']
+account_list = [wonna,wonna3,wonna4,wonna5,wonna6,wonna7]
 v.preference = {
     'pearl': ['harbor','phoenix','breach'],
     'breeze':['viper','phoenix','breach'],
@@ -968,8 +973,8 @@ v.preference = {
 }
 v.game_mode = 'swiftplay'
 v.game_mode = 'spike_rush' 
-v.game_mode = 'unrated' 
 v.game_mode = 'competitive'
+v.game_mode = 'unrated' 
 """
 """
 v.preference = ['chamber', 'omen', 'phoenix']
@@ -980,24 +985,24 @@ v.preference = ['jett', 'reyna', 'phoenix']
 v.preference = ['omen', 'sage', 'jett']
 v.preference = ['skye', 'jett', 'phoenix']
 v.preference = ['reyna', 'jett', 'phoenix']
-v.preference = ['phoenix', 'jett', 'sage']
 v.preference = ['iso', 'yoru', 'omen']
-v.preference = ['gekko', 'yoru', 'omen']
 v.preference = ['yoru', 'gekko', 'omen']
+v.preference = ['gekko', 'yoru', 'omen']
+v.preference = ['phoenix', 'jett', 'sage'] #basic
 """ """
-v.account = 'oOoOoOo'
-v.account = 'speakEngInVal'
-v.account = 'xav1er'
-v.account = 'FatherSun'
-v.account = 'Dear Curi'
-v.account = 'LaVanTor'
+v.account = wonna6
+v.account = wonna7
+v.account = wonna
+v.account = wonna5
+v.account = wonna3
+v.account = wonna4
 def hold(game_mode,available_modes):
     MainFlow = "v.MainFlow(v.account, skipStart='y', reQ='y')"
     withpartyRank = "v.MainFlow(v.account, skipStart='y')"
     launchAndLogin = "v.MainFlow(v.account, skipStart='y', reQ='y', launchAndLogin=True)"
     # starting()
     while True:
-        input_value = print_instructions_main(v.account,['main program','report player','requeue','login & queue','afk','check_all_account_available_agent','afk_boss','spammer','dc_notification',"getAgentsPosition"],v.game_mode,v.preference)
+        input_value = print_instructions_main(v.account,['main program','report player','requeue','login & queue','afk','check_all_account_available_agent','afk_boss','spammer','dc_notification'],v.game_mode,v.preference)
         if input_value == "1":
             eval(withpartyRank)
         elif input_value == "2":
@@ -1020,8 +1025,8 @@ def hold(game_mode,available_modes):
             spammer()
         elif input_value == "9":
             v.dc_notification()
-        elif input_value == "0":
-            v.getAgentsPosition(account=v.account)
+        # elif input_value == "0":
+        #     v.getAgentsPosition(account=v.account)
         elif input_value in available_agents:
             insert_agent(v.preference, input_value)
         else:
@@ -1043,8 +1048,8 @@ if __name__ == "__main__":
     # v.getAgentsPosition(account=v.account)
 
     # v.MainFlow(v.account, skipStart='y')
-    # v.MainFlow('speakEngInVal') #waiting for m tch found directly
-    # v.MainFlow('FatherSun', random='random is on', reQ='y')
+    # v.MainFlow(wonna4) #waiting for m tch found directly
+    # v.MainFlow(wonna, random='random is on', reQ='y')
 
 # """ 0;P;c;1;o;1;d;1;z;1;0t;1;0a;1;1b;0 """
 # 0;P;c;5;h;0;0l;1;0o;1;0a;1;0f;0;1b;0
