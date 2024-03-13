@@ -22,6 +22,11 @@ class apex:
         self.debugging = 0
         self.solo_agent = 'vantage'
         self.last_pos = (1,1)
+        self.line_and_class = [{948:[{"assult":[626,730,840,944,1060]},
+                                  {"skirmisher":[1283,1390,1478,1598,1710,1829]}]},
+                            {1134:[{"recon":[409,525,630,736]},
+                                   {"support":[972,1061,1173,1282,1395,1507]},
+                                   {"controller":[1735,1846,1961,2056]}]}]
         self.d_message = {
             "in_apex_game.png":"loading in game",
             "in_dropship.png":"🚢 in drop ship 🚢",
@@ -32,6 +37,9 @@ class apex:
             "you_are_jumpmaster.png":"❗️ you are jumpmaster ❗️",
             "assigned":"🤦‍♀️ you are jumpmaster 🤦‍♀️"
         }
+    def get_legends_position(self):
+        
+        return
     def searchAndClick(self,target, needClick=True):
         self.debugger(self.screenshotPath+target)
         while True:
@@ -183,43 +191,17 @@ class apex:
         formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
         pyautogui.screenshot(self.screenshotPath+formatted_datetime+f"_{details}.png")
     def check_what_picked(self):
-        line_1 = [626,730,840,944,1060,1283,1390,1478,1598,1710,1829]
-        line_2 = [449,577,675,769,994,1115,1222,1337,1457,1674,1773,1911,2000]
         yellow = (245,165,35)
         green = (125,175,10)
         blue = (10,180,180)
-        y1 = 948
-        y2 = 1134
         picked = set()
-        """  """
-        for i,x in enumerate(line_1):
-            if pyautogui.pixelMatchesColor(x, y1, yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, y1, green, tolerance=0) or pyautogui.pixelMatchesColor(x, y1, blue, tolerance=0):
-                if i <=4:
-                    picked.add("assault")
-                else:
-                    picked.add("skirmisher")
-        for i,x in enumerate(line_2):
-            if pyautogui.pixelMatchesColor(x, y2, yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, y2, green, tolerance=0) or pyautogui.pixelMatchesColor(x, y2, blue, tolerance=0):
-                if i <=3:
-                    picked.add("recon")
-                elif i <=8:
-                    picked.add("support")
-                else:
-                    picked.add("controller")
-        for i in picked:
-            del self.preferences[i]
+        for each_dic in self.line_and_class:
+            for y_index,class_dic in enumerate(each_dic):
+                for apex_class,x_index in enumerate(class_dic):
+                    if pyautogui.pixelMatchesColor(x_index, y_index, yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, y1, green, tolerance=0) or pyautogui.pixelMatchesColor(x, y1, blue, tolerance=0):
+                        picked.add(apex_class)
+                        del self.preferences[apex_class]
         return picked
-        """ while True:
-            print("+++++++++++++++++++++++++++++++++++++++++++++++")
-            for x in line_1:
-                r, g, b = pyautogui.pixel(x, y1)
-                # r, g, b = pyautogui.pixel(1478, 948)
-                print(r, g, b)
-            print("-------------------------")
-            for x in line_2:
-                r, g, b = pyautogui.pixel(x, y2)
-                # r, g, b = pyautogui.pixel(1478, 948)
-                print(r, g, b) """
     def if_in_game(self): 
         self.searchAndClick('in_apex_game.png',needClick=False)
         # self.send_to_discord(self.d_message['in_apex_game.png'])
@@ -290,10 +272,14 @@ class apex:
             return
         time.sleep(20)
     def open_apex_packs(self):
+        print('HI')
         while True:
-            if self.tryAndSearch("apex_packs.png", withoutClick=False, withoutMove=False) is not False:
-                time.sleep(19)
+            if self.searchAndClick(target="apex_packs.png", needClick=False):
+                time.sleep(3)
                 self.screenshot("apex_packs")
+            while True:
+                if self.tryAndSearch("apex_packs.png", withoutClick=False, withoutMove=False) is not False:
+                    break
     def error_checking(self):
         return
     def checkScenerio(self):
@@ -314,17 +300,17 @@ class apex:
             "skirmisher": ["horizon", "pathfinder","wraith"],
             "assault": ["bangalore", "fuse", "ash", "maggie"],
             "recon": ["bloodhound", "seer","vantage"],
-            "support": ["gibraltar", "lifeline","loba"],
+            "support": ["gibraltar", "lifeline","loba",""],
             "controller": ["rampart", "caustic", "catalyst"]
         }
         """ config """
         """ preferences """
         self.preferences = dict()
         self.class_based = False
-        self.preferences["support"] = "lifeline"
-        self.preferences["recon"] = "vantage"
-        self.preferences["controller"] = "rampart"
         self.preferences["skirmisher"] = "pathfinder"
+        self.preferences["recon"] = "vantage"
+        self.preferences["support"] = "loba"
+        self.preferences["controller"] = "rampart"
         self.preferences["assault"] = "bangalore"
         """  """
         self.preferences = ["vantage","caustic", "rampart","seer"]
