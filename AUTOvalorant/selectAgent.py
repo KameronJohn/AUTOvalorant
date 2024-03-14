@@ -19,9 +19,12 @@ dc_path = currentPath +r'\..\..\kmjAUTO\core'
 sys.path.insert(0, dc_path)
 import discord_send_msg as d
 print("initiating...")
-"""  """
-""" better account variables manage: in game name, ac, pw """
-"""  """
+"""
+1. to update agent, just update 1) self.columns_position 2) self.rows_position 3) excel if needed
+
+tbd:
+better account variables manage: in game name, ac, pw
+"""
 class v:
     def system_preference(self):
         self.preference = {
