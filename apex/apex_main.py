@@ -12,7 +12,7 @@ dc_path = currentPath +r'\..\..\kmjAUTO\core'
 sys.path.insert(0, dc_path)
 import discord_send_msg as d
 """ 
-1. to update legends, update 1)self.line_and_class by calling function update_new_legends_xy_position
+1. to update legends, update 1)excel by calling function update_new_legends_xy_position
 """
 class apex:
     def __init__(self):
@@ -25,11 +25,6 @@ class apex:
         self.debugging = 1 # self.debugger()
         self.solo_agent = 'vantage'
         self.last_pos = (1,1)
-        self.line_and_class = [{948:[{"assult":[626,730,840,944,1060]},
-                                  {"skirmisher":[1283,1390,1478,1598,1710,1829]}]},
-                            {1134:[{"recon":[409,525,630,736]},
-                                   {"support":[972,1061,1173,1282,1395,1507]},
-                                   {"controller":[1735,1846,1961,2056]}]}]
         self.d_message = {
             "in_apex_game.png":"loading in game",
             "in_dropship.png":"🚢 in drop ship 🚢",
@@ -140,11 +135,11 @@ class apex:
         print(f"pick order: {self.pick_order}")
         print('selecting agents...')
         if self.pick_order <= 2:
-            if self.tryAndSearch("not_3.png", confidence=0.9) is not False:
+            if self.tryAndSearch("not_3.png", confidence=0.95) is not False:
                 msg = 'not a full team'
                 self.send_to_discord(msg)
                 self.screenshot(msg)
-                self.actual_pick(self.df[self.solo_agent])
+                self.actual_pick(self.df[self.df['legends'] == self.solo_agent])
                 return
         #preference by class
         if type(self.preferences) is dict:
@@ -155,7 +150,7 @@ class apex:
                     """ return to neutral position """
                     pyautogui.FAILSAFE = False
                     pyautogui.move(self.netural_pos)
-                    self.actual_pick(self.df[plegend])
+                    self.actual_pick(self.df[self.df['legends'] == plegend])
                     if self.tryAndSearch('agent_picked.png') is not False:
                         return
                     else:
@@ -181,7 +176,7 @@ class apex:
         """ return to neutral position """
         pyautogui.FAILSAFE = False
         pyautogui.move(self.netural_pos)
-        self.actual_pick(self.df[plegend])
+        self.actual_pick(self.df[self.df['legends'] == plegend])
         if self.tryAndSearch('agent_picked.png') is not False:
             return True
         else:
@@ -203,7 +198,7 @@ class apex:
             if pyautogui.pixelMatchesColor(x, y, yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, y, green, tolerance=0) or pyautogui.pixelMatchesColor(x, y, blue, tolerance=0):
                 picked_index.add(i)
                 del self.preferences[row['class']]
-                print("picked: "+row['class']+" - "+row['legends'])
+                print("teammate picked: "+row['class']+" - "+row['legends'])
         return picked_index
     def if_in_game(self): 
         self.searchAndClick('in_apex_game.png',needClick=False)
@@ -333,14 +328,14 @@ class apex:
         """ config """
         """ preferences """
         self.preferences = dict()
-        self.force_pick = True
+        self.force_pick = False
+        self.preferences["support"] = "gibraltar"
         self.preferences["skirmisher"] = "pathfinder"
         self.preferences["recon"] = "vantage"
-        self.preferences["support"] = "loba"
         self.preferences["controller"] = "rampart"
         self.preferences["assault"] = "bangalore"
         """  """
-        self.preferences = ["vantage","rampart","seer"]
+        # self.preferences = ["vantage","rampart","seer"]
         """ preferences """
 def main():
     a = apex()
