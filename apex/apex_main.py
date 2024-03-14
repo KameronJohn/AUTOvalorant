@@ -1,4 +1,4 @@
-print(0)
+import pandas as pd
 import pyautogui
 import keyboard
 import os
@@ -19,7 +19,7 @@ class apex:
         self.screenshotPath = self.currentPath+'apex_source\\'
         self.others_path = self.currentPath+'others\\'
         self.accounts_info_path = self.currentPath+'accounts_info\\'
-        self.debugging = 0
+        self.debugging = 1 # self.debugger()
         self.solo_agent = 'vantage'
         self.last_pos = (1,1)
         self.line_and_class = [{948:[{"assult":[626,730,840,944,1060]},
@@ -38,7 +38,18 @@ class apex:
             "assigned":"🤦‍♀️ you are jumpmaster 🤦‍♀️"
         }
     def get_legends_position(self):
-        
+        self.df = pd.read_excel(self.currentPath+'\\apex_legends.xlsx')
+        """ description: filter the df to the preferred legends only """
+        # if type(self.preferences) is dict:
+        #     # dictionary value to list
+        #     data_as_list = values_list = list(self.preferences.values())
+        #     self.debugger("data_as_list:")
+        #     self.debugger(data_as_list)
+        #     self.df = self.df[self.df['legends'].isin(data_as_list)]
+        # elif type(self.preferences) is list:
+        #     self.df = self.df[self.df['legends'].isin(self.preferences)]
+        # self.debugger("filtered")
+        # self.debugger(self.df)
         return
     def searchAndClick(self,target, needClick=True):
         self.debugger(self.screenshotPath+target)
@@ -89,14 +100,11 @@ class apex:
             current_datetime = datetime.now()
             formatted_datetime = current_datetime.strftime("%H-%M-%S")
             print(f'debug-[{formatted_datetime}]: {msg}')
-    def actual_pick(self,legend):
-        try:
-            img_path = "\\legends\\soft\\"+legend+".png"
-            x,y = self.tryAndSearch(img_path)
-        except:
-            print(f"failed to find {img_path}")
-            return False
+    def actual_pick(self,df_row):
         start_time = time.time() 
+        x = df_row['xindex']
+        # to click towards the box's center
+        y = int(df_row['yindex']) + 50
         while True:
             pyautogui.FAILSAFE = False
             pyautogui.move(self.netural_pos)
@@ -107,10 +115,10 @@ class apex:
             elapsed_time = time.time() - start_time
             if elapsed_time > 2:
                 break
-        msg = f"selected: {legend}"
+        msg = f"selected: {df_row['legends']}"
         print(msg)
         # self.send_to_discord(msg)
-        return True
+        return
     def select_legends(self):
         self.searchAndClick("selecting_agent.png")
         pick_time = time.time() - self.pick_order_count
@@ -122,70 +130,58 @@ class apex:
             self.pick_order = 3
         else:
             self.pick_order = 4
-            self.send_to_discord(f"pick_order = 4, pick_time: {pick_time}")
-        print('selecting agents')
+            self.send_to_discord(f"error: pick_order = 4, pick_time recorded: {pick_time}")
+        print(f"pick order: {self.pick_order}")
+        print('selecting agents...')
         if self.pick_order <= 2:
             if self.tryAndSearch("not_3.png", confidence=0.9) is not False:
                 msg = 'not a full team'
                 self.send_to_discord(msg)
                 self.screenshot(msg)
-                self.actual_pick(self.solo_agent)
+                self.actual_pick(self.df[self.solo_agent])
                 return
         #preference by class
         if type(self.preferences) is dict:
-            if self.class_based is True:
-                picked = self.check_what_picked()
-                print('picked:')
-                print(picked)
-                print("self.preferences")
-                print(self.preferences)
+            if self.force_pick is False:
+                self.check_what_picked()
+                self.debugger(f"self.preferences: {self.preferences}")
                 for pclass,plegend in self.preferences.items():
                     """ return to neutral position """
                     pyautogui.FAILSAFE = False
                     pyautogui.move(self.netural_pos)
-                    a = self.actual_pick(plegend)
-                    b = self.tryAndSearch('agent_picked.png')
-                    if a is not False:
-                        return
-                    else:
-                        pass  
-                    if b is not False:
-                        print()
-                        return
-                    else:
-                        print("agent_picked.png not found")
-                else:
-                    ValueError("gg lor")
-            elif self.class_based is False:
-                print("self.class_based")
-                print(self.class_based)
-                for pclass,plegend in self.preferences.items():
-                    """ return to neutral position """
-                    pyautogui.FAILSAFE = False
-                    pyautogui.move(self.netural_pos)
-                    self.actual_pick(plegend)
+                    self.actual_pick(self.df[plegend])
                     if self.tryAndSearch('agent_picked.png') is not False:
                         return
                     else:
-                        msg = f"{plegend} is picked"
-                        print(msg)
-                        self.screenshot(msg)
+                        print(f"agent_picked.png not found when picking {plegend}")
                 else:
+                    ValueError("gg lor")
+            elif self.force_pick is True:
+                self.debugger(f"self.force_pick is {self.force_pick}")
+                for pclass,plegend in self.preferences.items():
+                    if self.simple_pick(plegend) is True:
+                        return
+                else:
+                    self.screenshot("nothing can be selected wor")
                     InterruptedError("GG")
         elif type(self.preferences) is list:
             for plegend in self.preferences:
-                """ return to neutral position """
-                pyautogui.FAILSAFE = False
-                pyautogui.move(self.netural_pos)
-                self.actual_pick(plegend)
-                if self.tryAndSearch('agent_picked.png') is not False:
+               if self.simple_pick(plegend) is True:
                     return
-                else:
-                    msg = f"{plegend} is picked"
-                    print(msg)
-                    self.screenshot(msg)
             else:
+                self.screenshot("nothing can be selected")
                 InterruptedError("GG")
+    def simple_pick(self,plegend,screenshot_needed=False):
+        """ return to neutral position """
+        pyautogui.FAILSAFE = False
+        pyautogui.move(self.netural_pos)
+        self.actual_pick(self.df[plegend])
+        if self.tryAndSearch('agent_picked.png') is not False:
+            return True
+        else:
+            msg = f"{plegend} is picked"
+            print(msg)
+            return False
     def screenshot(self,details):
         current_datetime = datetime.now()
         formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
@@ -194,14 +190,15 @@ class apex:
         yellow = (245,165,35)
         green = (125,175,10)
         blue = (10,180,180)
-        picked = set()
-        for each_dic in self.line_and_class:
-            for y_index,class_dic in enumerate(each_dic):
-                for apex_class,x_index in enumerate(class_dic):
-                    if pyautogui.pixelMatchesColor(x_index, y_index, yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, y1, green, tolerance=0) or pyautogui.pixelMatchesColor(x, y1, blue, tolerance=0):
-                        picked.add(apex_class)
-                        del self.preferences[apex_class]
-        return picked
+        picked_index = set()
+        for i, row in self.df.iterrows():
+            x = row['xindex']
+            y = row['yindex']
+            if pyautogui.pixelMatchesColor(x, y, yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, y, green, tolerance=0) or pyautogui.pixelMatchesColor(x, y, blue, tolerance=0):
+                picked_index.add(i)
+                del self.preferences[row['class']]
+                print("picked: "+row['class']+" - "+row['legends'])
+        return picked_index
     def if_in_game(self): 
         self.searchAndClick('in_apex_game.png',needClick=False)
         # self.send_to_discord(self.d_message['in_apex_game.png'])
@@ -286,6 +283,7 @@ class apex:
         self.send_to_discord("initiated...")
         game_end = False
         self.error_checking()
+        self.get_legends_position()
         while True:
             if self.tryAndSearch('ready.png') is not False or self.tryAndSearch('gameFound.png') is not False:
                 self.if_game_found()
@@ -306,7 +304,7 @@ class apex:
         """ config """
         """ preferences """
         self.preferences = dict()
-        self.class_based = False
+        self.force_pick = True
         self.preferences["skirmisher"] = "pathfinder"
         self.preferences["recon"] = "vantage"
         self.preferences["support"] = "loba"
@@ -317,6 +315,10 @@ class apex:
         """ preferences """
 def main():
     a = apex()
+    a.legends_preference()
+    a.get_legends_position()
+    a.check_what_picked()
+    """  """
     # a.open_apex_packs()
     a.checkScenerio()
 if __name__ == '__main__' :
