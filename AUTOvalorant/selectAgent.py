@@ -876,7 +876,13 @@ class v:
             if len(self.preference) >=2:
                 break
         return
+    def queue_and_brb(self,withpartyRank):
+        print("  !  !  !   Remeber to manual start queuing  !  !  !")
+        eval(withpartyRank)
+        self.afk(drop=0,shield=0,abilties=0)
+        return
     def hold(self):
+        print(self.preference)
         MainFlow = "self.MainFlow(skipStart='y', reQ='y')"
         withpartyRank = "self.MainFlow(skipStart='y')"
         launchAndLogin = "self.MainFlow(skipStart='y', reQ='y', launchAndLogin=True)"
@@ -904,6 +910,8 @@ class v:
             elif input_value == "8":
                 self.spammer()
             elif input_value == "9":
+                self.queue_and_brb(withpartyRank)
+            elif input_value == "0":
                 self.dc_notification()
             # elif input_value == "0":
             #     v.getAgentsPosition(account=v.account)
