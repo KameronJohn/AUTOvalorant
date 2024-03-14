@@ -11,6 +11,9 @@ currentPath = os.path.dirname(os.path.abspath(__file__))
 dc_path = currentPath +r'\..\..\kmjAUTO\core'
 sys.path.insert(0, dc_path)
 import discord_send_msg as d
+""" 
+1. to update legends, update 1)self.line_and_class by calling function update_new_legends_xy_position
+"""
 class apex:
     def __init__(self):
         self.netural_pos = 1200,350
@@ -37,8 +40,11 @@ class apex:
             "you_are_jumpmaster.png":"❗️ you are jumpmaster ❗️",
             "assigned":"🤦‍♀️ you are jumpmaster 🤦‍♀️"
         }
+        self.excel_file = self.currentPath+'\\apex_legends.xlsx'
     def get_legends_position(self):
-        self.df = pd.read_excel(self.currentPath+'\\apex_legends.xlsx')
+        self.df = pd.read_excel(self.excel_file)
+        self.df = self.df.sort_values(by=["order"])
+        print(self.df)
         """ description: filter the df to the preferred legends only """
         # if type(self.preferences) is dict:
         #     # dictionary value to list
@@ -292,14 +298,37 @@ class apex:
                 self.send_to_discord(self.d_message['squad_eliminated.png'])
                 game_end = True
             self.respawning_check()
+    def get_new_x_position(self,index):
+        while True:
+            a = pyautogui.position()
+            print(a)
+            if keyboard.is_pressed('1'):
+                x,y = a
+                self.df.at[index, 'xindex'] = x
+                break
+        return x,y
+    def update_new_legends_xy_position(self):
+        self.get_legends_position()
+        # Iterate over DataFrame rows and update 'y' column
+        PosList = []
+        for index, row in self.df.iterrows():
+            x,y = self.get_new_x_position(index)
+            PosList.append(x)
+            print(PosList)
+            time.sleep(0.4)
+        print(PosList)
+        print('END')
+        # Write DataFrame to an Excel file
+        self.df.to_excel(self.excel_file, index=False)
+        return
     def legends_preference(self):
         """ config """
         self.all_agents = {
-            "skirmisher": ["horizon", "pathfinder","wraith"],
-            "assault": ["bangalore", "fuse", "ash", "maggie"],
-            "recon": ["bloodhound", "seer","vantage"],
-            "support": ["gibraltar", "lifeline","loba",""],
-            "controller": ["rampart", "caustic", "catalyst"]
+            "assault": ["bangalore", "fuse", "ash", "maggie","ballistic"],
+            "skirmisher": ["horizon", "pathfinder","wraith","valkyrie","octane","revenant"],
+            "recon": ["bloodhound", "seer","vantage","crypto"],
+            "support": ["gibraltar", "lifeline","loba","newcastle","conduit"],
+            "controller": ["rampart", "caustic", "catalyst","wattson"]
         }
         """ config """
         """ preferences """
@@ -311,16 +340,13 @@ class apex:
         self.preferences["controller"] = "rampart"
         self.preferences["assault"] = "bangalore"
         """  """
-        self.preferences = ["vantage","caustic", "rampart","seer"]
+        self.preferences = ["vantage","rampart","seer"]
         """ preferences """
 def main():
     a = apex()
-    a.legends_preference()
-    a.get_legends_position()
-    a.check_what_picked()
-    """  """
-    # a.open_apex_packs()
     a.checkScenerio()
+    # a.open_apex_packs()
+    # a.update_new_legends_xy_position()
 if __name__ == '__main__' :
     main()
     # chop_image.main()
