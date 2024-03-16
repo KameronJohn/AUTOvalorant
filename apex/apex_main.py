@@ -11,6 +11,9 @@ currentPath = os.path.dirname(os.path.abspath(__file__))
 dc_path = currentPath +r'\..\..\kmjAUTO\core'
 sys.path.insert(0, dc_path)
 import discord_send_msg as d
+""" 
+1. to update legends, update 1)excel by calling function update_new_legends_xy_position
+"""
 class apex:
     def __init__(self):
         self.netural_pos = 1200,350
@@ -22,11 +25,6 @@ class apex:
         self.debugging = 1 # self.debugger()
         self.solo_agent = 'vantage'
         self.last_pos = (1,1)
-        self.line_and_class = [{948:[{"assult":[626,730,840,944,1060]},
-                                  {"skirmisher":[1283,1390,1478,1598,1710,1829]}]},
-                            {1134:[{"recon":[409,525,630,736]},
-                                   {"support":[972,1061,1173,1282,1395,1507]},
-                                   {"controller":[1735,1846,1961,2056]}]}]
         self.d_message = {
             "in_apex_game.png":"loading in game",
             "in_dropship.png":"🚢 in drop ship 🚢",
@@ -37,8 +35,16 @@ class apex:
             "you_are_jumpmaster.png":"❗️ you are jumpmaster ❗️",
             "assigned":"🤦‍♀️ you are jumpmaster 🤦‍♀️"
         }
+        self.excel_file = self.currentPath+'\\apex_legends.xlsx'
+        self.yellow = (245,165,35)
+        self.green = (125,175,10)
+        self.blue = (10,180,180)
+        self.players_box_x_pos = [568,1295,2167]
+        self.players_box_y_pos = 1339
     def get_legends_position(self):
-        self.df = pd.read_excel(self.currentPath+'\\apex_legends.xlsx')
+        self.df = pd.read_excel(self.excel_file)
+        self.df = self.df.sort_values(by=["order"])
+        print(self.df)
         """ description: filter the df to the preferred legends only """
         # if type(self.preferences) is dict:
         #     # dictionary value to list
@@ -55,7 +61,7 @@ class apex:
         self.debugger(self.screenshotPath+target)
         while True:
             try:
-                x, y = pyautogui.locateCenterOnScreen(self.screenshotPath+target, region = (0,0,2560,1440), confidence=0.8)
+                x, y = pyautogui.locateCenterOnScreen(self.screenshotPath+target, region = (0,0,2560,1440), confidence=0.85)
                 if (x, y) is not None:
                     if needClick is True:
                         pyautogui.click(x,y)
@@ -66,7 +72,6 @@ class apex:
             except:
                 pass
     def tryAndSearch(self,target, withoutClick=True, withoutMove=True, confidence=0.85):
-        self.debugger(f"try searching: {self.screenshotPath+target}")
         try:
             x, y = pyautogui.locateCenterOnScreen(self.screenshotPath+target, region = (0,0,2560,1440), confidence=confidence)
             if (x, y) is not None:
@@ -115,7 +120,7 @@ class apex:
             elapsed_time = time.time() - start_time
             if elapsed_time > 2:
                 break
-        msg = f"selected: {df_row['legends']}"
+        msg = f"selected: {str(df_row['class'])} - {str(df_row['legends'])}"
         print(msg)
         # self.send_to_discord(msg)
         return
@@ -133,13 +138,24 @@ class apex:
             self.send_to_discord(f"error: pick_order = 4, pick_time recorded: {pick_time}")
         print(f"pick order: {self.pick_order}")
         print('selecting agents...')
-        if self.pick_order <= 2:
-            if self.tryAndSearch("not_3.png", confidence=0.9) is not False:
+        # (947, 1339)
+        player_count = 0
+        for x in self.players_box_x_pos:
+            if pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.green, tolerance=0) or pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.blue, tolerance=0):
+                player_count+=1
+        if player_count != 3:
+            msg = 'not a full team'
+            self.send_to_discord(msg)
+            self.screenshot(msg)
+            self.actual_pick(self.df[self.df['legends'] == self.solo_agent])
+            return
+            """ if self.pick_order <= 2:
+            if self.tryAndSearch("not_3.png", confidence=0.95) is not False:
                 msg = 'not a full team'
                 self.send_to_discord(msg)
                 self.screenshot(msg)
-                self.actual_pick(self.df[self.solo_agent])
-                return
+                self.actual_pick(self.df[self.df['legends'] == self.solo_agent])
+                return """
         #preference by class
         if type(self.preferences) is dict:
             if self.force_pick is False:
@@ -149,7 +165,7 @@ class apex:
                     """ return to neutral position """
                     pyautogui.FAILSAFE = False
                     pyautogui.move(self.netural_pos)
-                    self.actual_pick(self.df[plegend])
+                    self.actual_pick(self.df[self.df['legends'] == plegend])
                     if self.tryAndSearch('agent_picked.png') is not False:
                         return
                     else:
@@ -165,6 +181,7 @@ class apex:
                     self.screenshot("nothing can be selected wor")
                     InterruptedError("GG")
         elif type(self.preferences) is list:
+            self.check_what_picked()
             for plegend in self.preferences:
                if self.simple_pick(plegend) is True:
                     return
@@ -175,7 +192,7 @@ class apex:
         """ return to neutral position """
         pyautogui.FAILSAFE = False
         pyautogui.move(self.netural_pos)
-        self.actual_pick(self.df[plegend])
+        self.actual_pick(self.df[self.df['legends'] == plegend])
         if self.tryAndSearch('agent_picked.png') is not False:
             return True
         else:
@@ -187,17 +204,15 @@ class apex:
         formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
         pyautogui.screenshot(self.screenshotPath+formatted_datetime+f"_{details}.png")
     def check_what_picked(self):
-        yellow = (245,165,35)
-        green = (125,175,10)
-        blue = (10,180,180)
         picked_index = set()
         for i, row in self.df.iterrows():
             x = row['xindex']
             y = row['yindex']
-            if pyautogui.pixelMatchesColor(x, y, yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, y, green, tolerance=0) or pyautogui.pixelMatchesColor(x, y, blue, tolerance=0):
+            if pyautogui.pixelMatchesColor(x, y, self.yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, y, self.green, tolerance=0) or pyautogui.pixelMatchesColor(x, y, self.blue, tolerance=0):
                 picked_index.add(i)
-                del self.preferences[row['class']]
-                print("picked: "+row['class']+" - "+row['legends'])
+                if type(self.preferences) == dict:
+                    del self.preferences[row['class']]
+                print("teammate picked: "+row['class']+" - "+row['legends'])
         return picked_index
     def if_in_game(self): 
         self.searchAndClick('in_apex_game.png',needClick=False)
@@ -285,6 +300,7 @@ class apex:
         self.error_checking()
         self.get_legends_position()
         while True:
+            time.sleep(2)
             if self.tryAndSearch('ready.png') is not False or self.tryAndSearch('gameFound.png') is not False:
                 self.if_game_found()
                 game_end is False
@@ -292,35 +308,55 @@ class apex:
                 self.send_to_discord(self.d_message['squad_eliminated.png'])
                 game_end = True
             self.respawning_check()
+    def get_new_x_position(self,index):
+        while True:
+            a = pyautogui.position()
+            print(a)
+            if keyboard.is_pressed('1'):
+                x,y = a
+                self.df.at[index, 'xindex'] = x
+                break
+        return x,y
+    def update_new_legends_xy_position(self):
+        self.get_legends_position()
+        # Iterate over DataFrame rows and update 'y' column
+        PosList = []
+        for index, row in self.df.iterrows():
+            x,y = self.get_new_x_position(index)
+            PosList.append(x)
+            print(PosList)
+            time.sleep(0.4)
+        print(PosList)
+        print('END')
+        # Write DataFrame to an Excel file
+        self.df.to_excel(self.excel_file, index=False)
+        return
     def legends_preference(self):
         """ config """
         self.all_agents = {
-            "skirmisher": ["horizon", "pathfinder","wraith"],
-            "assault": ["bangalore", "fuse", "ash", "maggie"],
-            "recon": ["bloodhound", "seer","vantage"],
-            "support": ["gibraltar", "lifeline","loba",""],
-            "controller": ["rampart", "caustic", "catalyst"]
+            "assault": ["bangalore", "fuse", "ash", "maggie","ballistic"],
+            "skirmisher": ["horizon", "pathfinder","wraith","valkyrie","octane","revenant"],
+            "recon": ["bloodhound", "seer","vantage","crypto"],
+            "support": ["gibraltar", "lifeline","loba","newcastle","conduit"],
+            "controller": ["rampart", "caustic", "catalyst","wattson"]
         }
         """ config """
         """ preferences """
         self.preferences = dict()
-        self.force_pick = True
+        self.force_pick = False
+        self.preferences["controller"] = "rampart"
+        self.preferences["support"] = "gibraltar"
         self.preferences["skirmisher"] = "pathfinder"
         self.preferences["recon"] = "vantage"
-        self.preferences["support"] = "loba"
-        self.preferences["controller"] = "rampart"
         self.preferences["assault"] = "bangalore"
         """  """
-        self.preferences = ["vantage","caustic", "rampart","seer"]
+        self.preferences = ["rampart","fuse","seer"]
         """ preferences """
 def main():
     a = apex()
-    a.legends_preference()
-    a.get_legends_position()
-    a.check_what_picked()
-    """  """
-    # a.open_apex_packs()
     a.checkScenerio()
+    # a.open_apex_packs()
+    # a.update_new_legends_xy_position()
 if __name__ == '__main__' :
     main()
     # chop_image.main()
