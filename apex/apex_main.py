@@ -138,24 +138,22 @@ class apex:
             self.send_to_discord(f"error: pick_order = 4, pick_time recorded: {pick_time}")
         print(f"pick order: {self.pick_order}")
         print('selecting agents...')
-        # (947, 1339)
-        player_count = 0
+        player_order = []
         for x in self.players_box_x_pos:
-            if pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.green, tolerance=0) or pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.blue, tolerance=0):
-                player_count+=1
-        if player_count != 3:
-            msg = 'not a full team'
-            self.send_to_discord(msg)
-            self.screenshot(msg)
-            self.actual_pick(self.df[self.df['legends'] == self.solo_agent])
-            return
-            """ if self.pick_order <= 2:
-            if self.tryAndSearch("not_3.png", confidence=0.95) is not False:
+            if pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.yellow, tolerance=0):
+                player_order.append("yellow")
+            elif pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.green, tolerance=0):
+                player_order.append("green")
+            elif pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.blue, tolerance=0):
+                player_order.append("blue")
+            else:
                 msg = 'not a full team'
                 self.send_to_discord(msg)
                 self.screenshot(msg)
                 self.actual_pick(self.df[self.df['legends'] == self.solo_agent])
-                return """
+                print(player_order)
+                return
+        print(player_order)
         #preference by class
         if type(self.preferences) is dict:
             if self.force_pick is False:
@@ -212,7 +210,7 @@ class apex:
                 picked_index.add(i)
                 if type(self.preferences) == dict:
                     del self.preferences[row['class']]
-                print("teammate picked: "+row['class']+" - "+row['legends'])
+                print("teammate picked: "+str(row['class'])+" - "+str(row['legends']))
         return picked_index
     def if_in_game(self): 
         self.searchAndClick('in_apex_game.png',needClick=False)
@@ -344,13 +342,13 @@ class apex:
         """ preferences """
         self.preferences = dict()
         self.force_pick = False
-        self.preferences["controller"] = "rampart"
-        self.preferences["support"] = "gibraltar"
         self.preferences["skirmisher"] = "pathfinder"
+        self.preferences["support"] = "loba"
+        self.preferences["controller"] = "rampart"
         self.preferences["recon"] = "vantage"
         self.preferences["assault"] = "bangalore"
         """  """
-        self.preferences = ["rampart","fuse","seer"]
+        # self.preferences = ["rampart","fuse","seer"]
         """ preferences """
 def main():
     a = apex()
