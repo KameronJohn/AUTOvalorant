@@ -72,17 +72,18 @@ class v:
         self.preference = ['omen', 'sage', 'jett']
         self.preference = ['skye', 'jett', 'phoenix']
         self.preference = ['reyna', 'jett', 'phoenix']
-        self.preference = ['iso', 'yoru', 'omen']
         self.preference = ['gekko', 'yoru', 'omen']
         self.preference = ['phoenix', 'jett', 'sage'] #basic
         self.preference = ['yoru', 'gekko', 'omen']
+        self.preference = ['iso', 'yoru', 'jett']
+        self.preference = ['sage', 'phoenix', 'omen']
         """  """
         self.account = self.wonna6
         self.account = self.wonna7
         self.account = self.wonna
+        self.account = self.wonna3
         self.account = self.wonna5
         self.account = self.wonna4
-        self.account = self.wonna3
         """  """
         self.game_mode = 'swiftplay'
         self.game_mode = 'spike_rush' 

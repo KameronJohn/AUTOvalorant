@@ -30,7 +30,7 @@ class apex:
             "in_dropship.png":"🚢 in drop ship 🚢",
             "in_dropshipp.png":"☄️ dropping ☄️",
             "squad_eliminated.png":"☠️ squad eliminated ☠️",
-            "respawning.png":"🍀 respawning 🍀",
+            "waiting_for_respawn.png":"🍀 respawning 🍀",
             "gameFound.png":f"🫡 game found 🫡",
             "you_are_jumpmaster.png":"❗️ you are jumpmaster ❗️",
             "assigned":"🤦‍♀️ you are jumpmaster 🤦‍♀️"
@@ -44,7 +44,7 @@ class apex:
     def get_legends_position(self):
         self.df = pd.read_excel(self.excel_file)
         self.df = self.df.sort_values(by=["order"])
-        print(self.df)
+        # print(self.df)
         """ description: filter the df to the preferred legends only """
         # if type(self.preferences) is dict:
         #     # dictionary value to list
@@ -57,11 +57,11 @@ class apex:
         # self.debugger("filtered")
         # self.debugger(self.df)
         return
-    def searchAndClick(self,target, needClick=True):
+    def searchAndClick(self,target, needClick=True,confidence=0.9):
         self.debugger(self.screenshotPath+target)
         while True:
             try:
-                x, y = pyautogui.locateCenterOnScreen(self.screenshotPath+target, region = (0,0,2560,1440), confidence=0.85)
+                x, y = pyautogui.locateCenterOnScreen(self.screenshotPath+target, region = (0,0,2560,1440), confidence=confidence)
                 if (x, y) is not None:
                     if needClick is True:
                         pyautogui.click(x,y)
@@ -120,7 +120,7 @@ class apex:
             elapsed_time = time.time() - start_time
             if elapsed_time > 2:
                 break
-        msg = f"selected: {str(df_row['class'])} - {str(df_row['legends'])}"
+        msg = f"selected: {str(df_row['class'].values[0])} - {str(df_row['legends'].values[0])}"
         print(msg)
         # self.send_to_discord(msg)
         return
@@ -151,6 +151,7 @@ class apex:
                 self.send_to_discord(msg)
                 self.screenshot(msg)
                 self.actual_pick(self.df[self.df['legends'] == self.solo_agent])
+                print("player_order:")
                 print(player_order)
                 return
         print(player_order)
@@ -209,11 +210,13 @@ class apex:
             if pyautogui.pixelMatchesColor(x, y, self.yellow, tolerance=0) or pyautogui.pixelMatchesColor(x, y, self.green, tolerance=0) or pyautogui.pixelMatchesColor(x, y, self.blue, tolerance=0):
                 picked_index.add(i)
                 if type(self.preferences) == dict:
+                    # a = row['class']
+                    # print(type(a))
                     del self.preferences[row['class']]
                 print("teammate picked: "+str(row['class'])+" - "+str(row['legends']))
         return picked_index
     def if_in_game(self): 
-        self.searchAndClick('in_apex_game.png',needClick=False)
+        self.searchAndClick('in_apex_game.png',needClick=False,confidence=0.7)
         # self.send_to_discord(self.d_message['in_apex_game.png'])
         self.jumpmaster = False
         if self.pick_order == 3:
@@ -267,20 +270,15 @@ class apex:
         time_format = "{:02d}:{:02d}".format(m, s)
         return time_format
     def respawning_check(self):
-        try:
-            x, y = pyautogui.locateCenterOnScreen(self.screenshotPath+'respawning.png', region = (0,150,2500,1000), confidence=0.9)
-            if (x, y) is not None:
-                try:
-                    x, y = pyautogui.locateCenterOnScreen(self.screenshotPath+'respawningg.png', region = (0,0,2560,1440), confidence=0.9)
-                    if (x, y) is not None:
-                        self.send_to_discord(self.d_message['respawning.png'])
-                        pass
-                except:
+        if self.tryAndSearch("waiting_for_respawn.png"):
+            self.debugger(f"waiting_for_respawn")
+            while True:
+                if self.tryAndSearch("waiting_for_respawn.png") is False:
+                    time.sleep(1)
+                    self.send_to_discord(self.d_message['waiting_for_respawn.png'])
                     return
-                pass
-        except:
-            return
-        time.sleep(20)
+                elif self.tryAndSearch('squad_eliminated.png'):
+                    return
     def open_apex_packs(self):
         print('HI')
         while True:
@@ -294,7 +292,7 @@ class apex:
         return
     def checkScenerio(self):
         self.send_to_discord("initiated...")
-        game_end = False
+        game_end = True
         self.error_checking()
         self.get_legends_position()
         while True:
@@ -343,12 +341,14 @@ class apex:
         self.preferences = dict()
         self.force_pick = False
         self.preferences["skirmisher"] = "pathfinder"
-        self.preferences["support"] = "loba"
-        self.preferences["controller"] = "rampart"
         self.preferences["recon"] = "vantage"
+        self.preferences["controller"] = "rampart"
+        self.preferences["support"] = "loba"
         self.preferences["assault"] = "bangalore"
         """  """
+        # self.preferences = ["pathfinder","vantage","bangalore"]
         # self.preferences = ["rampart","fuse","seer"]
+        # self.preferences = ["ash","pathfinder","vantage"]
         """ preferences """
 def main():
     a = apex()
