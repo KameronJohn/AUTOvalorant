@@ -125,7 +125,6 @@ class v:
                     'neon','omen','phoenix','raze','reyna','sage',
                     'skye','sova','viper','yoru']
         self.account_list = [self.wonna,self.wonna3,self.wonna4,self.wonna5,self.wonna6,self.wonna7]
-        self.system_preference()
     def agentXYpositionOLD(self,account):
         csv_filename = self.currentPath+ 'agentXYposition.csv'
         agentXYposition = []
@@ -943,7 +942,8 @@ if __name__ == "__main__":
     v = v()
     # afk(drop=0,shield=0,abilties=1)
     # testing()
-    v.hold()   
+    v.system_preference()
+    v.hold()
     # v.MainFlow(wonna, random='random is on', reQ='y')
 
 # """ 0;P;c;1;o;1;d;1;z;1;0t;1;0a;1;1b;0 """

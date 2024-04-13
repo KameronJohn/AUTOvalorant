@@ -83,7 +83,7 @@ class apex:
         except:
             return False
     def if_game_found(self):
-        self.legends_preference()
+        # self.legends_preference()
         start_time = time.time()
         self.send_to_discord("\n⬇️️  ⬇️  ⬇️  ⬇️  queuing  ⬇️  ⬇️  ⬇️  ⬇️")
         while True:
@@ -94,7 +94,8 @@ class apex:
         self.queue_time = time.time() - start_time
         self.send_to_discord(self.d_message['gameFound.png']+f"({self.queue_time})")
         # self.send_to_discord(msg)
-        self.select_legends()
+        if self.select_legends() is False:
+            return
         self.if_in_game()
         return
     def send_to_discord(self,msg,channel=0):
@@ -136,6 +137,7 @@ class apex:
         else:
             self.pick_order = 4
             self.send_to_discord(f"error: pick_order = 4, pick_time recorded: {pick_time}")
+            return False
         print(f"pick order: {self.pick_order}")
         print('selecting agents...')
         player_order = []
@@ -292,18 +294,20 @@ class apex:
         return
     def checkScenerio(self):
         self.send_to_discord("initiated...")
-        game_end = True
+        in_the_game = False
         self.error_checking()
         self.get_legends_position()
         while True:
             time.sleep(2)
             if self.tryAndSearch('ready.png') is not False or self.tryAndSearch('gameFound.png') is not False:
                 self.if_game_found()
-                game_end is False
-            elif self.tryAndSearch('squad_eliminated.png') is not False and game_end is False:
+                in_the_game = True
+            elif self.tryAndSearch('squad_eliminated.png') and in_the_game is True:
                 self.send_to_discord(self.d_message['squad_eliminated.png'])
-                game_end = True
-            self.respawning_check()
+                in_the_game = False
+            elif self.respawning_check():
+                in_the_game = True
+                pass
     def get_new_x_position(self,index):
         while True:
             a = pyautogui.position()
@@ -352,6 +356,7 @@ class apex:
         """ preferences """
 def main():
     a = apex()
+    a.legends_preference()
     a.checkScenerio()
     # a.open_apex_packs()
     # a.update_new_legends_xy_position()
