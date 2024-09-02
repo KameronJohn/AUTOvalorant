@@ -32,7 +32,14 @@ def getMousePosition():
         if keyboard.is_pressed('2'):
             print(PosList)
             return
-getMousePosition()
+# getMousePosition()
+def testing():
+    while True:
+        if keyboard.is_pressed('1'):
+            for i in range (10):
+                pyautogui.click()
+    return
+testing()
 def afk():
     while True:
         try:

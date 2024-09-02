@@ -19,9 +19,15 @@ dc_path = currentPath +r'\..\..\kmjAUTO\core'
 sys.path.insert(0, dc_path)
 import discord_send_msg as d
 print("initiating...")
-"""
-1. to update agent, just update 1) self.columns_position 2) self.rows_position 3) excel if needed
 
+"""
+##NEW AGENT
+1. to update agent, update 0) excel 1) self.columns_position 2) self.rows_position 
+
+z`
+##NEW MAP
+1. screenshot, save the loading map page
+2. edit slf.preference
 tbd:
 better account variables manage: in game name, ac, pw
 """
@@ -37,7 +43,8 @@ class v:
             'split': ['omen','phoenix','breach' ],
             'bind': ['omen','phoenix','breach'],
             'icebox': ['omen','phoenix','breach'], 
-            'fracture': ['omen','breach','omen']
+            'fracture': ['omen','breach','omen'],
+            'abyss': ['omen','breach','omen']
         }
         self.preference = {
             'breeze':['neon','phoenix','breach'],
@@ -49,7 +56,8 @@ class v:
             'bind': ['pheonix','phoenix','breach'],
             'icebox': ['omen','phoenix','breach'], 
             'pearl': ['harbor','phoenix','breach'],
-            'fracture': ['omen','breach','omen']
+            'fracture': ['omen','breach','omen'],
+            'abyss': ['omen','breach','omen']
         }
         self.preference = {
             'breeze':['neon','phoenix','breach'],
@@ -61,7 +69,8 @@ class v:
             'bind': ['yoru','phoenix','breach'],
             'icebox': ['omen','phoenix','breach'], 
             'pearl': ['harbor','phoenix','breach'],
-            'fracture': ['omen','breach','omen']
+            'fracture': ['omen','breach','omen'],
+            'abyss': ['omen','breach','omen']
         }
         """  """
         self.preference = ['chamber', 'omen', 'phoenix']
@@ -69,21 +78,22 @@ class v:
         self.preference = ['brimstone', 'sage', 'phoenix']
         self.preference = ['gekko', 'phoenix', 'jett']  
         self.preference = ['jett', 'reyna', 'phoenix']
-        self.preference = ['omen', 'sage', 'jett']
         self.preference = ['skye', 'jett', 'phoenix']
         self.preference = ['reyna', 'jett', 'phoenix']
         self.preference = ['gekko', 'yoru', 'omen']
         self.preference = ['phoenix', 'jett', 'sage'] #basic
-        self.preference = ['yoru', 'gekko', 'omen']
         self.preference = ['iso', 'yoru', 'jett']
         self.preference = ['sage', 'phoenix', 'omen']
+        self.preference = ['cypher', 'phoenix', 'omen']
+        self.preference = ['omen', 'reyna', 'jett']
+        self.preference = ['yoru', 'gekko', 'omen']
         """  """
         self.account = self.wonna6
         self.account = self.wonna7
-        self.account = self.wonna
         self.account = self.wonna3
         self.account = self.wonna5
         self.account = self.wonna4
+        self.account = self.wonna
         """  """
         self.game_mode = 'swiftplay'
         self.game_mode = 'spike_rush' 
@@ -101,9 +111,9 @@ class v:
         self.screenshotPath = self.currentPath+'source\\'
         self.others_path = self.currentPath+'others\\'
         self.accounts_info_path = self.currentPath+'accounts_info\\'
-        self.lockX, self.lockY = 1268, 968
-        self.columns_position = [835,954,1058,1176,1272,1388,1499,1615,1731]
-        self.rows_position = [1121,1228,1340]
+        self.lockX, self.lockY = 1273, 1008
+        self.columns_position = [108,246,395,516]
+        self.rows_position = [461,594,737,857,985,1131]
         # FaiDeLah
         self.wonna = 'FatherSun'
         self.wonna3 = 'LaVanTor'
@@ -111,6 +121,7 @@ class v:
         self.wonna6 = 'LatdaWn'
         self.wonna7 = 'Dear Curi'
         self.wonna5 = 'xav1er'
+        self.all_agent_white_pos = (105, 375)
         self.accountCredentials = {
             self.wonna: ['wonnacha','Pleasetellme3'],
             self.wonna3: ['wonnacha3','Pleasetellme3'],
@@ -120,11 +131,14 @@ class v:
             self.wonna7: ['wonnacha7','Pleasetellme3']
         }
         self.available_modes = ['unrated','competitive','swiftplay','spike_rush']
-        self.available_agents = ['harbor','deadlock','iso','astra','breach','brimstone','chamber',
-                    'cypher','gekko','jett','kayo','killjoy',
-                    'neon','omen','phoenix','raze','reyna','sage',
-                    'skye','sova','viper','yoru']
+        # 0 , 1 initator,  2 dualist, 3 sentinel, 4 controller
+        self.agent_role_pos = [(212, 334), (305, 326), (414, 333), (520, 330)]
+        # self.all_available_agents = ['harbor','deadlock','iso','astra','breach','brimstone','chamber',
+        #             'cypher','gekko','jett','kayo','killjoy',
+        #             'neon','omen','phoenix','raze','reyna','sage',
+        #             'skye','sova','viper','yoru']
         self.account_list = [self.wonna,self.wonna3,self.wonna4,self.wonna5,self.wonna6,self.wonna7]
+        self.new_way_pick_agent = False
     def agentXYpositionOLD(self,account):
         csv_filename = self.currentPath+ 'agentXYposition.csv'
         agentXYposition = []
@@ -140,16 +154,47 @@ class v:
     def getAgentList(self,account):
         # Read Excel file
         df = pd.read_excel(self.currentPath+'\\availableAgents.xlsx')
-        # Display the DataFrame
-        # print(df)
+        #
         filtered_values = df.loc[df[account].notnull(), 'Agent'].tolist()
-        # Display the list of values
-        # print(filtered_values)
+        self.all_available_agents = df['Agent'].tolist()
+        self.filtered_agents_df = df[df[account].notnull()]
+        print(self.filtered_agents_df)
+        if len(filtered_values)> len(self.columns_position)*len(self.rows_position):
+            self.new_way_pick_agent = True
         return filtered_values
+    def newPickAgentWay(self,agent):
+        # Get the value from the 'Role' column where 'Agent' is 'Sova'
+        role_value = self.filtered_agents_df.loc[self.filtered_agents_df['Agent'] == agent, 'Role'].values[0]
+        print(role_value)
+        # tbd
+        while True:
+            for i in range(2):
+                pyautogui.click(self.agent_role_pos[int(role_value)])
+            # Get the RGB color value of the pixel at the specified coordinates
+            pixel_color = pyautogui.pixel(self.all_agent_white_pos)
+            # get new role position
+            # click position
+            # Check if the pixel color is white
+            if pixel_color == (234, 231, 251):
+                break
+            # rgb(234, 231, 251)
+
+        # pick the role
+        # check if the role is picked
+        # use the old method
+        return
+    def get_newagentXYposition(self,agentName):
+        self.filtered_agent_df = self.filtered_agents_df[self.filtered_agents_df['Agent'] == agentName]
+        role_values = self.filtered_agent_df['Role'].values[0]
+        df_agents_in_the_same_role = self.filtered_agents_df[self.filtered_agents_df['Role'] == role_values]
+        # print(df_agents_in_the_same_role)
+        one_role_agent_list = df_agents_in_the_same_role['Agent'].tolist()
+        # print(filtered_values)
+        return one_role_agent_list,self.agent_role_pos[role_values]
     def agentXYposition(self,account):
         agentList = self.getAgentList(account)
-        rows = 3
-        columns = 9
+        rows = len(self.rows_position)
+        columns = len(self.columns_position)
         agentList.sort()
         selectedAgent = list()
         for agentName in agentList:
@@ -157,13 +202,25 @@ class v:
             # Calculate the row and column
             row = (iIndex) // columns
             column = (iIndex) % columns
-            if (row > rows):
-                print('something went wrong')
-                exit()
-            Xposition = self.columns_position[column]
-            Yposition = self.rows_position[row]
-            selectedAgent.append({'Agent': agentName, 'Xposition':Xposition,'Yposition':Yposition})
-        return selectedAgent    
+            if (row >= rows):
+                print('new way')
+                one_role_agent_list,agent_role_pos = self.get_newagentXYposition(agentName)
+                iIndex = one_role_agent_list.index(agentName)
+                # Calculate the row and column
+                row = (iIndex) // columns
+                column = (iIndex) % columns
+                agent_role_pos = agent_role_pos
+            else:
+                Xposition = self.columns_position[column]
+                Yposition = self.rows_position[row]
+                agent_role_pos = ""
+            selectedAgent.append({'Agent': agentName, 'Xposition':Xposition,'Yposition':Yposition, 'agent_role_pos' : agent_role_pos})
+            """  
+            to do:
+            selectedAgent is ready
+            if selectedAgent[agent_role_pos] is not ""
+            """
+        return selectedAgent
     """ example {'Date': '20230709', 'Account': wonna, 'Agent': 'astra', 'Xposition': '710', 'Yposition': '1233'}"""
     """ OLD METHOD"""
     #if even number= either select agent/ re queuing
@@ -203,7 +260,7 @@ class v:
                     print('nope')
             except:
                 pass
-    def tryAndSearch(self,target, withoutClick=True, withoutMove=True):
+    def tryAndSearch(self,target, withoutClick=True, withoutMove=True,*args, **kwargs):
         try:
             x, y = pyautogui.locateCenterOnScreen(self.screenshotPath+target, region = (0,0,2500,1440), confidence=0.85)
             if (x, y) is not None:
@@ -235,11 +292,11 @@ class v:
                 try:
                     self.afk_status
                     for i in range(3):
-                        click(pos) 
+                        click(pos)
                         sleep(1)
                 except:
                     pass
-                self.searchAndClick('buy_phase.png', needClick=False, confidence=0.6)
+                self.searchAndClick('buying_phase.png', needClick=False, confidence=0.6)
                 self.stateReport(7, 'buying phase',send_dc=0)
                 return
             else:
@@ -283,7 +340,7 @@ class v:
             compile_cmd = ["g++", f"{self.others_path}selectagent.cpp", "-o", "selectagent"]
             subprocess.run(compile_cmd, shell=True, check=True)
         # Run the compiled executable with the x and y coordinates as arguments
-        run_cmd = [f"{self.others_path}selectagent.exe", str(xaxis), str(yaxis), str(self.lockX), str(self.lockY)]
+        run_cmd = [f"{self.others_path}selectagent.exe", str(xaxis), str(yaxis), str(self.lockX), str(self.lockY), 2500]
         subprocess.run(run_cmd, shell=True, check=True)
     def selectAgent(self,preference, venue, agentXYposition, order=0, repickAgent=False):
         if self.random:
@@ -307,6 +364,7 @@ class v:
                     xaxis = int(i['Xposition'])
                     yaxis = int(i['Yposition'])
                     break
+            self.agent_details = i
         if repickAgent is False:
             # time.sleep(1)
             self.checkIfLoadingPageDone()
@@ -318,6 +376,8 @@ class v:
             self.stateReport(4,f'agent selecting: 🕵️  {agent} 🕵️',send_dc=False)
             self.debugger('after agent sel')
         """  """
+        if self.new_way_pick_agent is True:
+            xaxis,yaxis = self.newPickAgentWay(agent)
         self.cpp_select_agent(xaxis,yaxis)
         if self.checkIfAgentLocked(agentXYposition): 
             order +=1
@@ -733,9 +793,9 @@ class v:
         # else:
         #     print("The pixel color is not red.")
         while True:
-            if self.tryAndSearch('buy_phase.png', withoutClick=True, withoutMove=True):
+            if self.tryAndSearch('buying_phase.png', withoutClick=True, withoutMove=True):
                 v.send_to_discord('buying_phase')
-                time.sleep(50)
+                time.sleep(45)
     @staticmethod
     def alert_msg(msg):
         print('❗❗❗'* 10 +'\n'+ msg +'\n'+'❗❗❗'* 10 )
@@ -876,7 +936,7 @@ class v:
             if len(self.preference) >=2:
                 break
         return
-    def queue_and_brb(self,withpartyRank):
+    def queue_and_afk(self,withpartyRank):
         print("  !  !  !   Remeber to manual start queuing  !  !  !")
         eval(withpartyRank)
         self.afk(drop=0,shield=0,abilties=0)
@@ -888,7 +948,7 @@ class v:
         launchAndLogin = "self.MainFlow(skipStart='y', reQ='y', launchAndLogin=True)"
         # starting()
         while True:
-            input_value = self.print_instructions_main(['main program','report player','requeue','login & queue','afk','check_all_account_available_agent','afk_boss','spammer','dc_notification'])
+            input_value = self.print_instructions_main(['main program','report player','requeue','login & queue','afk','check_all_account_available_agent','afk_boss','spammer','queue_and_afk','dc_notification'])
             if input_value == "1":
                 eval(withpartyRank)
             elif input_value == "2":
@@ -910,12 +970,12 @@ class v:
             elif input_value == "8":
                 self.spammer()
             elif input_value == "9":
-                self.queue_and_brb(withpartyRank)
+                self.queue_and_afk(withpartyRank)
             elif input_value == "0":
                 self.dc_notification()
             # elif input_value == "0":
             #     v.getAgentsPosition(account=v.account)
-            elif input_value in self.available_agents:
+            elif input_value in self.all_available_agents:
                 self.insert_agent(input_value)
             else:
                 for mode in self.available_modes:

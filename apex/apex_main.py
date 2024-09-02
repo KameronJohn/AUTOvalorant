@@ -94,6 +94,10 @@ class apex:
         self.queue_time = time.time() - start_time
         self.send_to_discord(self.d_message['gameFound.png']+f"({self.queue_time})")
         # self.send_to_discord(msg)
+        self.direct_selecet_legends()
+    def direct_selecet_legends(self):
+        if self.tryAndSearch("selecting_agent.png", withoutClick=False, withoutMove=False) is False:
+            return
         if self.select_legends() is False:
             return
         self.if_in_game()
@@ -126,27 +130,29 @@ class apex:
         # self.send_to_discord(msg)
         return
     def select_legends(self):
-        self.searchAndClick("selecting_agent.png")
-        pick_time = time.time() - self.pick_order_count
-        if pick_time <= 8:
+        try:
+            pick_time = time.time() - self.pick_order_count
+            if pick_time <= 8:
+                self.pick_order = 1
+            elif pick_time <= 15:
+                self.pick_order = 2
+            elif pick_time <= 26:
+                self.pick_order = 3
+            else:
+                self.pick_order = 4
+                self.send_to_discord(f"error: pick_order = 4, pick_time recorded: {pick_time}")
+                return False
+            print(f"pick order: {self.pick_order}")
+        except AttributeError:
             self.pick_order = 1
-        elif pick_time <= 15:
-            self.pick_order = 2
-        elif pick_time <= 26:
-            self.pick_order = 3
-        else:
-            self.pick_order = 4
-            self.send_to_discord(f"error: pick_order = 4, pick_time recorded: {pick_time}")
-            return False
-        print(f"pick order: {self.pick_order}")
         print('selecting agents...')
         player_order = []
         for x in self.players_box_x_pos:
-            if pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.yellow, tolerance=0):
+            if pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.yellow, tolerance=0.2):
                 player_order.append("yellow")
-            elif pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.green, tolerance=0):
+            elif pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.green, tolerance=0.2):
                 player_order.append("green")
-            elif pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.blue, tolerance=0):
+            elif pyautogui.pixelMatchesColor(x, self.players_box_y_pos, self.blue, tolerance=0.2):
                 player_order.append("blue")
             else:
                 msg = 'not a full team'
@@ -206,6 +212,8 @@ class apex:
         pyautogui.screenshot(self.screenshotPath+formatted_datetime+f"_{details}.png")
     def check_what_picked(self):
         picked_index = set()
+        self.debugger("self.preferences::")
+        self.debugger(self.preferences)
         for i, row in self.df.iterrows():
             x = row['xindex']
             y = row['yindex']
@@ -299,7 +307,7 @@ class apex:
         self.get_legends_position()
         while True:
             time.sleep(2)
-            if self.tryAndSearch('ready.png') is not False or self.tryAndSearch('gameFound.png') is not False:
+            if self.tryAndSearch('ready.png') is not False or self.tryAndSearch('gameFound.png') is not False or self.in_requeue() is True:
                 self.if_game_found()
                 in_the_game = True
             elif self.tryAndSearch('squad_eliminated.png') and in_the_game is True:
@@ -308,6 +316,14 @@ class apex:
             elif self.respawning_check():
                 in_the_game = True
                 pass
+            elif self.direct_selecet_legends():
+                in_the_game = True
+                pass
+    def in_requeue(self):
+        return False
+        if self.tryAndSearch('requeue.png') is not False:
+            return True
+        return False
     def get_new_x_position(self,index):
         while True:
             a = pyautogui.position()

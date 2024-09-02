@@ -44,23 +44,24 @@ def system_preference():
     v.preference = ['jett', 'reyna', 'phoenix']
     v.preference = ['omen', 'sage', 'jett']
     v.preference = ['skye', 'jett', 'phoenix']
-    v.preference = ['reyna', 'jett', 'phoenix']
     v.preference = ['gekko', 'yoru', 'omen']
     v.preference = ['phoenix', 'jett', 'sage'] #basic
     v.preference = ['yoru', 'gekko', 'omen']
-    v.preference = ['iso', 'yoru', 'jett']
+    v.preference = ['reyna', 'jett', 'phoenix']
+    v.preference = ['deadlock', 'killjoy', 'phoenix']
     v.preference = ['sage', 'phoenix', 'omen']
+    v.preference = ['iso', 'yoru', 'jett']
     """  """
     v.account = v.wonna6
     v.account = v.wonna7
-    v.account = v.wonna
     v.account = v.wonna3
     v.account = v.wonna5
     v.account = v.wonna4
+    v.account = v.wonna
     """  """
     v.game_mode = 'swiftplay'
     v.game_mode = 'spike_rush' 
-    v.game_mode = 'unrated' 
+    v.game_mode = 'unrated'
     v.game_mode = 'competitive'
     """"""
 if __name__ == "__main__":

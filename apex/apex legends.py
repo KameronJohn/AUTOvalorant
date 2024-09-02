@@ -1,3 +1,4 @@
+
 from apex_main import apex
 def legends_preference():
     """ config """
@@ -12,11 +13,11 @@ def legends_preference():
     """ preferences """
     a.preferences = dict()
     a.force_pick = False
+    a.preferences["assault"] = "ballistic"
     a.preferences["skirmisher"] = "pathfinder"
+    a.preferences["support"] = "loba"
     a.preferences["recon"] = "vantage"
     a.preferences["controller"] = "rampart"
-    a.preferences["support"] = "loba"
-    a.preferences["assault"] = "bangalore"
     """  """
     # a.preferences = ["pathfinder","vantage","bangalore"]
     # a.preferences = ["rampart","fuse","seer"]
