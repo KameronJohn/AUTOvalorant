@@ -159,38 +159,44 @@ class v:
         self.all_available_agents = df['Agent'].tolist()
         self.filtered_agents_df = df[df[account].notnull()]
         print(self.filtered_agents_df)
-        if len(filtered_values)> len(self.columns_position)*len(self.rows_position):
-            self.new_way_pick_agent = True
+        # if len(filtered_values)> len(self.columns_position)*len(self.rows_position):
+        #     self.new_way_pick_agent = True
         return filtered_values
-    def newPickAgentWay(self,agent):
-        # Get the value from the 'Role' column where 'Agent' is 'Sova'
-        role_value = self.filtered_agents_df.loc[self.filtered_agents_df['Agent'] == agent, 'Role'].values[0]
-        print(role_value)
+    def return_default_agent_selection_page(self):
+        while True:
+            pixel_color = pyautogui.pixel(self.all_agent_white_pos)
+            if pixel_color == (234, 231, 251):
+                return
+            else:
+                pyautogui.click(self.all_agent_white_pos)
+    def newPickAgentWay(self,agent_details):
         # tbd
         while True:
             for i in range(2):
-                pyautogui.click(self.agent_role_pos[int(role_value)])
+                pyautogui.click(self.agent_role_pos[int(agent_details["Role"])])
             # Get the RGB color value of the pixel at the specified coordinates
             pixel_color = pyautogui.pixel(self.all_agent_white_pos)
-            # get new role position
-            # click position
             # Check if the pixel color is white
             if pixel_color == (234, 231, 251):
-                break
-            # rgb(234, 231, 251)
-
-        # pick the role
-        # check if the role is picked
-        # use the old method
-        return
-    def get_newagentXYposition(self,agentName):
+                pass
+            else:
+                return
+    def get_newagentXYposition(self,rows,columns,agentName):
         self.filtered_agent_df = self.filtered_agents_df[self.filtered_agents_df['Agent'] == agentName]
-        role_values = self.filtered_agent_df['Role'].values[0]
-        df_agents_in_the_same_role = self.filtered_agents_df[self.filtered_agents_df['Role'] == role_values]
-        # print(df_agents_in_the_same_role)
+        agent_role_in_number = int(self.filtered_agent_df['Role'].values[0])
+        df_agents_in_the_same_role = self.filtered_agents_df[self.filtered_agents_df['Role'] == agent_role_in_number]
         one_role_agent_list = df_agents_in_the_same_role['Agent'].tolist()
-        # print(filtered_values)
-        return one_role_agent_list,self.agent_role_pos[role_values]
+        iIndex = one_role_agent_list.index(agentName)
+        # Calculate the row and column
+        row = (iIndex) // columns
+        column = (iIndex) % columns
+        if (row >= rows):
+            exit("error: invalid lor")
+        else:
+            role_based_Xposition = self.columns_position[column]
+            role_based_Yposition = self.rows_position[row]
+            agent_role_pos = self.agent_role_pos[agent_role_in_number-1]
+        return agent_role_pos,role_based_Xposition,role_based_Yposition
     def agentXYposition(self,account):
         agentList = self.getAgentList(account)
         rows = len(self.rows_position)
@@ -203,23 +209,23 @@ class v:
             row = (iIndex) // columns
             column = (iIndex) % columns
             if (row >= rows):
-                print('new way')
-                one_role_agent_list,agent_role_pos = self.get_newagentXYposition(agentName)
-                iIndex = one_role_agent_list.index(agentName)
-                # Calculate the row and column
-                row = (iIndex) // columns
-                column = (iIndex) % columns
-                agent_role_pos = agent_role_pos
+                Xposition = ""
+                Yposition = ""
+                role_based_only = True
             else:
                 Xposition = self.columns_position[column]
                 Yposition = self.rows_position[row]
-                agent_role_pos = ""
-            selectedAgent.append({'Agent': agentName, 'Xposition':Xposition,'Yposition':Yposition, 'agent_role_pos' : agent_role_pos})
-            """  
-            to do:
-            selectedAgent is ready
-            if selectedAgent[agent_role_pos] is not ""
-            """
+                role_based_only = False
+            #getting the new x,y position based on role
+            agent_role_pos,role_based_Xposition,role_based_Yposition = self.get_newagentXYposition(rows,columns,agentName)
+            selectedAgent.append({'Agent': agentName, 
+                                  'Xposition':Xposition,
+                                  'Yposition':Yposition, 
+                                  'agent_role_pos':agent_role_pos,
+                                  'role_based_Xposition':role_based_Xposition,
+                                  'role_based_Yposition':role_based_Yposition,
+                                  "role_based_only":role_based_only
+                                  })
         return selectedAgent
     """ example {'Date': '20230709', 'Account': wonna, 'Agent': 'astra', 'Xposition': '710', 'Yposition': '1233'}"""
     """ OLD METHOD"""
@@ -340,7 +346,7 @@ class v:
             compile_cmd = ["g++", f"{self.others_path}selectagent.cpp", "-o", "selectagent"]
             subprocess.run(compile_cmd, shell=True, check=True)
         # Run the compiled executable with the x and y coordinates as arguments
-        run_cmd = [f"{self.others_path}selectagent.exe", str(xaxis), str(yaxis), str(self.lockX), str(self.lockY), 2500]
+        run_cmd = [f"{self.others_path}selectagent.exe", str(xaxis), str(yaxis), str(self.lockX), str(self.lockY), "2500"]
         subprocess.run(run_cmd, shell=True, check=True)
     def selectAgent(self,preference, venue, agentXYposition, order=0, repickAgent=False):
         if self.random:
@@ -360,11 +366,16 @@ class v:
             self.agentSelected.append(agent)
             for i in agentXYposition:
                 if i['Agent'] == agent:
-                    # agnetPosition = i2
-                    xaxis = int(i['Xposition'])
-                    yaxis = int(i['Yposition'])
+                    if i['role_based_only'] is True:
+                        self.new_way_pick_agent == True
+                        xaxis = int(i['role_based_Xposition'])
+                        yaxis = int(i['role_based_Yposition'])
+                    else:
+                        # agnetPosition = i2
+                        xaxis = int(i['Xposition'])
+                        yaxis = int(i['Yposition'])
                     break
-            self.agent_details = i
+            agent_details = i
         if repickAgent is False:
             # time.sleep(1)
             self.checkIfLoadingPageDone()
@@ -377,8 +388,12 @@ class v:
             self.debugger('after agent sel')
         """  """
         if self.new_way_pick_agent is True:
-            xaxis,yaxis = self.newPickAgentWay(agent)
+            xaxis,yaxis = self.newPickAgentWay(agent_details)
+        else:
+            self.return_default_agent_selection_page()
         self.cpp_select_agent(xaxis,yaxis)
+        #reset value
+        self.new_way_pick_agent == False
         if self.checkIfAgentLocked(agentXYposition): 
             order +=1
             self.alert_msg(f'agent {order} cant be selected')
