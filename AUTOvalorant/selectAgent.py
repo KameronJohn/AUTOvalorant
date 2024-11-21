@@ -22,9 +22,12 @@ print("initiating...")
 
 """
 ##NEW AGENT
-1. to update agent, update 0) excel 1) self.columns_position 2) self.rows_position 
+1. to update agent, update 0) excel 1) self.disappeared_top_row_when_creach_bottom
 
-z`
+2. agent selection related:
+
+self.top
+
 ##NEW MAP
 1. screenshot, save the loading map page
 2. edit slf.preference
@@ -83,10 +86,11 @@ class v:
         self.preference = ['gekko', 'yoru', 'omen']
         self.preference = ['phoenix', 'jett', 'sage'] #basic
         self.preference = ['iso', 'yoru', 'jett']
-        self.preference = ['sage', 'phoenix', 'omen']
         self.preference = ['cypher', 'phoenix', 'omen']
         self.preference = ['omen', 'reyna', 'jett']
         self.preference = ['yoru', 'gekko', 'omen']
+        self.preference = ['sage', 'phoenix', 'omen']
+        self.preference = ['sage', 'phoenix', 'jett']
         """  """
         self.account = self.wonna6
         self.account = self.wonna7
@@ -94,6 +98,7 @@ class v:
         self.account = self.wonna5
         self.account = self.wonna4
         self.account = self.wonna
+        self.account = self.wonna8
         """  """
         self.game_mode = 'swiftplay'
         self.game_mode = 'spike_rush' 
@@ -121,7 +126,9 @@ class v:
         self.wonna6 = 'LatdaWn'
         self.wonna7 = 'Dear Curi'
         self.wonna5 = 'xav1er'
-        self.all_agent_white_pos = (105, 375)
+        self.wonna8 = 'Tin Synix'
+        self.wonna9 = ''
+        self.wonna10 = ''
         self.accountCredentials = {
             self.wonna: ['wonnacha','Pleasetellme3'],
             self.wonna3: ['wonnacha3','Pleasetellme3'],
@@ -132,13 +139,21 @@ class v:
         }
         self.available_modes = ['unrated','competitive','swiftplay','spike_rush']
         # 0 , 1 initator,  2 dualist, 3 sentinel, 4 controller
-        self.agent_role_pos = [(212, 334), (305, 326), (414, 333), (520, 330)]
+        self.top = "top"
+        self.bot = "bot"
+        self.bar_pos = {
+            self.top: (602, 405),
+            self.bot: (599, 1181)
+        }
         # self.all_available_agents = ['harbor','deadlock','iso','astra','breach','brimstone','chamber',
         #             'cypher','gekko','jett','kayo','killjoy',
         #             'neon','omen','phoenix','raze','reyna','sage',
         #             'skye','sova','viper','yoru']
         self.account_list = [self.wonna,self.wonna3,self.wonna4,self.wonna5,self.wonna6,self.wonna7]
-        self.new_way_pick_agent = False
+        self.agent_page_selected_color = 255, 255, 255
+        self.disappeared_top_row_when_creach_bottom = 1
+        self.select_agent_bar_current_position = self.top
+        self.select_agent_bar_positions = [self.top, self.bot]
     def agentXYpositionOLD(self,account):
         csv_filename = self.currentPath+ 'agentXYposition.csv'
         agentXYposition = []
@@ -158,91 +173,86 @@ class v:
         filtered_values = df.loc[df[account].notnull(), 'Agent'].tolist()
         self.all_available_agents = df['Agent'].tolist()
         self.filtered_agents_df = df[df[account].notnull()]
-        print(self.filtered_agents_df)
+        # print(self.filtered_agents_df)
         # if len(filtered_values)> len(self.columns_position)*len(self.rows_position):
         #     self.new_way_pick_agent = True
         return filtered_values
-    def return_default_agent_selection_page(self):
-        while True:
-            pixel_color = pyautogui.pixel(self.all_agent_white_pos)
-            if pixel_color == (234, 231, 251):
-                return
-            else:
-                pyautogui.click(self.all_agent_white_pos)
-    def newPickAgentWay(self,agent_details):
-        # tbd
-        while True:
-            for i in range(2):
-                pyautogui.click(self.agent_role_pos[int(agent_details["Role"])])
-            # Get the RGB color value of the pixel at the specified coordinates
-            pixel_color = pyautogui.pixel(self.all_agent_white_pos)
-            # Check if the pixel color is white
-            if pixel_color == (234, 231, 251):
-                pass
-            else:
-                return
-    def get_newagentXYposition(self,rows,columns,agentName):
-        self.filtered_agent_df = self.filtered_agents_df[self.filtered_agents_df['Agent'] == agentName]
-        agent_role_in_number = int(self.filtered_agent_df['Role'].values[0])
-        df_agents_in_the_same_role = self.filtered_agents_df[self.filtered_agents_df['Role'] == agent_role_in_number]
-        one_role_agent_list = df_agents_in_the_same_role['Agent'].tolist()
-        iIndex = one_role_agent_list.index(agentName)
-        # Calculate the row and column
-        row = (iIndex) // columns
-        column = (iIndex) % columns
-        if (row >= rows):
-            exit("error: invalid lor")
+    # def return_default_agent_selection_page(self):
+    #     print(self.all_agent_white_pos)
+    #     pyautogui.moveTo(self.all_agent_white_pos)
+    #     while True:
+    #         print(self.all_agent_white_pos)
+    #         pixel_color = pyautogui.pixel(self.all_agent_white_pos)
+    #         print(pixel_color)
+    #         if pixel_color == (self.agent_page_selected_color):
+    #             return
+    #         else:
+    #             pyautogui.click(self.all_agent_white_pos)
+    def change_bar_pos(self,position):
+        if self.select_agent_bar_current_position == position:
+            return
         else:
-            role_based_Xposition = self.columns_position[column]
-            role_based_Yposition = self.rows_position[row]
-            agent_role_pos = self.agent_role_pos[agent_role_in_number-1]
-        return agent_role_pos,role_based_Xposition,role_based_Yposition
+            x,y  = self.bar_pos[position]
+            while True:
+                for i in range(2):
+                    pyautogui.click(self.bar_pos[position])
+                if pyautogui.pixelMatchesColor(x,y, self.agent_page_selected_color, tolerance=20):
+                    return
     def agentXYposition(self,account):
         agentList = self.getAgentList(account)
         rows = len(self.rows_position)
         columns = len(self.columns_position)
         agentList.sort()
-        selectedAgent = list()
+        bottom_agentList = agentList[len(self.columns_position )*self.disappeared_top_row_when_creach_bottom:]
+        selectedAgent = dict()
+        #get top position (lopping all agents)
         for agentName in agentList:
+            selectedAgent[agentName] = {}
             iIndex = agentList.index(agentName)
             # Calculate the row and column
             row = (iIndex) // columns
             column = (iIndex) % columns
             if (row >= rows):
-                Xposition = ""
-                Yposition = ""
-                role_based_only = True
+                pass
             else:
                 Xposition = self.columns_position[column]
                 Yposition = self.rows_position[row]
-                role_based_only = False
-            #getting the new x,y position based on role
-            agent_role_pos,role_based_Xposition,role_based_Yposition = self.get_newagentXYposition(rows,columns,agentName)
-            selectedAgent.append({'Agent': agentName, 
-                                  'Xposition':Xposition,
-                                  'Yposition':Yposition, 
-                                  'agent_role_pos':agent_role_pos,
-                                  'role_based_Xposition':role_based_Xposition,
-                                  'role_based_Yposition':role_based_Yposition,
-                                  "role_based_only":role_based_only
-                                  })
+                selectedAgent[agentName][self.top] = {
+                    "pos_x": Xposition,
+                    "pos_y": Yposition
+                }
+        #get bot position
+        for agentName in bottom_agentList:
+            iIndex = bottom_agentList.index(agentName)
+            # Calculate the row and column
+            row = (iIndex) // columns
+            column = (iIndex) % columns
+            if (row >= rows):
+                pass
+            else:
+                bot_Xposition = self.columns_position[column]
+                bot_Yposition = self.rows_position[row]
+                selectedAgent[agentName][self.bot] = {
+                    "pos_x": bot_Xposition,
+                    "pos_y": bot_Yposition
+                }
         return selectedAgent
     """ example {'Date': '20230709', 'Account': wonna, 'Agent': 'astra', 'Xposition': '710', 'Yposition': '1233'}"""
     """ OLD METHOD"""
     #if even number= either select agent/ re queuing
     # saving each account's agent's XY position
-    def agentXYpositionOLD(self,account):
-        csv_filename = self.currentPath+ 'agentXYposition.csv'
-        agentXYposition = []
-        with open(csv_filename) as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                if row['Account'] == account:
-                    agentXYposition.append(row)
-        if len(agentXYposition) < 4:
-            exit('SOMETIME IS NOT RIGHT: len(agentXYposition) < 4')
-        print(agentXYposition)
-        return agentXYposition
+    # def agentXYpositionOLD(self,account):
+    #     csv_filename = self.currentPath+ 'agentXYposition.csv'
+    #     agentXYposition = []
+    #     with open(csv_filename) as f:
+    #         reader = csv.DictReader(f)
+    #         for row in reader:
+    #             if row['Account'] == account:
+    #                 agentXYposition.append(row)
+    #     if len(agentXYposition) < 4:
+    #         exit('SOMETIME IS NOT RIGHT: len(agentXYposition) < 4')
+    #     print(agentXYposition)
+    #     return agentXYposition
     @staticmethod
     def writerows(self,csvFile, lines):
         with open(csvFile, 'w', newline='') as f:
@@ -346,7 +356,7 @@ class v:
             compile_cmd = ["g++", f"{self.others_path}selectagent.cpp", "-o", "selectagent"]
             subprocess.run(compile_cmd, shell=True, check=True)
         # Run the compiled executable with the x and y coordinates as arguments
-        run_cmd = [f"{self.others_path}selectagent.exe", str(xaxis), str(yaxis), str(self.lockX), str(self.lockY), "2500"]
+        run_cmd = [f"{self.others_path}selectagent.exe", str(xaxis), str(yaxis), str(self.lockX), str(self.lockY)]
         subprocess.run(run_cmd, shell=True, check=True)
     def selectAgent(self,preference, venue, agentXYposition, order=0, repickAgent=False):
         if self.random:
@@ -364,18 +374,21 @@ class v:
             else:
                 agent = preference[order]
             self.agentSelected.append(agent)
-            for i in agentXYposition:
-                if i['Agent'] == agent:
-                    if i['role_based_only'] is True:
-                        self.new_way_pick_agent == True
-                        xaxis = int(i['role_based_Xposition'])
-                        yaxis = int(i['role_based_Yposition'])
-                    else:
-                        # agnetPosition = i2
-                        xaxis = int(i['Xposition'])
-                        yaxis = int(i['Yposition'])
+            #getting xy positiion before getting into the loading page
+            """ 
+                    self.select_agent_bar_current_position = self.top
+        self.select_agent_bar_positions = [self.top, self.bot]
+            """
+            for position in self.select_agent_bar_positions:
+                if position in agentXYposition[agent]:
+                    xaxis = agentXYposition[agent][position]["pos_x"]
+                    yaxis = agentXYposition[agent][position]["pos_y"]
                     break
-            agent_details = i
+            else:
+                # print(agentXYposition)
+                print("picking agent")
+                print(agent)
+                exit("oh no")
         if repickAgent is False:
             # time.sleep(1)
             self.checkIfLoadingPageDone()
@@ -387,17 +400,17 @@ class v:
             self.stateReport(4,f'agent selecting: 🕵️  {agent} 🕵️',send_dc=False)
             self.debugger('after agent sel')
         """  """
-        if self.new_way_pick_agent is True:
-            xaxis,yaxis = self.newPickAgentWay(agent_details)
-        else:
-            self.return_default_agent_selection_page()
+        self.change_bar_pos(position)
+            # tbd this functino is not working
+            # how to check if the role is clicked
+            # if the agent is selected, still use role based position
+            # self.return_default_agent_selection_page()
         self.cpp_select_agent(xaxis,yaxis)
         #reset value
-        self.new_way_pick_agent == False
         if self.checkIfAgentLocked(agentXYposition): 
             order +=1
             self.alert_msg(f'agent {order} cant be selected')
-            self.selectAgent(preference, venue, agentXYposition, order, repickAgent=True)
+            # self.selectAgent(preference, venue, agentXYposition, order, repickAgent=True)
         else:
             self.stateReport(5,f'agent selected',send_dc=False)
             pyautogui.FAILSAFE = False
@@ -408,6 +421,14 @@ class v:
             pyautogui.keyUp('alt')
             """ alt tab here """
     def checkIfAgentLocked(self,agentXYposition):
+        for x in range(self.columns_position):
+            for y in range(self.rows_position):
+                for i in range(2):
+                    pyautogui.click(x,y)
+                if self.tryAndSearch('availableAgent.png', withoutClick=True):
+                    return 'notSelected'
+                break
+        return
         self.debugger('agentXYposition:\n')
         self.debugger(agentXYposition)
         new_items = [d for d in agentXYposition if 'Agent' not in d or d['Agent'] not in self.agentSelected]
@@ -438,12 +459,12 @@ class v:
         b3 = pyautogui.pixel(pixelllx,pixelllY)
         count = 0
         count2 = 0  
-        tolerance = 1
+        # tolerance = 10
         while True:
-            if pyautogui.pixelMatchesColor(pixelx, pixelY, (0,0,0), tolerance=tolerance):
+            if pyautogui.pixelMatchesColor(pixelx, pixelY, (0,0,0), tolerance=0):
                 break
         while True:
-            if not pyautogui.pixelMatchesColor(pixelx, pixelY, (0,0,0), tolerance=tolerance):
+            if not pyautogui.pixelMatchesColor(pixelx, pixelY, (0,0,0), tolerance=0):
                 self.stateReport(3, 'select agent page',send_dc=False)
                 return
     @staticmethod
@@ -557,8 +578,7 @@ class v:
     def errorChecking(self,agentXYposition):
         availableAgent = []
         possibleAgent = []
-        for i in agentXYposition:
-            availableAgent.append(i['Agent'])
+        availableAgent = list(agentXYposition.keys())
         if type(self.preference) is dict:
             print(''+'map'+'')
             mySet = set()
@@ -578,7 +598,7 @@ class v:
                 print(possibleAgent)
                 print('availableAgent:  ')
                 print(availableAgent)
-                print(f'{a} is not available in this account!!!')
+                print(f'[{a}] is not available on this account!!!')
                 exit()
     def debugger(self,msg):
         if self.debugging == 1:
@@ -957,7 +977,6 @@ class v:
         self.afk(drop=0,shield=0,abilties=0)
         return
     def hold(self):
-        print(self.preference)
         MainFlow = "self.MainFlow(skipStart='y', reQ='y')"
         withpartyRank = "self.MainFlow(skipStart='y')"
         launchAndLogin = "self.MainFlow(skipStart='y', reQ='y', launchAndLogin=True)"

@@ -37,7 +37,6 @@ def system_preference():
         'fracture': ['omen','breach','omen']
     }
     """  """
-    v.preference = ['chamber', 'omen', 'phoenix']
     v.preference = ['raze', 'reyna', 'phoenix']
     v.preference = ['brimstone', 'sage', 'phoenix']
     v.preference = ['gekko', 'phoenix', 'jett']  
@@ -45,18 +44,21 @@ def system_preference():
     v.preference = ['omen', 'sage', 'jett']
     v.preference = ['skye', 'jett', 'phoenix']
     v.preference = ['gekko', 'yoru', 'omen']
-    v.preference = ['phoenix', 'jett', 'sage'] #basic
-    v.preference = ['yoru', 'gekko', 'omen']
     v.preference = ['reyna', 'jett', 'phoenix']
     v.preference = ['deadlock', 'killjoy', 'phoenix']
     v.preference = ['sage', 'phoenix', 'omen']
     v.preference = ['iso', 'yoru', 'jett']
+    v.preference = ['clove', 'yoru', 'jett']
+    v.preference = ['chamber', 'omen', 'phoenix']
+    v.preference = ['sage', 'deadlock', 'phoenix']
+    v.preference = ['phoenix', 'jett', 'sage'] #basic
+    v.preference = ['yoru', 'gekko', 'omen']
     """  """
     v.account = v.wonna6
     v.account = v.wonna7
-    v.account = v.wonna3
     v.account = v.wonna5
     v.account = v.wonna4
+    v.account = v.wonna3
     v.account = v.wonna
     """  """
     v.game_mode = 'swiftplay'

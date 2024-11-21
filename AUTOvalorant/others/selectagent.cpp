@@ -53,7 +53,6 @@ int main(int argc, char* argv[])
     // std::cout << "pos2_y = " << pos2_y << std::endl;
 
 
-    int click_time = std::stoi(argv[5]);
 
     // Define the two coordinates to move to
     POINT coords[] = {
@@ -79,7 +78,7 @@ int main(int argc, char* argv[])
         for (int j = 0; j < numCoords; j++)
         {
             // Check if 4 seconds have elapsed
-            if (GetTickCount() - startTick > click_time)
+            if (GetTickCount() - startTick > 2500)
             {
                 // std::cout << "Breaking loop" << std::endl;
                 return 0;

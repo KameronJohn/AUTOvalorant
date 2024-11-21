@@ -32,6 +32,20 @@ def getMousePosition():
         if keyboard.is_pressed('2'):
             print(PosList)
             return
+agent_page_selected_color = 255, 255, 255
+a = pyautogui.pixel(599, 1181)
+while True:
+    if pyautogui.pixelMatchesColor(599, 1181, agent_page_selected_color, tolerance=20):
+        print('nice')
+    else:
+        print(".")
+        pass
+if agent_page_selected_color == a:
+    print('nice')
+else:
+    print(agent_page_selected_color)
+    print(a)
+    print('no')
 # getMousePosition()
 def testing():
     while True:
@@ -39,7 +53,7 @@ def testing():
             for i in range (10):
                 pyautogui.click()
     return
-testing()
+# testing()
 def afk():
     while True:
         try:
