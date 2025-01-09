@@ -49,10 +49,10 @@ def system_preference():
     v.preference = ['sage', 'phoenix', 'omen']
     v.preference = ['iso', 'yoru', 'jett']
     v.preference = ['clove', 'yoru', 'jett']
-    v.preference = ['chamber', 'omen', 'phoenix']
     v.preference = ['sage', 'deadlock', 'phoenix']
     v.preference = ['phoenix', 'jett', 'sage'] #basic
     v.preference = ['yoru', 'gekko', 'omen']
+    v.preference = ['chamber', 'yoru', 'phoenix']
     """  """
     v.account = v.wonna6
     v.account = v.wonna7

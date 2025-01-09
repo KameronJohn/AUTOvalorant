@@ -97,8 +97,8 @@ class v:
         self.account = self.wonna3
         self.account = self.wonna5
         self.account = self.wonna4
-        self.account = self.wonna
         self.account = self.wonna8
+        self.account = self.wonna
         """  """
         self.game_mode = 'swiftplay'
         self.game_mode = 'spike_rush' 
@@ -173,21 +173,7 @@ class v:
         filtered_values = df.loc[df[account].notnull(), 'Agent'].tolist()
         self.all_available_agents = df['Agent'].tolist()
         self.filtered_agents_df = df[df[account].notnull()]
-        # print(self.filtered_agents_df)
-        # if len(filtered_values)> len(self.columns_position)*len(self.rows_position):
-        #     self.new_way_pick_agent = True
         return filtered_values
-    # def return_default_agent_selection_page(self):
-    #     print(self.all_agent_white_pos)
-    #     pyautogui.moveTo(self.all_agent_white_pos)
-    #     while True:
-    #         print(self.all_agent_white_pos)
-    #         pixel_color = pyautogui.pixel(self.all_agent_white_pos)
-    #         print(pixel_color)
-    #         if pixel_color == (self.agent_page_selected_color):
-    #             return
-    #         else:
-    #             pyautogui.click(self.all_agent_white_pos)
     def change_bar_pos(self,position):
         if self.select_agent_bar_current_position == position:
             return
@@ -239,20 +225,6 @@ class v:
         return selectedAgent
     """ example {'Date': '20230709', 'Account': wonna, 'Agent': 'astra', 'Xposition': '710', 'Yposition': '1233'}"""
     """ OLD METHOD"""
-    #if even number= either select agent/ re queuing
-    # saving each account's agent's XY position
-    # def agentXYpositionOLD(self,account):
-    #     csv_filename = self.currentPath+ 'agentXYposition.csv'
-    #     agentXYposition = []
-    #     with open(csv_filename) as f:
-    #         reader = csv.DictReader(f)
-    #         for row in reader:
-    #             if row['Account'] == account:
-    #                 agentXYposition.append(row)
-    #     if len(agentXYposition) < 4:
-    #         exit('SOMETIME IS NOT RIGHT: len(agentXYposition) < 4')
-    #     print(agentXYposition)
-    #     return agentXYposition
     @staticmethod
     def writerows(self,csvFile, lines):
         with open(csvFile, 'w', newline='') as f:
@@ -331,10 +303,11 @@ class v:
                     # click(x, y)                                                                   
                     if agentXYposition is False:
                         break
-                    self.selectAgent(self.preference, venue, agentXYposition)
                     break
             except:
                 count+=1
+        self.selectAgent(self.preference, venue, agentXYposition)
+        return
         # """ alt tab here """
         # pyautogui.keyDown('alt')
         # pyautogui.press('tab')
@@ -390,9 +363,10 @@ class v:
                 print(agent)
                 exit("oh no")
         if repickAgent is False:
-            # time.sleep(1)
             self.checkIfLoadingPageDone()
-            # time.sleep(1)
+        else:
+            for i in range(5):
+                pyautogui.click(xaxis,yaxis)
         cursorPos = pyautogui.position()
         if self.random:
             self.stateReport(4,f'🍭🍭RANDOM🍭🍭 agent selecting: 🍭  {agent} 🍭',send_dc=False)
@@ -410,7 +384,7 @@ class v:
         if self.checkIfAgentLocked(agentXYposition): 
             order +=1
             self.alert_msg(f'agent {order} cant be selected')
-            # self.selectAgent(preference, venue, agentXYposition, order, repickAgent=True)
+            self.selectAgent(preference, venue, agentXYposition, order, repickAgent=True)
         else:
             self.stateReport(5,f'agent selected',send_dc=False)
             pyautogui.FAILSAFE = False
@@ -421,13 +395,16 @@ class v:
             pyautogui.keyUp('alt')
             """ alt tab here """
     def checkIfAgentLocked(self,agentXYposition):
-        for x in range(self.columns_position):
-            for y in range(self.rows_position):
+        count = 0
+        for y in self.rows_position:
+            for x in self.columns_position:
                 for i in range(2):
                     pyautogui.click(x,y)
                 if self.tryAndSearch('availableAgent.png', withoutClick=True):
                     return 'notSelected'
-                break
+                count +=1
+                if count >= 6:
+                    return
         return
         self.debugger('agentXYposition:\n')
         self.debugger(agentXYposition)
@@ -699,12 +676,6 @@ class v:
                     break
             except:
                 pass
-            # try:
-            #     xx = pyautogui.locateCenterOnScreen(self.screenshotPath+'riot_client_valorant_icon.png', region = (0,0,2560,1440), confidence=0.7)
-            #     if xx is not None:
-            #         click(xx)
-            # except:
-            #     pass
             try:
                 aa = pyautogui.locateCenterOnScreen(self.screenshotPath+'riot_client_play_icon.png', region = (0,0,2560,1440), confidence=0.7)
                 if aa is not None:
@@ -815,18 +786,6 @@ class v:
         d.send("Val", msg,channel)
         return
     def dc_notification(self):
-        # print("waiting for next phase...")
-        # x = 1307  # X-coordinate of the pixel
-        # y = 258   # Y-coordinate of the pixel
-
-        # # Get the RGB color value of the pixel at the specified coordinates
-        # pixel_color = pyautogui.pixel(x, y)
-
-        # # Check if the pixel color is red
-        # if pixel_color == (255, 0, 0):
-        #     print("The pixel color is red.")
-        # else:
-        #     print("The pixel color is not red.")
         while True:
             if self.tryAndSearch('buying_phase.png', withoutClick=True, withoutMove=True):
                 v.send_to_discord('buying_phase')
@@ -1037,6 +996,8 @@ if __name__ == "__main__":
     # afk(drop=0,shield=0,abilties=1)
     # testing()
     v.system_preference()
+    # agentXYposition = {'astra': {'top': {'pos_x': 108, 'pos_y': 461}}, 'breach': {'top': {'pos_x': 246, 'pos_y': 461}}, 'brimstone': {'top': {'pos_x': 395, 'pos_y': 461}}, 'chamber': {'top': {'pos_x': 516, 'pos_y': 461}}, 'clove': {'top': {'pos_x': 108, 'pos_y': 594}, 'bot': {'pos_x': 108, 'pos_y': 461}}, 'cypher': {'top': {'pos_x': 246, 'pos_y': 594}, 'bot': {'pos_x': 246, 'pos_y': 461}}, 'deadlock': {'top': {'pos_x': 395, 'pos_y': 594}, 'bot': {'pos_x': 395, 'pos_y': 461}}, 'fade': {'top': {'pos_x': 516, 'pos_y': 594}, 'bot': {'pos_x': 516, 'pos_y': 461}}, 'gekko': {'top': {'pos_x': 108, 'pos_y': 737}, 'bot': {'pos_x': 108, 'pos_y': 594}}, 'harbor': {'top': {'pos_x': 246, 'pos_y': 737}, 'bot': {'pos_x': 246, 'pos_y': 594}}, 'iso': {'top': {'pos_x': 395, 'pos_y': 737}, 'bot': {'pos_x': 395, 'pos_y': 594}}, 'jett': {'top': {'pos_x': 516, 'pos_y': 737}, 'bot': {'pos_x': 516, 'pos_y': 594}}, 'kayo': {'top': {'pos_x': 108, 'pos_y': 857}, 'bot': {'pos_x': 108, 'pos_y': 737}}, 'killjoy': {'top': {'pos_x': 246, 'pos_y': 857}, 'bot': {'pos_x': 246, 'pos_y': 737}}, 'neon': {'top': {'pos_x': 395, 'pos_y': 857}, 'bot': {'pos_x': 395, 'pos_y': 737}}, 'omen': {'top': {'pos_x': 516, 'pos_y': 857}, 'bot': {'pos_x': 516, 'pos_y': 737}}, 'phoenix': {'top': {'pos_x': 108, 'pos_y': 985}, 'bot': {'pos_x': 108, 'pos_y': 857}}, 'raze': {'top': {'pos_x': 246, 'pos_y': 985}, 'bot': {'pos_x': 246, 'pos_y': 857}}, 'reyna': {'top': {'pos_x': 395, 'pos_y': 985}, 'bot': {'pos_x': 395, 'pos_y': 857}}, 'sage': {'top': {'pos_x': 516, 'pos_y': 985}, 'bot': {'pos_x': 516, 'pos_y': 857}}, 'skye': {'top': {'pos_x': 108, 'pos_y': 1131}, 'bot': {'pos_x': 108, 'pos_y': 985}}, 'sova': {'top': {'pos_x': 246, 'pos_y': 1131}, 'bot': {'pos_x': 246, 'pos_y': 985}}, 'viper': {'top': {'pos_x': 395, 'pos_y': 1131}, 'bot': {'pos_x': 395, 'pos_y': 985}}, 'vyse': {'top': {'pos_x': 516, 'pos_y': 1131}, 'bot': {'pos_x': 516, 'pos_y': 985}}, 'yoru': {'bot': {'pos_x': 108, 'pos_y': 1131}}}
+    # v.checkIfAgentLocked(agentXYposition)
     v.hold()
     # v.MainFlow(wonna, random='random is on', reQ='y')
 
